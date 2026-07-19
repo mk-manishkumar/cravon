@@ -1,7 +1,9 @@
 import "dotenv/config";
 import express, { Application, Request, Response, NextFunction } from "express";
 import cors from "cors";
+
 import connectDB from "./src/config/db.js";
+import authRoutes from "./src/routes/auth.routes.js";
 
 const app: Application = express();
 
@@ -30,8 +32,11 @@ app.use(express.urlencoded({ extended: true }));
 // ==========================================
 //  ROUTES
 // ==========================================
+
+app.use('/api/v1/auth', authRoutes);
+
 // Basic Health Check Route
-app.get("/api/health", (req: Request, res: Response) => {
+app.get("/", (req: Request, res: Response) => {
   res.status(200).json({ status: "success", message: "Cravon API is up and running!" });
 });
 
@@ -46,15 +51,10 @@ app.use((req: Request, res: Response, next: NextFunction) => {
   });
 });
 
+import { errorHandler } from "./src/utils/errorHandler.js";
+
 // Global Error Handler Middleware
-app.use((err: any, req: Request, res: Response, next: NextFunction) => {
-  const statusCode = err.statusCode || 500;
-  res.status(statusCode).json({
-    status: "error",
-    message: err.message || "Internal Server Error",
-    stack: process.env.NODE_ENV === "development" ? err.stack : undefined,
-  });
-});
+app.use(errorHandler);
 
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);

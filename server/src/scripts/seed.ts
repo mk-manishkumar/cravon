@@ -2,11 +2,11 @@ import 'dotenv/config';
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
 
-import Role from '../models/Role.js';
-import Permission from '../models/Permission.js';
-import RolePermission from '../models/RolePermission.js';
-import User from '../models/User.js';
-import UserRole from '../models/UserRole.js';
+import Role from '../models/role.model.js';
+import Permission from '../models/permission.model.js';
+import RolePermission from '../models/rolePermission.model.js';
+import User from '../models/user.model.js';
+import UserRole from '../models/userRole.model.js';
 
 const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/cravon';
 
@@ -39,8 +39,8 @@ const seedDatabase = async () => {
     console.log('Seeding Roles...');
     const superAdminRole = await Role.create({ roleName: 'SuperAdmin', description: 'Root user with all permissions' });
     const adminRole = await Role.create({ roleName: 'Admin', description: 'System administrator' });
-    const restaurantOwnerRole = await Role.create({ roleName: 'RestaurantOwner', description: 'Owner of a restaurant' });
-    const customerRole = await Role.create({ roleName: 'Customer', description: 'Standard app user' });
+    await Role.create({ roleName: 'RestaurantOwner', description: 'Owner of a restaurant' });
+    await Role.create({ roleName: 'Customer', description: 'Standard app user' });
 
     // Connect Permissions to SuperAdmin (Give SuperAdmin EVERYTHING)
     console.log('Assigning Permissions to Roles...');
@@ -64,7 +64,8 @@ const seedDatabase = async () => {
     const hashedPassword = await bcrypt.hash('SuperSecret123!', salt);
 
     const superAdminUser = await User.create({
-      name: 'Super Admin',
+      firstName: 'Super',
+      lastName: 'Admin',
       email: 'superadmin@cravon.com',
       password: hashedPassword,
       phone: '1234567890',
@@ -91,4 +92,4 @@ const seedDatabase = async () => {
   }
 };
 
-seedDatabase();
+await seedDatabase();
