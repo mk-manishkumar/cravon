@@ -16,73 +16,98 @@ const seedDatabase = async () => {
     await mongoose.connect(MONGO_URI);
     console.log('Database connected.\n');
 
-    // Clear existing RBAC data to prevent duplicates on rerun
-    console.log('Clearing existing RBAC data...');
-    await RolePermission.deleteMany({});
-    await UserRole.deleteMany({});
-    await Permission.deleteMany({});
-    await Role.deleteMany({});
-    await User.deleteMany({ email: 'superadmin@cravon.com' });
-    
-    // Insert Permissions
+    // Seeding Permissions using bulkWrite for upsert
     console.log('Seeding Permissions...');
-    const permissions = await Permission.insertMany([
+    const permissionData = [
       { permissionName: 'create_restaurant', description: 'Can create a new restaurant', module: 'Restaurant' },
       { permissionName: 'delete_restaurant', description: 'Can delete a restaurant', module: 'Restaurant' },
       { permissionName: 'verify_restaurant', description: 'Can verify and approve a restaurant', module: 'Restaurant' },
       { permissionName: 'manage_users', description: 'Can manage all users in the system', module: 'User' },
       { permissionName: 'assign_roles', description: 'Can assign roles to users', module: 'RBAC' },
       { permissionName: 'view_reports', description: 'Can view system financial reports', module: 'Reports' },
-    ]);
+    ];
+    
+    await Permission.bulkWrite(permissionData.map(p => ({
+      updateOne: { filter: { permissionName: p.permissionName }, update: { $set: p }, upsert: true }
+    })));
+    const permissions = await Permission.find();
 
-    // Insert Roles
+    // Seeding Roles using bulkWrite for upsert
     console.log('Seeding Roles...');
-    const superAdminRole = await Role.create({ roleName: 'SuperAdmin', description: 'Root user with all permissions' });
-    const adminRole = await Role.create({ roleName: 'Admin', description: 'System administrator' });
-    await Role.create({ roleName: 'RestaurantOwner', description: 'Owner of a restaurant' });
-    await Role.create({ roleName: 'Customer', description: 'Standard app user' });
+    const roleData = [
+      { roleName: 'SuperAdmin', description: 'Root user with all permissions' },
+      { roleName: 'Admin', description: 'System administrator' },
+      { roleName: 'RestaurantOwner', description: 'Owner of a restaurant' },
+      { roleName: 'Customer', description: 'Standard app user' }
+    ];
 
-    // Connect Permissions to SuperAdmin (Give SuperAdmin EVERYTHING)
+    await Role.bulkWrite(roleData.map(r => ({
+      updateOne: { filter: { roleName: r.roleName }, update: { $set: r }, upsert: true }
+    })));
+    
+    const superAdminRole = await Role.findOne({ roleName: 'SuperAdmin' });
+    const adminRole = await Role.findOne({ roleName: 'Admin' });
+
+    // Assigning Permissions to Roles
     console.log('Assigning Permissions to Roles...');
-    const superAdminPermissions = permissions.map(p => ({
-      roleId: superAdminRole._id,
-      permissionId: p._id
-    }));
-    await RolePermission.insertMany(superAdminPermissions);
+    // SuperAdmin gets everything
+    for (const p of permissions) {
+      await RolePermission.updateOne(
+        { roleId: superAdminRole!._id, permissionId: p._id },
+        { $set: { roleId: superAdminRole!._id, permissionId: p._id } },
+        { upsert: true }
+      );
+    }
 
-    // Give Admin limited permissions (example)
+    // Admin gets limited permissions
     const adminPerms = permissions.filter(p => ['verify_restaurant', 'manage_users'].includes(p.permissionName));
-    const adminPermissions = adminPerms.map(p => ({
-      roleId: adminRole._id,
-      permissionId: p._id
-    }));
-    await RolePermission.insertMany(adminPermissions);
+    for (const p of adminPerms) {
+      await RolePermission.updateOne(
+        { roleId: adminRole!._id, permissionId: p._id },
+        { $set: { roleId: adminRole!._id, permissionId: p._id } },
+        { upsert: true }
+      );
+    }
 
     // Create SuperAdmin User
-    console.log('Creating SuperAdmin User...');
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash('SuperSecret123!', salt);
+    console.log('Checking SuperAdmin User...');
+    const superAdminPassword = process.env.SUPERADMIN_PASSWORD;
+    if (!superAdminPassword) {
+      console.error('\n ERROR: SUPERADMIN_PASSWORD is not defined in your environment variables.');
+      console.error('Please add it to your .env file for security purposes.\n');
+      process.exit(1);
+    }
+    let superAdminUser = await User.findOne({ email: 'superadmin@cravon.com' });
+    
+    if (!superAdminUser) {
+      const salt = await bcrypt.genSalt(10);
+      const hashedPassword = await bcrypt.hash(superAdminPassword, salt);
 
-    const superAdminUser = await User.create({
-      firstName: 'Super',
-      lastName: 'Admin',
-      email: 'superadmin@cravon.com',
-      password: hashedPassword,
-      phone: '1234567890',
-      status: 'active'
-    });
+      superAdminUser = await User.create({
+        firstName: 'Super',
+        lastName: 'Admin',
+        email: 'superadmin@cravon.com',
+        password: hashedPassword,
+        phone: '1234567890',
+        status: 'active'
+      });
+      console.log('SuperAdmin User created successfully.');
+    } else {
+      console.log('SuperAdmin User already exists. Skipping creation.');
+    }
 
     // Assign SuperAdmin Role to the SuperAdmin User
     console.log('Assigning SuperAdmin role to user...');
-    await UserRole.create({
-      userId: superAdminUser._id,
-      roleId: superAdminRole._id
-    });
+    await UserRole.updateOne(
+      { userId: superAdminUser._id, roleId: superAdminRole!._id },
+      { $set: { userId: superAdminUser._id, roleId: superAdminRole!._id } },
+      { upsert: true }
+    );
 
     console.log('\n Database Seeded Successfully!');
     console.log('---------------------------------');
     console.log(`SuperAdmin Email: superadmin@cravon.com`);
-    console.log(`SuperAdmin Password: SuperSecret123!`);
+    console.log(`SuperAdmin Password: [Loaded from .env]`);
     console.log('---------------------------------');
 
     process.exit(0);

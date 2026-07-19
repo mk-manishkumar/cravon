@@ -6,6 +6,7 @@ import RefreshToken from '../models/refreshToken.model.js';
 import { generateAccessToken, generateRefreshToken } from '../utils/generateTokens.js';
 import { ApiError } from '../utils/errorHandler.js';
 
+// REGISTER USER SERVICE
 export const registerUser = async (data: any) => {
   const { firstName, lastName, email, password, phone } = data;
 
@@ -29,6 +30,7 @@ export const registerUser = async (data: any) => {
   return newUser;
 };
 
+// LOGIN USER SERVICE
 export const loginUser = async (data: any) => {
   const { email, password } = data;
 
