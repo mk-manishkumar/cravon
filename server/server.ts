@@ -5,6 +5,7 @@ import cors from "cors";
 import connectDB from "./src/config/db.js";
 import authRoutes from "./src/routes/auth.routes.js";
 import { errorHandler } from "./src/utils/errorHandler.js";
+import { globalLimiter } from "./src/middlewares/rateLimiter.middleware.js";
 
 const app: Application = express();
 
@@ -29,6 +30,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 //  ROUTES
+app.use("/api", globalLimiter);
 app.use("/api/v1/auth", authRoutes);
 
 // ERROR HANDLING
