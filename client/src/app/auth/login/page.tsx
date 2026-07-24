@@ -47,13 +47,13 @@ export default function LoginPage() {
 
       <div className="relative w-full max-w-105 bg-white rounded-[28px] shadow-[0_20px_60px_-15px_rgba(255,61,87,0.25)] px-8 py-10 sm:px-10">
         {/* Brand */}
-        <div className="text-center mb-7">
+        <div className="text-center mb-4">
           <span className="text-[32px] font-extrabold bg-clip-text text-transparent" style={{ fontFamily: displayFont, backgroundImage: "linear-gradient(135deg, #FF3D57 0%, #FF7A30 55%, #FFC93C 100%)" }}>
             Cravon
           </span>
         </div>
 
-        <h2 className="text-[26px] text-[#2B1210] text-center mb-2.5" style={{ fontFamily: displayFont, fontWeight: 700 }}>
+        <h2 className="text-[26px] text-[#2B1210] text-center mb-6" style={{ fontFamily: displayFont, fontWeight: 700 }}>
           Welcome back
         </h2>
 
@@ -68,7 +68,7 @@ export default function LoginPage() {
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-4" noValidate>
+        <form onSubmit={handleSubmit} className="space-y-3" noValidate>
           <div>
             <label className="block text-[12px] font-bold uppercase tracking-[0.04em] text-[#B08A81] mb-1.5" htmlFor="email">
               Email address
