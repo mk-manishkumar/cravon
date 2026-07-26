@@ -23,7 +23,7 @@ export default function LoginPage() {
     setIsLoading(true);
 
     try {
-      const data = await authService.login({ email, password });
+      await authService.login({ email, password });
       await queryClient.invalidateQueries({ queryKey: ["auth", "me"] });
       router.push("/");
     } catch (err) {

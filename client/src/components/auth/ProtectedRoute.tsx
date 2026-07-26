@@ -7,10 +7,10 @@ import { useEffect } from "react";
 export default function ProtectedRoute({ 
   children, 
   redirectTo = "/auth/login" 
-}: { 
+}: Readonly<{ 
   children: React.ReactNode, 
   redirectTo?: string 
-}) {
+}>) {
   const { user, isLoading } = useAuth();
   const router = useRouter();
 
