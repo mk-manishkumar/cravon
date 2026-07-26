@@ -6,8 +6,11 @@ import { useRouter } from "next/navigation";
 import { authService } from "@/services/auth.service";
 import axios from "axios";
 
+import { useQueryClient } from "@tanstack/react-query";
+
 export default function LoginPage() {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -21,8 +24,7 @@ export default function LoginPage() {
 
     try {
       const data = await authService.login({ email, password });
-      // Logic to save JWT tokens will go here
-      console.log("Login successful:", data);
+      await queryClient.invalidateQueries({ queryKey: ["auth", "me"] });
       router.push("/");
     } catch (err) {
       if (axios.isAxiosError(err)) {
@@ -115,12 +117,18 @@ export default function LoginPage() {
           </button>
         </form>
 
-        <p className="mt-7 text-center text-[14px] text-[#8A6F68]">
-          New to Cravon?{" "}
-          <Link href="/auth/register" className="font-bold text-[#FF3D57] hover:text-[#E22B45] transition-colors">
-            Create an account
+        <div className="mt-7 flex flex-col items-center gap-3">
+          <p className="text-center text-[14px] text-[#8A6F68]">
+            New to Cravon?{" "}
+            <Link href="/auth/register" className="font-bold text-[#FF3D57] hover:text-[#E22B45] transition-colors">
+              Create an account
+            </Link>
+          </p>
+          <div className="w-full h-1px bg-linear-to-r from-transparent via-[#F1E1D6] to-transparent my-1" />
+          <Link href="/auth/restaurant/login" className="flex items-center justify-center w-full py-2.5 rounded-xl border-2 border-[#FFC93C]/30 text-[14px] font-bold text-[#FF7A30] hover:bg-[#FFFBF8] transition-colors">
+            Login as a Partner
           </Link>
-        </p>
+        </div>
       </div>
     </div>
   );

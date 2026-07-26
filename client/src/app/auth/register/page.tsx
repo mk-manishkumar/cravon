@@ -151,12 +151,18 @@ export default function RegisterPage() {
           </button>
         </form>
 
-        <p className="mt-5 text-center text-[14px] text-[#8A6F68]">
-          Already have an account?{" "}
-          <Link href="/auth/login" className="font-bold text-[#FF3D57] hover:text-[#E22B45] transition-colors">
-            Sign in
+        <div className="mt-5 flex flex-col items-center gap-3">
+          <p className="text-center text-[14px] text-[#8A6F68]">
+            Already have an account?{" "}
+            <Link href="/auth/login" className="font-bold text-[#FF3D57] hover:text-[#E22B45] transition-colors">
+              Sign in
+            </Link>
+          </p>
+          <div className="w-full h-1px bg-linear-to-r from-transparent via-[#F1E1D6] to-transparent my-1" />
+          <Link href="/auth/restaurant/register" className="flex items-center justify-center w-full py-2.5 rounded-xl border-2 border-[#FFC93C]/30 text-[14px] font-bold text-[#FF7A30] hover:bg-[#FFFBF8] transition-colors">
+            Join as a Partner
           </Link>
-        </p>
+        </div>
       </div>
     </div>
   );
