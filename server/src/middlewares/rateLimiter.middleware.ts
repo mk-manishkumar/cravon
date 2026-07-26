@@ -1,23 +1,26 @@
-import { rateLimit } from "express-rate-limit";
+import { rateLimit, Options } from "express-rate-limit";
+
+// Base Configuration Object
+const baseConfig: Partial<Options> = {
+  windowMs: Number.parseInt(process.env.RATE_LIMIT_WINDOW_MS || "900000", 10),
+  standardHeaders: true,
+  legacyHeaders: false,
+};
 
 // Global Rate Limiter
 export const globalLimiter = rateLimit({
-  windowMs: Number.parseInt(process.env.RATE_LIMIT_WINDOW_MS || "900000", 10),
+  ...baseConfig,
   max: Number.parseInt(process.env.RATE_LIMIT_GLOBAL || "100", 10),
-  standardHeaders: true,
-  legacyHeaders: false,
   message: {
     status: "error",
     message: "Too many requests from this IP, please try again after 15 minutes",
   },
 });
 
-// Strict Rate Limiter
+// Strict Rate Limiter for Authentication
 export const authLimiter = rateLimit({
-  windowMs: Number.parseInt(process.env.RATE_LIMIT_WINDOW_MS || "900000", 10),
+  ...baseConfig,
   max: Number.parseInt(process.env.RATE_LIMIT_AUTH || "5", 10),
-  standardHeaders: true,
-  legacyHeaders: false,
   message: {
     status: "error",
     message: "Too many login/register attempts from this IP, please try again after 15 minutes",
