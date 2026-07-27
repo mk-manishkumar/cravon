@@ -14,7 +14,6 @@ export default function RestaurantRegisterPage() {
     email: "",
     phone: "",
     password: "",
-    restaurantName: "",
   });
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
@@ -83,12 +82,6 @@ export default function RestaurantRegisterPage() {
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4" noValidate>
-          <div>
-            <label className="block text-[11px] font-semibold uppercase tracking-widest text-[#777777] mb-1.5" htmlFor="restaurantName">
-              Restaurant Name
-            </label>
-            <input id="restaurantName" name="restaurantName" type="text" required value={formData.restaurantName} onChange={handleChange} className="w-full px-4 py-3 bg-[#1A1A1A] border border-[#2A2A2A] rounded-xl text-[14px] text-white outline-none transition-all focus:bg-[#222222] focus:border-[#FF7A30] focus:ring-1 focus:ring-[#FF7A30]" />
-          </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div>
@@ -147,10 +140,6 @@ export default function RestaurantRegisterPage() {
               Log in to Dashboard
             </Link>
           </p>
-          <div className="w-full h-1px bg-linear-to-r from-transparent via-[#222222] to-transparent my-1" />
-          <Link href="/auth/register" className="flex items-center justify-center w-full py-2.5 rounded-xl border border-[#333333] text-[13px] font-semibold text-[#888888] hover:text-white hover:border-[#555555] hover:bg-[#1A1A1A] transition-all">
-            Register as a Customer
-          </Link>
         </div>
       </div>
     </div>

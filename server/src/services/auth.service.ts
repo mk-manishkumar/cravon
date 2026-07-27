@@ -33,7 +33,7 @@ export const registerUser = async (data: any) => {
 
 // REGISTER RESTAURANT OWNER SERVICE
 export const registerRestaurantOwner = async (data: any) => {
-  const { firstName, lastName, email, password, phone, restaurantName } = data;
+  const { firstName, lastName, email, password, phone } = data;
 
   const existingUser = await User.findOne({ email });
   if (existingUser) throw new ApiError(400, "Email already exists");
@@ -55,7 +55,7 @@ export const registerRestaurantOwner = async (data: any) => {
 
   await Restaurant.create({
     ownerId: newUser._id,
-    name: restaurantName,
+    name: `${firstName} ${lastName}'s Restaurant`,
     status: "pending",
   });
 

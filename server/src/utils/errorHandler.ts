@@ -14,9 +14,9 @@ export const errorHandler = (err: any, _req: Request, res: Response, _next: Next
   console.error("Server Error Details:", err);
 
   if (err instanceof ZodError) {
-    // ZodError exposes 'issues' (not 'errors') which contains validation details
-    const messages = (err as ZodError).issues.map((e: any) => `${e.path.join(".")}: ${e.message}`);
-    return res.status(400).json({ status: "error", message: messages.join(", ") });
+    // Only show the first error to keep the UI clean
+    const firstErrorMessage = (err as ZodError).issues[0]?.message || "Invalid input provided.";
+    return res.status(400).json({ status: "error", message: firstErrorMessage });
   }
 
   if (err instanceof ApiError) {
@@ -24,13 +24,13 @@ export const errorHandler = (err: any, _req: Request, res: Response, _next: Next
   }
 
   if (err.name === "ValidationError") {
-    const messages = Object.values(err.errors).map((e: any) => e.message);
-    return res.status(400).json({ status: "error", message: messages.join(", ") });
+    const firstErrorMessage = (Object.values(err.errors)[0] as any)?.message || "Validation failed.";
+    return res.status(400).json({ status: "error", message: firstErrorMessage });
   }
 
   if (err.code === 11000) {
     const field = Object.keys(err.keyValue).join(", ");
-    return res.status(409).json({ status: "error", message: `Duplicate value for: ${field}` });
+    return res.status(409).json({ status: "error", message: `This ${field} is already registered. Please use another.` });
   }
 
   res.status(500).json({ status: "error", message: "Internal server error" });

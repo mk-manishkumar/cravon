@@ -110,10 +110,6 @@ export default function RestaurantLoginPage() {
               Apply now
             </Link>
           </p>
-          <div className="w-full h-1px bg-linear-to-r from-transparent via-[#222222] to-transparent my-1" />
-          <Link href="/auth/login" className="flex items-center justify-center w-full py-2.5 rounded-xl border border-[#333333] text-[13px] font-semibold text-[#888888] hover:text-white hover:border-[#555555] hover:bg-[#1A1A1A] transition-all">
-            Login as a Customer
-          </Link>
         </div>
       </div>
     </div>
