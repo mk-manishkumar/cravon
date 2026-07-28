@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { authService } from "@/services/auth.service";
+import toast from "react-hot-toast";
 
 interface User {
   id: string;
@@ -39,8 +40,10 @@ export const useAuthStore = create<AuthState>((set) => ({
     set({ isLoggingOut: true });
     try {
       await authService.logout();
+      toast.success("Successfully logged out");
     } catch (error) {
       console.error("Logout failed:", error);
+      toast.error("Failed to log out. Please try again.");
     } finally {
       // Regardless of success/fail, clear local state
       set({ user: null, isLoggingOut: false });

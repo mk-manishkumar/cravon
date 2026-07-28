@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { AuthInitializer } from "@/providers/AuthInitializer";
 import ReactQueryProvider from "@/providers/ReactQueryProvider";
+import ToastProvider from "@/providers/ToastProvider";
 
 export const metadata: Metadata = {
   title: "Cravon",
@@ -14,6 +15,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       <body className="min-h-full flex flex-col">
         <ReactQueryProvider>
           <AuthInitializer>
+            <ToastProvider />
             {children}
           </AuthInitializer>
         </ReactQueryProvider>

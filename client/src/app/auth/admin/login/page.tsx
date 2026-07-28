@@ -4,32 +4,30 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { authService } from "@/services/auth.service";
 import axios from "axios";
-import { useQueryClient } from "@tanstack/react-query";
+import toast from "react-hot-toast";
+import { useAuthStore } from "@/store/authStore";
 
 export default function AdminLoginPage() {
   const router = useRouter();
-  const queryClient = useQueryClient();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setError("");
     setIsLoading(true);
 
     try {
       await authService.loginAdmin({ email, password });
-      await queryClient.invalidateQueries({ queryKey: ["auth", "me"] });
-      // Redirect to admin dashboard
+      await useAuthStore.getState().checkAuth();
+      toast.success("Welcome back, Administrator!");
       router.push("/admin/dashboard");
     } catch (err) {
       if (axios.isAxiosError(err)) {
-        setError(err.response?.data?.message || err.response?.data?.error || "Invalid credentials or unauthorized access.");
+        toast.error(err.response?.data?.message || err.response?.data?.error || "Invalid credentials or unauthorized access.");
       } else {
-        setError("Something went wrong on our end. Please try again.");
+        toast.error("Something went wrong on our end. Please try again.");
       }
     } finally {
       setIsLoading(false);
@@ -57,16 +55,9 @@ export default function AdminLoginPage() {
           <span className="text-[10px] font-bold uppercase tracking-widest text-[#666666]">Internal Network</span>
         </div>
 
-        {error && (
-          <div role="alert" aria-live="polite" className="flex gap-2.5 bg-[#1A0A0A] border border-[#3A1515] rounded-xl px-4 py-3 mb-6">
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className="shrink-0 mt-0.5">
-              <circle cx="8" cy="8" r="7" stroke="#FF3D57" strokeWidth="1.4" />
-              <path d="M8 4.5V8.5" stroke="#FF3D57" strokeWidth="1.4" strokeLinecap="round" />
-              <circle cx="8" cy="11" r="0.8" fill="#FF3D57" />
-            </svg>
-            <p className="text-[13px] leading-snug text-[#FF6B7D]">{error}</p>
-          </div>
-        )}
+        <h2 className="text-[22px] text-white text-center mb-7" style={{ fontFamily: displayFont, fontWeight: 600 }}>
+          Admin Portal
+        </h2>
 
         <form onSubmit={handleSubmit} className="space-y-4" noValidate>
           <div>

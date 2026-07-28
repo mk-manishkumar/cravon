@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { authService } from "@/services/auth.service";
 import axios from "axios";
+import toast from "react-hot-toast";
 import { useAuthStore } from "@/store/authStore";
 
 export default function RestaurantLoginPage() {
@@ -12,23 +13,22 @@ export default function RestaurantLoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setError("");
     setIsLoading(true);
 
     try {
       await authService.loginRestaurant({ email, password });
       await useAuthStore.getState().checkAuth();
+      toast.success("Welcome back, partner!");
       router.push("/partner/dashboard");
     } catch (err) {
       if (axios.isAxiosError(err)) {
-        setError(err.response?.data?.message || err.response?.data?.error || "Invalid credentials or unauthorized access.");
+        toast.error(err.response?.data?.message || err.response?.data?.error || "Invalid credentials or unauthorized access.");
       } else {
-        setError("Something went wrong on our end. Please try again.");
+        toast.error("Something went wrong on our end. Please try again.");
       }
     } finally {
       setIsLoading(false);
@@ -61,17 +61,6 @@ export default function RestaurantLoginPage() {
         <h2 className="text-[22px] text-white text-center mb-7" style={{ fontFamily: displayFont, fontWeight: 600 }}>
           Welcome back
         </h2>
-
-        {error && (
-          <div role="alert" aria-live="polite" className="flex gap-2.5 bg-[#1A0A0A] border border-[#3A1515] rounded-xl px-4 py-3 mb-6">
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className="shrink-0 mt-0.5">
-              <circle cx="8" cy="8" r="7" stroke="#FF3D57" strokeWidth="1.4" />
-              <path d="M8 4.5V8.5" stroke="#FF3D57" strokeWidth="1.4" strokeLinecap="round" />
-              <circle cx="8" cy="11" r="0.8" fill="#FF3D57" />
-            </svg>
-            <p className="text-[13px] leading-snug text-[#FF6B7D]">{error}</p>
-          </div>
-        )}
 
         <form onSubmit={handleSubmit} className="space-y-4" noValidate>
           <div>

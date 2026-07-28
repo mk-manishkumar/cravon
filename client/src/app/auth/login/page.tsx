@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { authService } from "@/services/auth.service";
 import axios from "axios";
+import toast from "react-hot-toast";
 
 import { useAuthStore } from "@/store/authStore";
 
@@ -13,23 +14,22 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setError("");
     setIsLoading(true);
 
     try {
       await authService.login({ email, password });
       await useAuthStore.getState().checkAuth();
+      toast.success("Welcome back!");
       router.push("/");
     } catch (err) {
       if (axios.isAxiosError(err)) {
-        setError(err.response?.data?.message || err.response?.data?.error || "We couldn't sign you in. Check your details and try again.");
+        toast.error(err.response?.data?.message || err.response?.data?.error || "We couldn't sign you in.");
       } else {
-        setError("Something went wrong on our end. Please try again.");
+        toast.error("Something went wrong on our end. Please try again.");
       }
     } finally {
       setIsLoading(false);
@@ -58,23 +58,12 @@ export default function LoginPage() {
           Welcome back
         </h2>
 
-        {error && (
-          <div role="alert" aria-live="polite" className="flex gap-2.5 bg-[#FFF1F0] border border-[#FFD1CB] rounded-2xl px-4 py-3 mb-6">
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className="shrink-0 mt-0.5">
-              <circle cx="8" cy="8" r="7" stroke="#C81E3A" strokeWidth="1.4" />
-              <path d="M8 4.5V8.5" stroke="#C81E3A" strokeWidth="1.4" strokeLinecap="round" />
-              <circle cx="8" cy="11" r="0.8" fill="#C81E3A" />
-            </svg>
-            <p className="text-[13px] leading-snug text-[#C81E3A]">{error}</p>
-          </div>
-        )}
-
         <form onSubmit={handleSubmit} className="space-y-3" noValidate>
           <div>
             <label className="block text-[12px] font-bold uppercase tracking-[0.04em] text-[#B08A81] mb-1.5" htmlFor="email">
               Email address
             </label>
-            <input id="email" type="email" required autoComplete="email" aria-invalid={!!error} value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" className="w-full px-4 py-3 bg-[#FFFBF8] border-[1.5px] border-[#F1E1D6] rounded-2xl text-[15px] text-[#2B1210] placeholder:text-[#C9B3AA] outline-none transition-all focus:bg-white focus:border-[#FF7A30] focus:ring-4 focus:ring-[#FF7A30]/12" />
+            <input id="email" type="email" required autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" className="w-full px-4 py-3 bg-[#FFFBF8] border-[1.5px] border-[#F1E1D6] rounded-2xl text-[15px] text-[#2B1210] placeholder:text-[#C9B3AA] outline-none transition-all focus:bg-white focus:border-[#FF7A30] focus:ring-4 focus:ring-[#FF7A30]/12" />
           </div>
 
           <div>
@@ -84,7 +73,7 @@ export default function LoginPage() {
               </label>
             </div>
             <div className="relative">
-              <input id="password" type={showPassword ? "text" : "password"} required autoComplete="current-password" aria-invalid={!!error} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" className="w-full px-4 py-3 pr-11 bg-[#FFFBF8] border-[1.5px] border-[#F1E1D6] rounded-2xl text-[15px] text-[#2B1210] placeholder:text-[#C9B3AA] outline-none transition-all focus:bg-white focus:border-[#FF7A30] focus:ring-4 focus:ring-[#FF7A30]/12" />
+              <input id="password" type={showPassword ? "text" : "password"} required autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" className="w-full px-4 py-3 pr-11 bg-[#FFFBF8] border-[1.5px] border-[#F1E1D6] rounded-2xl text-[15px] text-[#2B1210] placeholder:text-[#C9B3AA] outline-none transition-all focus:bg-white focus:border-[#FF7A30] focus:ring-4 focus:ring-[#FF7A30]/12" />
               <button type="button" onClick={() => setShowPassword((v) => !v)} aria-label={showPassword ? "Hide password" : "Show password"} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[#C9B3AA] hover:text-[#2B1210] transition-colors">
                 {showPassword ? (
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
