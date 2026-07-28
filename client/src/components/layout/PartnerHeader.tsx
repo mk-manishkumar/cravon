@@ -2,10 +2,12 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuthStore } from "@/store/authStore";
 
 export default function PartnerHeader() {
-  const { user, logout, isLoading } = useAuth();
+  const user = useAuthStore((state) => state.user);
+  const logout = useAuthStore((state) => state.logout);
+  const isLoading = useAuthStore((state) => state.isLoading);
   const [showDropdown, setShowDropdown] = useState(false);
 
   const displayFont = "'Baloo 2', 'Poppins', 'Segoe UI', sans-serif";

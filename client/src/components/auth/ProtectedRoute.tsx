@@ -1,24 +1,28 @@
 "use client";
 
-import { useAuth } from "@/contexts/AuthContext";
-import { useRouter } from "next/navigation";
+import { useAuthStore } from "@/store/authStore";
+import { useRouter, usePathname } from "next/navigation";
 import { useEffect } from "react";
 
-export default function ProtectedRoute({ 
-  children, 
-  redirectTo = "/auth/login" 
-}: Readonly<{ 
-  children: React.ReactNode, 
-  redirectTo?: string 
-}>) {
-  const { user, isLoading } = useAuth();
+interface ProtectedRouteProps {
+  readonly children: React.ReactNode;
+}
+
+export default function ProtectedRoute({ children }: ProtectedRouteProps) {
+  const user = useAuthStore((state) => state.user);
+  const isLoading = useAuthStore((state) => state.isLoading);
   const router = useRouter();
+  const pathname = usePathname();
 
   useEffect(() => {
     if (!isLoading && !user) {
-      router.push(redirectTo);
+      if (pathname.startsWith("/partner") || pathname.startsWith("/auth/restaurant")) {
+        router.push("/auth/restaurant/login");
+      } else {
+        router.push("/auth/login");
+      }
     }
-  }, [user, isLoading, router, redirectTo]);
+  }, [isLoading, user, router, pathname]);
 
   if (isLoading || !user) {
     return (

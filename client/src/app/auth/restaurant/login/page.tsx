@@ -5,11 +5,10 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { authService } from "@/services/auth.service";
 import axios from "axios";
-import { useQueryClient } from "@tanstack/react-query";
+import { useAuthStore } from "@/store/authStore";
 
 export default function RestaurantLoginPage() {
   const router = useRouter();
-  const queryClient = useQueryClient();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -23,7 +22,7 @@ export default function RestaurantLoginPage() {
 
     try {
       await authService.loginRestaurant({ email, password });
-      await queryClient.invalidateQueries({ queryKey: ["auth", "me"] });
+      await useAuthStore.getState().checkAuth();
       router.push("/partner/dashboard");
     } catch (err) {
       if (axios.isAxiosError(err)) {
