@@ -7,6 +7,7 @@ export interface IUser extends Document {
   password?: string;
   phone?: string;
   status: string;
+  isVerified: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -17,7 +18,8 @@ const UserSchema: Schema = new Schema({
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   phone: { type: String },
-  status: { type: String, enum: ['active', 'suspended', 'deleted'], default: 'active' }
+  status: { type: String, enum: ['active', 'suspended', 'deleted'], default: 'active' },
+  isVerified: { type: Boolean, default: false }
 }, { timestamps: true });
 
 export default mongoose.model<IUser>('User', UserSchema);

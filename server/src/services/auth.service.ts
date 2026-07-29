@@ -1,10 +1,13 @@
 import bcrypt from "bcryptjs";
+import crypto from "node:crypto";
 import User from "../models/user.model.js";
 import Role from "../models/role.model.js";
 import UserRole from "../models/userRole.model.js";
 import Restaurant from "../models/restaurant.model.js";
+import Otp from "../models/otp.model.js";
 import { ApiError } from "../utils/errorHandler.js";
 import { processLogin } from "../utils/auth.utils.js";
+import { sendOtpEmail } from "../utils/mailer.js";
 
 // REGISTER CUSTOMER
 export const registerUser = async (data: any) => {
@@ -48,6 +51,7 @@ export const registerRestaurantOwner = async (data: any) => {
     password: hashedPassword,
     phone,
     status: "active",
+    isVerified: false,
   });
 
   const ownerRole = await Role.findOne({ roleName: "RestaurantOwner" });
@@ -59,7 +63,33 @@ export const registerRestaurantOwner = async (data: any) => {
     status: "pending",
   });
 
+  // Generate 6-digit OTP
+  const otpCode = crypto.randomInt(100000, 1000000).toString();
+  await Otp.create({ email, otpCode });
+
+  // Send OTP Email
+  await sendOtpEmail(email, otpCode);
+
   return newUser;
+};
+
+// VERIFY RESTAURANT OTP SERVICE
+export const verifyRestaurantOtp = async (data: any) => {
+  const { email, otp } = data;
+
+  const otpRecord = await Otp.findOne({ email, otpCode: otp });
+  if (!otpRecord) throw new ApiError(400, "Invalid or expired OTP");
+
+  const user = await User.findOne({ email });
+  if (!user) throw new ApiError(404, "User not found");
+
+  user.isVerified = true;
+  await user.save();
+
+  await Otp.deleteOne({ _id: otpRecord._id });
+
+  // After successful verification, immediately log them in
+  return processLogin({ email, password: "" }, ["RestaurantOwner"], true); // skipPasswordCheck flag
 };
 
 // LOGIN USER SERVICE - CUSTOMER

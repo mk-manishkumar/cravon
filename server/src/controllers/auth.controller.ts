@@ -25,6 +25,17 @@ export const registerRestaurant = asyncHandler(async (req: Request, res: Respons
   res.status(201).json({ message: "Restaurant partner registered successfully" });
 });
 
+export const verifyRestaurantOtp = asyncHandler(async (req: Request, res: Response) => {
+  const { email, otp } = req.body;
+  if (!email || !otp) {
+    res.status(400).json({ message: "Email and OTP are required" });
+    return;
+  }
+  const data = await authService.verifyRestaurantOtp({ email, otp });
+  setAuthCookies(res, data.accessToken, data.refreshToken);
+  res.status(200).json(formatLoginResponse(data));
+});
+
 export const loginRestaurant = asyncHandler(async (req: Request, res: Response) => {
   const parsedData = loginSchema.parse(req.body);
   const data = await authService.loginRestaurantOwner(parsedData);

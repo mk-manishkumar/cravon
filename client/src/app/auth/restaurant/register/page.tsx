@@ -29,8 +29,8 @@ export default function RestaurantRegisterPage() {
 
     try {
       await authService.registerRestaurant(formData);
-      toast.success("Application submitted successfully! Please log in.");
-      router.push("/auth/restaurant/login");
+      toast.success("Application submitted successfully! Please verify your email.");
+      router.push(`/auth/restaurant/verify?email=${encodeURIComponent(formData.email)}`);
     } catch (err) {
       if (axios.isAxiosError(err)) {
         toast.error(err.response?.data?.message || err.response?.data?.error || "We couldn't create your partner account.");

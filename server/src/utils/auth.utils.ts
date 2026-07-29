@@ -16,14 +16,21 @@ export const verifyUserRole = async (userId: string, expectedRoleNames: string[]
 };
 
 // GENERIC LOGIN HELPER
-export const processLogin = async (data: any, expectedRoles: string[]) => {
+export const processLogin = async (data: any, expectedRoles: string[], skipPasswordCheck = false) => {
   const { email, password } = data;
 
   const user = await User.findOne({ email });
   if (!user) throw new ApiError(401, "Invalid email or password");
 
-  const isMatch = await bcrypt.compare(password, user.password || "");
-  if (!isMatch) throw new ApiError(401, "Invalid email or password");
+  if (!skipPasswordCheck) {
+    const isMatch = await bcrypt.compare(password, user.password || "");
+    if (!isMatch) throw new ApiError(401, "Invalid email or password");
+  }
+
+  // Block unverified Restaurant Owners from logging in normally
+  if (expectedRoles.includes("RestaurantOwner") && user.isVerified === false) {
+    throw new ApiError(403, "Please verify your email via the OTP sent to your inbox before logging in.");
+  }
 
   // Strict RBAC check
   await verifyUserRole(user._id.toString(), expectedRoles);

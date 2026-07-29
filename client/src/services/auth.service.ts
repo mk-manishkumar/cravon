@@ -20,6 +20,10 @@ export const authService = {
     const response = await api.post('/auth/restaurant/register', userData);
     return response.data;
   },
+  verifyRestaurantOtp: async (data: { email: string, otp: string }) => {
+    const response = await api.post('/auth/restaurant/verify-otp', data);
+    return response.data;
+  },
 
   // Admin
   loginAdmin: async (credentials: Record<string, string>) => {
