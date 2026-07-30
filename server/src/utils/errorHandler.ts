@@ -11,7 +11,10 @@ export class ApiError extends Error {
 }
 
 export const errorHandler = (err: any, _req: Request, res: Response, _next: NextFunction) => {
-  console.error("Server Error Details:", err);
+  // Only log unexpected 500 errors to the terminal to keep it clean.
+  if (!(err instanceof ApiError) && !(err instanceof ZodError) && err.name !== "ValidationError" && err.code !== 11000) {
+    console.error("Unexpected Server Error:", err);
+  }
 
   if (err instanceof ZodError) {
     // Only show the first error to keep the UI clean

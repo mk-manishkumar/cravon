@@ -106,3 +106,24 @@ export const loginRestaurantOwner = async (data: any) => {
 export const loginAdmin = async (data: any) => {
   return processLogin(data, ["Admin", "SuperAdmin"]);
 };
+
+// RESEND RESTAURANT OTP SERVICE
+export const resendRestaurantOtp = async (data: { email: string }) => {
+  const { email } = data;
+
+  const user = await User.findOne({ email });
+  if (!user) throw new ApiError(404, "User not found");
+  if (user.isVerified) throw new ApiError(400, "User is already verified");
+
+  // Delete any existing OTPs for this email to prevent spam/confusion
+  await Otp.deleteMany({ email });
+
+  // Generate new 6-digit OTP
+  const otpCode = crypto.randomInt(100000, 1000000).toString();
+  await Otp.create({ email, otpCode });
+
+  // Send OTP Email
+  await sendOtpEmail(email, otpCode);
+
+  return { message: "OTP resent successfully" };
+};

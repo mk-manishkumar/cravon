@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { register, login, registerRestaurant, verifyRestaurantOtp, loginRestaurant, loginAdmin, getMe, logout } from "../controllers/auth.controller.js";
+import { register, login, registerRestaurant, verifyRestaurantOtp, resendRestaurantOtp, loginRestaurant, loginAdmin, getMe, logout } from "../controllers/auth.controller.js";
 import { authLimiter } from "../middlewares/rateLimiter.middleware.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
 
@@ -16,6 +16,7 @@ router.post("/login", authLimiter, login);
 // Restaurant Partner Auth
 router.post("/restaurant/register", authLimiter, registerRestaurant);
 router.post("/restaurant/verify-otp", authLimiter, verifyRestaurantOtp);
+router.post("/restaurant/resend-otp", authLimiter, resendRestaurantOtp);
 router.post("/restaurant/login", authLimiter, loginRestaurant);
 
 // Admin Auth

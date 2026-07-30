@@ -36,6 +36,16 @@ export const verifyRestaurantOtp = asyncHandler(async (req: Request, res: Respon
   res.status(200).json(formatLoginResponse(data));
 });
 
+export const resendRestaurantOtp = asyncHandler(async (req: Request, res: Response) => {
+  const { email } = req.body;
+  if (!email) {
+    res.status(400).json({ message: "Email is required" });
+    return;
+  }
+  await authService.resendRestaurantOtp({ email });
+  res.status(200).json({ message: "OTP resent successfully" });
+});
+
 export const loginRestaurant = asyncHandler(async (req: Request, res: Response) => {
   const parsedData = loginSchema.parse(req.body);
   const data = await authService.loginRestaurantOwner(parsedData);
