@@ -39,29 +39,57 @@ export const registerRestaurantOwner = async (data: any) => {
   const { firstName, lastName, email, password, phone } = data;
 
   const existingUser = await User.findOne({ email });
-  if (existingUser) throw new ApiError(400, "Email already exists");
 
   const salt = await bcrypt.genSalt(10);
   const hashedPassword = await bcrypt.hash(password, salt);
 
-  const newUser = await User.create({
-    firstName,
-    lastName,
-    email,
-    password: hashedPassword,
-    phone,
-    status: "active",
-    isVerified: false,
-  });
+  let targetUser;
 
-  const ownerRole = await Role.findOne({ roleName: "RestaurantOwner" });
-  if (ownerRole) await UserRole.create({ userId: newUser._id, roleId: ownerRole._id });
+  if (existingUser) {
+    if (existingUser.isVerified) {
+      throw new ApiError(400, "Email already exists");
+    } else {
+      // Forgiving Registration (Idempotent): Overwrite their old data
+      existingUser.firstName = firstName;
+      existingUser.lastName = lastName;
+      existingUser.phone = phone;
+      existingUser.password = hashedPassword;
+      await existingUser.save();
 
-  await Restaurant.create({
-    ownerId: newUser._id,
-    name: `${firstName} ${lastName}'s Restaurant`,
-    status: "pending",
-  });
+      // Update restaurant name just in case they changed their name
+      const existingRestaurant = await Restaurant.findOne({ ownerId: existingUser._id });
+      if (existingRestaurant) {
+        existingRestaurant.name = `${firstName} ${lastName}'s Restaurant`;
+        await existingRestaurant.save();
+      }
+
+      // Delete old OTPs
+      await Otp.deleteMany({ email });
+      targetUser = existingUser;
+    }
+  } else {
+    // Normal Registration
+    const newUser = await User.create({
+      firstName,
+      lastName,
+      email,
+      password: hashedPassword,
+      phone,
+      status: "active",
+      isVerified: false,
+    });
+
+    const ownerRole = await Role.findOne({ roleName: "RestaurantOwner" });
+    if (ownerRole) await UserRole.create({ userId: newUser._id, roleId: ownerRole._id });
+
+    await Restaurant.create({
+      ownerId: newUser._id,
+      name: `${firstName} ${lastName}'s Restaurant`,
+      status: "pending",
+    });
+
+    targetUser = newUser;
+  }
 
   // Generate 6-digit OTP
   const otpCode = crypto.randomInt(100000, 1000000).toString();
@@ -70,7 +98,7 @@ export const registerRestaurantOwner = async (data: any) => {
   // Send OTP Email
   await sendOtpEmail(email, otpCode);
 
-  return newUser;
+  return targetUser;
 };
 
 // VERIFY RESTAURANT OTP SERVICE
