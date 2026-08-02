@@ -49,7 +49,7 @@ export const registerRestaurantOwner = async (data: any) => {
     if (existingUser.isVerified) {
       throw new ApiError(400, "Email already exists");
     } else {
-      // Forgiving Registration (Idempotent): Overwrite their old data
+      // Overwrite the old data
       existingUser.firstName = firstName;
       existingUser.lastName = lastName;
       existingUser.phone = phone;
