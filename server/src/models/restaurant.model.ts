@@ -22,6 +22,7 @@ export interface IRestaurant extends Document {
   status: 'active' | 'inactive' | 'pending';
   isOnboarded: boolean;
   createdAt: Date;
+  updatedAt: Date;
 }
 
 const restaurantSchema = new Schema<IRestaurant>({
@@ -45,8 +46,7 @@ const restaurantSchema = new Schema<IRestaurant>({
   image: { type: String },
   status: { type: String, enum: ['active', 'inactive', 'pending'], default: 'pending' },
   isOnboarded: { type: Boolean, default: false },
-  createdAt: { type: Date, default: Date.now },
-});
+}, { timestamps: true });
 
 // Index for geospatial queries
 restaurantSchema.index({ location: '2dsphere' });
