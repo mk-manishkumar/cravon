@@ -10,8 +10,6 @@ export const onboardRestaurant = async (ownerId: string, data: any) => {
     status: "pending",
   });
 
-  if (restaurant.isOnboarded) throw new ApiError(400, "Restaurant is already onboarded");
-
   const { name, address, lat, lng, cuisines, costForTwo, staffCount, operatingHours } = data;
 
   restaurant.name = name;
@@ -30,5 +28,12 @@ export const onboardRestaurant = async (ownerId: string, data: any) => {
 
   await restaurant.save();
 
+  return restaurant;
+};
+
+// Delete the restaurant for the logged-in user
+export const deleteRestaurant = async (ownerId: string) => {
+  const restaurant = await Restaurant.findOneAndDelete({ ownerId });
+  if (!restaurant) throw new ApiError(404, "Restaurant not found");
   return restaurant;
 };

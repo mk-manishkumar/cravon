@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import asyncHandler from "../utils/asyncHandler.js";
-import { onboardRestaurant } from "../services/restaurant.service.js";
+import { onboardRestaurant, deleteRestaurant } from "../services/restaurant.service.js";
 import { ApiError } from "../utils/errorHandler.js";
 import Restaurant from "../models/restaurant.model.js";
 
@@ -37,5 +37,18 @@ export const getMyRestaurant = asyncHandler(async (req: Request, res: Response) 
   res.status(200).json({
     status: "success",
     data: restaurant,
+  });
+});
+
+// Delete the restaurant for the logged-in user
+export const deleteMyRestaurant = asyncHandler(async (req: Request, res: Response) => {
+  const userId = (req as any).user?.id;
+  if (!userId) throw new ApiError(401, "Unauthorized");
+
+  await deleteRestaurant(userId);
+
+  res.status(200).json({
+    status: "success",
+    message: "Restaurant deleted successfully",
   });
 });

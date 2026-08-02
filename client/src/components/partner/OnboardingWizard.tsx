@@ -20,10 +20,22 @@ const onboardingSchema = z.object({
 
 type OnboardingFormValues = z.infer<typeof onboardingSchema>;
 
+interface InitialData {
+  name?: string;
+  address?: string;
+  location?: { coordinates?: number[] };
+  cuisines?: string[];
+  costForTwo?: number;
+  staffCount?: number;
+  operatingHours?: { open?: string; close?: string };
+}
+
 interface Props {
   readonly onComplete: (data: Record<string, unknown>) => void;
   readonly onClose?: () => void;
   readonly isLoading?: boolean;
+  readonly initialData?: InitialData;
+  readonly isEditMode?: boolean;
 }
 
 const steps = [
@@ -32,8 +44,21 @@ const steps = [
   { id: 3, title: "Review & Launch", icon: CheckCircle2 },
 ];
 
-export default function OnboardingWizard({ onComplete, onClose, isLoading = false }: Props) {
+export default function OnboardingWizard({ onComplete, onClose, isLoading = false, initialData, isEditMode = false }: Props) {
   const [currentStep, setCurrentStep] = useState(1);
+
+  // Map initial data (if any) to form values
+  const defaultValues = {
+    name: initialData?.name || "",
+    address: initialData?.address || "",
+    lat: initialData?.location?.coordinates?.[1] || undefined,
+    lng: initialData?.location?.coordinates?.[0] || undefined,
+    cuisines: initialData?.cuisines ? initialData.cuisines.join(", ") : "",
+    costForTwo: initialData?.costForTwo || undefined,
+    staffCount: initialData?.staffCount || undefined,
+    openTime: initialData?.operatingHours?.open || "09:00",
+    closeTime: initialData?.operatingHours?.close || "22:00",
+  };
 
   const {
     register,
@@ -43,11 +68,7 @@ export default function OnboardingWizard({ onComplete, onClose, isLoading = fals
     formState: { errors },
   } = useForm<OnboardingFormValues>({
     resolver: zodResolver(onboardingSchema),
-    defaultValues: {
-      cuisines: "",
-      openTime: "09:00",
-      closeTime: "22:00",
-    },
+    defaultValues,
   });
 
   const nextStep = async () => {
@@ -100,7 +121,9 @@ export default function OnboardingWizard({ onComplete, onClose, isLoading = fals
             </svg>
           </button>
         )}
-        <h2 className="text-2xl font-bold text-white mb-6">Complete your Onboarding</h2>
+        <h2 className="text-2xl font-bold text-white mb-6">
+          {isEditMode ? "Edit Restaurant Details" : "Complete your Onboarding"}
+        </h2>
 
         <div className="flex items-center justify-between relative">
           {/* Progress Line */}
@@ -240,9 +263,13 @@ export default function OnboardingWizard({ onComplete, onClose, isLoading = fals
             <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500">
               <div className="bg-[#111] border border-[#222] rounded-xl p-6">
                 <h3 className="text-white font-semibold text-lg mb-4 flex items-center gap-2">
-                  <CheckCircle2 className="text-[#00C853]" size={20} /> Almost there!
+                  <CheckCircle2 className="text-[#00C853]" size={20} /> {isEditMode ? "Ready to Save?" : "Almost there!"}
                 </h3>
-                <p className="text-[#888] text-sm leading-relaxed mb-6">Please review the details below. Once you click &quot;Submit &amp; Go Live&quot;, your restaurant will be officially onboarded and ready for menu uploads.</p>
+                <p className="text-[#888] text-sm leading-relaxed mb-6">
+                  {isEditMode 
+                    ? "Please review the details below. Once you click \"Save Changes\", your restaurant profile will be updated." 
+                    : "Please review the details below. Once you click \"Submit & Go Live\", your restaurant will be officially onboarded and ready for menu uploads."}
+                </p>
 
                 <div className="space-y-3 text-sm">
                   <div className="flex justify-between pb-3 border-b border-[#222]">
@@ -288,7 +315,9 @@ export default function OnboardingWizard({ onComplete, onClose, isLoading = fals
               </button>
             ) : (
               <button key="btn-submit" type="submit" disabled={isLoading} className="cursor-pointer flex-1 px-6 py-3.5 rounded-xl text-[14px] font-semibold text-white bg-linear-to-r from-[#00C853] to-[#00E676] hover:from-[#00E676] hover:to-[#69F0AE] shadow-lg outline-none focus:ring-4 focus:ring-[#00C853]/30 transition-all flex items-center justify-center gap-2 active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed">
-                {isLoading ? "Submitting..." : "Submit & Go Live"}
+                {isLoading && "Submitting..."}
+                {!isLoading && isEditMode && "Save Changes"}
+                {!isLoading && !isEditMode && "Submit & Go Live"}
               </button>
             )}
           </div>

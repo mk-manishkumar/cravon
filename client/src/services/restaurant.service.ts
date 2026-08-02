@@ -12,4 +12,10 @@ export const restaurantService = {
     const response = await api.get("/restaurants/me");
     return response.data;
   },
+
+  // Delete the restaurant
+  deleteMyRestaurant: async () => {
+    const response = await api.delete("/restaurants/me");
+    return response.data;
+  },
 };
