@@ -10,18 +10,21 @@ export const onboardRestaurant = async (ownerId: string, data: any) => {
     status: "pending",
   });
 
-  const { name, address, lat, lng, cuisines, costForTwo, staffCount, operatingHours } = data;
+  const { name, address, lat, lng, operatingDays, operatingHours, mealTimings } = data;
 
   restaurant.name = name;
-  restaurant.address = address;
-  restaurant.location = {
-    type: "Point",
-    coordinates: [lng, lat], // GeoJSON expects longitude first
-  };
-  restaurant.cuisines = cuisines;
-  restaurant.costForTwo = costForTwo;
-  restaurant.staffCount = staffCount;
+  if (address) restaurant.address = address;
+  if (lat !== undefined && lng !== undefined) {
+    restaurant.location = {
+      type: "Point",
+      coordinates: [lng, lat],
+    };
+  } else {
+    restaurant.location = undefined;
+  }
+  restaurant.operatingDays = operatingDays;
   restaurant.operatingHours = operatingHours;
+  restaurant.mealTimings = mealTimings;
 
   restaurant.isOnboarded = true;
   restaurant.status = "active";

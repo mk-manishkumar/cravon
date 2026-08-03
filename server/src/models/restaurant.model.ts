@@ -9,12 +9,15 @@ export interface IRestaurant extends Document {
     type: 'Point';
     coordinates: number[]; // [longitude, latitude]
   };
-  cuisines: string[];
-  costForTwo?: number;
-  staffCount?: number;
+  operatingDays: string[];
   operatingHours?: {
     open: string;
     close: string;
+  };
+  mealTimings?: {
+    breakfast?: { open: string; close: string };
+    lunch?: { open: string; close: string };
+    dinner?: { open: string; close: string };
   };
   rating: number;
   deliveryTime?: number;
@@ -34,12 +37,15 @@ const restaurantSchema = new Schema<IRestaurant>({
     type: { type: String, enum: ['Point'] },
     coordinates: { type: [Number] } // [longitude, latitude]
   },
-  cuisines: { type: [String], default: [] },
-  costForTwo: { type: Number },
-  staffCount: { type: Number },
+  operatingDays: { type: [String], default: [] },
   operatingHours: {
     open: { type: String },
     close: { type: String },
+  },
+  mealTimings: {
+    breakfast: { open: { type: String }, close: { type: String } },
+    lunch: { open: { type: String }, close: { type: String } },
+    dinner: { open: { type: String }, close: { type: String } },
   },
   rating: { type: Number, default: 0 },
   deliveryTime: { type: Number },

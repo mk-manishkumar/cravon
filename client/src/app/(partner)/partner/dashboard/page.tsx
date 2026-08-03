@@ -5,7 +5,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { restaurantService } from "@/services/restaurant.service";
 import OnboardingWidget from "@/components/partner/OnboardingWidget";
 import OnboardingWizard from "@/components/partner/OnboardingWizard";
-import { MapPin, Utensils, Users, DollarSign, Clock, Store, Pencil, Trash2 } from "lucide-react";
+import { MapPin, Clock, Store, Pencil, Trash2, Utensils } from "lucide-react";
 import toast from "react-hot-toast";
 
 export default function PartnerDashboardPage() {
@@ -122,43 +122,51 @@ export default function PartnerDashboardPage() {
                   </div>
                 </div>
 
-                <div className="flex items-start gap-3">
-                  <div className="p-2 bg-[#1A1A1A] rounded-lg text-[#666]">
-                    <Utensils size={18} />
-                  </div>
-                  <div>
-                    <p className="text-xs font-semibold text-[#666] uppercase tracking-wider mb-1">Cuisines</p>
-                    <p className="text-sm text-[#CCC]">{restaurant?.cuisines?.length > 0 ? restaurant.cuisines.join(", ") : "No cuisines added"}</p>
-                  </div>
-                </div>
 
-                <div className="flex items-start gap-3">
-                  <div className="p-2 bg-[#1A1A1A] rounded-lg text-[#666]">
-                    <Users size={18} />
-                  </div>
-                  <div>
-                    <p className="text-xs font-semibold text-[#666] uppercase tracking-wider mb-1">Staff Count</p>
-                    <p className="text-sm text-[#CCC]">{restaurant?.staffCount ? `${restaurant.staffCount} Members` : "Not specified"}</p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3">
-                  <div className="p-2 bg-[#1A1A1A] rounded-lg text-[#666]">
-                    <DollarSign size={18} />
-                  </div>
-                  <div>
-                    <p className="text-xs font-semibold text-[#666] uppercase tracking-wider mb-1">Cost For Two</p>
-                    <p className="text-sm text-[#CCC]">{restaurant?.costForTwo ? `$${restaurant.costForTwo}` : "Not specified"}</p>
-                  </div>
-                </div>
 
                 <div className="flex items-start gap-3">
                   <div className="p-2 bg-[#1A1A1A] rounded-lg text-[#666]">
                     <Clock size={18} />
                   </div>
                   <div>
-                    <p className="text-xs font-semibold text-[#666] uppercase tracking-wider mb-1">Operating Hours</p>
-                    <p className="text-sm text-[#CCC]">{restaurant?.operatingHours?.open && restaurant?.operatingHours?.close ? `${restaurant.operatingHours.open} - ${restaurant.operatingHours.close}` : "Not set"}</p>
+                    <p className="text-xs font-semibold text-[#666] uppercase tracking-wider mb-1">Operating Days</p>
+                    <p className="text-sm text-[#CCC]">
+                      {restaurant?.operatingDays?.length > 0 
+                        ? restaurant.operatingDays.join(", ") 
+                        : "Not specified"}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3">
+                  <div className="p-2 bg-[#1A1A1A] rounded-lg text-[#666]">
+                    <Utensils size={18} />
+                  </div>
+                  <div>
+                    <p className="text-xs font-semibold text-[#666] uppercase tracking-wider mb-1">Meal Timings</p>
+                    <div className="space-y-1 text-sm text-[#CCC]">
+                      {restaurant?.mealTimings?.breakfast?.open ? (
+                        <div className="flex justify-between gap-4">
+                          <span className="text-[#888]">Breakfast:</span>
+                          <span>{restaurant.mealTimings.breakfast.open} - {restaurant.mealTimings.breakfast.close}</span>
+                        </div>
+                      ) : null}
+                      {restaurant?.mealTimings?.lunch?.open ? (
+                        <div className="flex justify-between gap-4">
+                          <span className="text-[#888]">Lunch:</span>
+                          <span>{restaurant.mealTimings.lunch.open} - {restaurant.mealTimings.lunch.close}</span>
+                        </div>
+                      ) : null}
+                      {restaurant?.mealTimings?.dinner?.open ? (
+                        <div className="flex justify-between gap-4">
+                          <span className="text-[#888]">Dinner:</span>
+                          <span>{restaurant.mealTimings.dinner.open} - {restaurant.mealTimings.dinner.close}</span>
+                        </div>
+                      ) : null}
+                      {(!restaurant?.mealTimings?.breakfast?.open && !restaurant?.mealTimings?.lunch?.open && !restaurant?.mealTimings?.dinner?.open) && (
+                        <span>Not specified</span>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>

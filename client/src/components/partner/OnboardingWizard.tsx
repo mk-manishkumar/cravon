@@ -1,21 +1,25 @@
 "use client";
 
 import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { CheckCircle2, MapPin, Store, Utensils, Users, DollarSign, Clock, ChevronRight, ChevronLeft } from "lucide-react";
+import { CheckCircle2, MapPin, Store, Clock, ChevronRight, ChevronLeft } from "lucide-react";
 
 const onboardingSchema = z.object({
   name: z.string().min(2, "Restaurant name must be at least 2 characters"),
-  address: z.string().min(10, "Please provide a complete address"),
-  lat: z.number().min(-90).max(90, "Invalid latitude"),
-  lng: z.number().min(-180).max(180, "Invalid longitude"),
-  cuisines: z.string().min(2, "Add at least one cuisine (e.g. Italian, Chinese)"),
-  costForTwo: z.number().min(1, "Please provide average cost for two"),
-  staffCount: z.number().min(1, "How many staff members do you have?"),
-  openTime: z.string().min(4, "Opening time required"),
-  closeTime: z.string().min(4, "Closing time required"),
+  address: z.union([z.string().min(10, "Please provide a complete address"), z.literal("")]).optional(),
+  lat: z.union([z.number().min(-90).max(90, "Invalid latitude"), z.number().refine(Number.isNaN)]).optional(),
+  lng: z.union([z.number().min(-180).max(180, "Invalid longitude"), z.number().refine(Number.isNaN)]).optional(),
+  operatingDays: z.array(z.string()).optional(),
+  openTime: z.union([z.string().min(4, "Opening time required"), z.literal("")]).optional(),
+  closeTime: z.union([z.string().min(4, "Closing time required"), z.literal("")]).optional(),
+  breakfastOpen: z.string().optional(),
+  breakfastClose: z.string().optional(),
+  lunchOpen: z.string().optional(),
+  lunchClose: z.string().optional(),
+  dinnerOpen: z.string().optional(),
+  dinnerClose: z.string().optional(),
 });
 
 type OnboardingFormValues = z.infer<typeof onboardingSchema>;
@@ -24,10 +28,13 @@ interface InitialData {
   name?: string;
   address?: string;
   location?: { coordinates?: number[] };
-  cuisines?: string[];
-  costForTwo?: number;
-  staffCount?: number;
+  operatingDays?: string[];
   operatingHours?: { open?: string; close?: string };
+  mealTimings?: {
+    breakfast?: { open?: string; close?: string };
+    lunch?: { open?: string; close?: string };
+    dinner?: { open?: string; close?: string };
+  };
 }
 
 interface Props {
@@ -47,17 +54,21 @@ const steps = [
 export default function OnboardingWizard({ onComplete, onClose, isLoading = false, initialData, isEditMode = false }: Props) {
   const [currentStep, setCurrentStep] = useState(1);
 
-  // Map initial data (if any) to form values
+  // Map initial data to form values
   const defaultValues = {
     name: initialData?.name || "",
     address: initialData?.address || "",
     lat: initialData?.location?.coordinates?.[1] || undefined,
     lng: initialData?.location?.coordinates?.[0] || undefined,
-    cuisines: initialData?.cuisines ? initialData.cuisines.join(", ") : "",
-    costForTwo: initialData?.costForTwo || undefined,
-    staffCount: initialData?.staffCount || undefined,
+    operatingDays: initialData?.operatingDays || ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
     openTime: initialData?.operatingHours?.open || "09:00",
     closeTime: initialData?.operatingHours?.close || "22:00",
+    breakfastOpen: initialData?.mealTimings?.breakfast?.open || "",
+    breakfastClose: initialData?.mealTimings?.breakfast?.close || "",
+    lunchOpen: initialData?.mealTimings?.lunch?.open || "",
+    lunchClose: initialData?.mealTimings?.lunch?.close || "",
+    dinnerOpen: initialData?.mealTimings?.dinner?.open || "",
+    dinnerClose: initialData?.mealTimings?.dinner?.close || "",
   };
 
   const {
@@ -65,18 +76,22 @@ export default function OnboardingWizard({ onComplete, onClose, isLoading = fals
     handleSubmit,
     trigger,
     getValues,
+    setValue,
+    control,
     formState: { errors },
   } = useForm<OnboardingFormValues>({
     resolver: zodResolver(onboardingSchema),
     defaultValues,
   });
 
+  const selectedDays = useWatch({ control, name: "operatingDays" }) || [];
+
   const nextStep = async () => {
     let fieldsToValidate: (keyof OnboardingFormValues)[] = [];
     if (currentStep === 1) {
       fieldsToValidate = ["name", "address", "lat", "lng"];
     } else if (currentStep === 2) {
-      fieldsToValidate = ["cuisines", "costForTwo", "staffCount", "openTime", "closeTime"];
+      fieldsToValidate = ["openTime", "closeTime", "operatingDays", "breakfastOpen", "breakfastClose", "lunchOpen", "lunchClose", "dinnerOpen", "dinnerClose"];
     }
 
     const isValid = await trigger(fieldsToValidate);
@@ -95,15 +110,21 @@ export default function OnboardingWizard({ onComplete, onClose, isLoading = fals
 
     const formattedData = {
       name: data.name,
-      address: data.address,
-      lat: data.lat,
-      lng: data.lng,
-      cuisines: data.cuisines.split(",").map((c) => c.trim()),
-      costForTwo: data.costForTwo,
-      staffCount: data.staffCount,
-      operatingHours: {
-        open: data.openTime,
-        close: data.closeTime,
+      address: data.address || undefined,
+      lat: data.lat !== undefined && !Number.isNaN(data.lat) ? data.lat : undefined,
+      lng: data.lng !== undefined && !Number.isNaN(data.lng) ? data.lng : undefined,
+      operatingDays: data.operatingDays || [],
+      operatingHours:
+        data.openTime && data.closeTime
+          ? {
+              open: data.openTime,
+              close: data.closeTime,
+            }
+          : undefined,
+      mealTimings: {
+        breakfast: data.breakfastOpen && data.breakfastClose ? { open: data.breakfastOpen, close: data.breakfastClose } : undefined,
+        lunch: data.lunchOpen && data.lunchClose ? { open: data.lunchOpen, close: data.lunchClose } : undefined,
+        dinner: data.dinnerOpen && data.dinnerClose ? { open: data.dinnerOpen, close: data.dinnerClose } : undefined,
       },
     };
     onComplete(formattedData);
@@ -121,9 +142,7 @@ export default function OnboardingWizard({ onComplete, onClose, isLoading = fals
             </svg>
           </button>
         )}
-        <h2 className="text-2xl font-bold text-white mb-6">
-          {isEditMode ? "Edit Restaurant Details" : "Complete your Onboarding"}
-        </h2>
+        <h2 className="text-2xl font-bold text-white mb-6">{isEditMode ? "Edit Restaurant Details" : "Complete your Onboarding"}</h2>
 
         <div className="flex items-center justify-between relative">
           {/* Progress Line */}
@@ -199,40 +218,6 @@ export default function OnboardingWizard({ onComplete, onClose, isLoading = fals
           {/* OPERATIONS */}
           {currentStep === 2 && (
             <div className="space-y-5 animate-in fade-in slide-in-from-right-4 duration-500">
-              <div>
-                <label htmlFor="cuisines" className="block text-[11px] font-semibold uppercase tracking-widest text-[#777777] mb-1.5">
-                  Cuisines (Comma Separated)
-                </label>
-                <div className="relative">
-                  <Utensils className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#555]" size={16} />
-                  <input id="cuisines" {...register("cuisines")} className="w-full pl-10 pr-4 py-3 bg-[#1A1A1A] border border-[#2A2A2A] rounded-xl text-[14px] text-white outline-none transition-all focus:bg-[#222222] focus:border-[#FF7A30] focus:ring-1 focus:ring-[#FF7A30]" placeholder="Italian, Pizza, Fast Food" />
-                </div>
-                {errors.cuisines && <p className="text-[#FF3D57] text-xs mt-1.5">{errors.cuisines.message}</p>}
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label htmlFor="costForTwo" className="block text-[11px] font-semibold uppercase tracking-widest text-[#777777] mb-1.5">
-                    Cost for Two ($)
-                  </label>
-                  <div className="relative">
-                    <DollarSign className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#555]" size={16} />
-                    <input id="costForTwo" type="number" {...register("costForTwo", { valueAsNumber: true })} className="w-full pl-10 pr-4 py-3 bg-[#1A1A1A] border border-[#2A2A2A] rounded-xl text-[14px] text-white outline-none transition-all focus:bg-[#222222] focus:border-[#FF7A30] focus:ring-1 focus:ring-[#FF7A30]" placeholder="e.g. 45" />
-                  </div>
-                  {errors.costForTwo && <p className="text-[#FF3D57] text-xs mt-1.5">{errors.costForTwo.message}</p>}
-                </div>
-                <div>
-                  <label htmlFor="staffCount" className="block text-[11px] font-semibold uppercase tracking-widest text-[#777777] mb-1.5">
-                    Total Staff
-                  </label>
-                  <div className="relative">
-                    <Users className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#555]" size={16} />
-                    <input id="staffCount" type="number" {...register("staffCount", { valueAsNumber: true })} className="w-full pl-10 pr-4 py-3 bg-[#1A1A1A] border border-[#2A2A2A] rounded-xl text-[14px] text-white outline-none transition-all focus:bg-[#222222] focus:border-[#FF7A30] focus:ring-1 focus:ring-[#FF7A30]" placeholder="e.g. 15" />
-                  </div>
-                  {errors.staffCount && <p className="text-[#FF3D57] text-xs mt-1.5">{errors.staffCount.message}</p>}
-                </div>
-              </div>
-
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label htmlFor="openTime" className="block text-[11px] font-semibold uppercase tracking-widest text-[#777777] mb-1.5">
@@ -255,6 +240,68 @@ export default function OnboardingWizard({ onComplete, onClose, isLoading = fals
                   {errors.closeTime && <p className="text-[#FF3D57] text-xs mt-1.5">{errors.closeTime.message}</p>}
                 </div>
               </div>
+
+              {/* Meal Timings */}
+              <div className="pt-4 border-t border-[#1F1F1F]">
+                <h4 className="text-[13px] font-semibold text-white uppercase tracking-wider mb-4">Meal Timings (Optional)</h4>
+                <div className="space-y-4">
+                  {/* Breakfast */}
+                  <div className="flex items-center gap-4">
+                    <div className="w-24 text-[12px] font-medium text-[#888]">Breakfast</div>
+                    <div className="flex-1 grid grid-cols-2 gap-3">
+                      <input type="time" {...register("breakfastOpen")} className="w-full px-3 py-2 bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg text-[13px] text-white outline-none transition-all focus:border-[#FF7A30] scheme-dark" placeholder="Open" />
+                      <input type="time" {...register("breakfastClose")} className="w-full px-3 py-2 bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg text-[13px] text-white outline-none transition-all focus:border-[#FF7A30] scheme-dark" placeholder="Close" />
+                    </div>
+                  </div>
+
+                  {/* Lunch */}
+                  <div className="flex items-center gap-4">
+                    <div className="w-24 text-[12px] font-medium text-[#888]">Lunch</div>
+                    <div className="flex-1 grid grid-cols-2 gap-3">
+                      <input type="time" {...register("lunchOpen")} className="w-full px-3 py-2 bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg text-[13px] text-white outline-none transition-all focus:border-[#FF7A30] scheme-dark" placeholder="Open" />
+                      <input type="time" {...register("lunchClose")} className="w-full px-3 py-2 bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg text-[13px] text-white outline-none transition-all focus:border-[#FF7A30] scheme-dark" placeholder="Close" />
+                    </div>
+                  </div>
+
+                  {/* Dinner */}
+                  <div className="flex items-center gap-4">
+                    <div className="w-24 text-[12px] font-medium text-[#888]">Dinner</div>
+                    <div className="flex-1 grid grid-cols-2 gap-3">
+                      <input type="time" {...register("dinnerOpen")} className="w-full px-3 py-2 bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg text-[13px] text-white outline-none transition-all focus:border-[#FF7A30] scheme-dark" placeholder="Open" />
+                      <input type="time" {...register("dinnerClose")} className="w-full px-3 py-2 bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg text-[13px] text-white outline-none transition-all focus:border-[#FF7A30] scheme-dark" placeholder="Close" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Operating Days Selector */}
+              <div className="pt-4 border-t border-[#1F1F1F]">
+                <div className="block text-[13px] font-semibold text-white uppercase tracking-wider mb-3">Operating Days</div>
+                <div className="flex flex-wrap gap-2">
+                  {["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"].map((day) => {
+                    const isSelected = selectedDays.includes(day);
+
+                    return (
+                      <button
+                        key={day}
+                        type="button"
+                        onClick={() => {
+                          const newDays = isSelected ? selectedDays.filter((d) => d !== day) : [...selectedDays, day];
+
+                          setValue("operatingDays", newDays, { shouldValidate: true, shouldDirty: true });
+                        }}
+                        className={`cursor-pointer px-4 py-2 rounded-xl text-[13px] font-medium transition-all ${isSelected ? "bg-[#FF7A30] text-white border border-[#FF7A30]" : "bg-[#1A1A1A] text-[#888] border border-[#2A2A2A] hover:bg-[#222]"}`}
+                      >
+                        {day.substring(0, 3)}
+                      </button>
+                    );
+                  })}
+                </div>
+                {errors.operatingDays && <p className="text-[#FF3D57] text-xs mt-2">{errors.operatingDays.message}</p>}
+
+                {/* Hidden input to properly register the array with react-hook-form */}
+                <input type="hidden" {...register("operatingDays")} />
+              </div>
             </div>
           )}
 
@@ -265,11 +312,7 @@ export default function OnboardingWizard({ onComplete, onClose, isLoading = fals
                 <h3 className="text-white font-semibold text-lg mb-4 flex items-center gap-2">
                   <CheckCircle2 className="text-[#00C853]" size={20} /> {isEditMode ? "Ready to Save?" : "Almost there!"}
                 </h3>
-                <p className="text-[#888] text-sm leading-relaxed mb-6">
-                  {isEditMode 
-                    ? "Please review the details below. Once you click \"Save Changes\", your restaurant profile will be updated." 
-                    : "Please review the details below. Once you click \"Submit & Go Live\", your restaurant will be officially onboarded and ready for menu uploads."}
-                </p>
+                <p className="text-[#888] text-sm leading-relaxed mb-6">{isEditMode ? 'Please review the details below. Once you click "Save Changes", your restaurant profile will be updated.' : 'Please review the details below. Once you click "Submit & Go Live", your restaurant will be officially onboarded and ready for menu uploads.'}</p>
 
                 <div className="space-y-3 text-sm">
                   <div className="flex justify-between pb-3 border-b border-[#222]">
@@ -287,11 +330,17 @@ export default function OnboardingWizard({ onComplete, onClose, isLoading = fals
                     </span>
                   </div>
                   <div className="flex justify-between pb-3 border-b border-[#222]">
-                    <span className="text-[#666]">Cuisines:</span>
-                    <span className="text-white font-medium">{getValues("cuisines")}</span>
+                    <span className="text-[#666]">Operating Days:</span>
+                    <span className="text-white font-medium text-right max-w-[60%]">
+                      {getValues("operatingDays")?.length
+                        ? getValues("operatingDays")!
+                            .map((d) => d.substring(0, 3))
+                            .join(", ")
+                        : "None Selected"}
+                    </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-[#666]">Operating Hours:</span>
+                    <span className="text-[#666]">Base Operating Hours:</span>
                     <span className="text-white font-medium">
                       {getValues("openTime")} - {getValues("closeTime")}
                     </span>
