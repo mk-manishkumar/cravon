@@ -7,6 +7,7 @@ import OnboardingWidget from "@/components/partner/OnboardingWidget";
 import OnboardingWizard from "@/components/partner/OnboardingWizard";
 import { MapPin, Clock, Store, Pencil, Trash2, Utensils } from "lucide-react";
 import toast from "react-hot-toast";
+import Image from "next/image";
 
 export default function PartnerDashboardPage() {
   const queryClient = useQueryClient();
@@ -75,14 +76,10 @@ export default function PartnerDashboardPage() {
             <div className="relative z-10">
               <div className="flex items-center justify-between mb-8">
                 <div className="flex items-center gap-4">
-                  <div className="w-16 h-16 bg-[#1A1A1A] rounded-2xl border border-[#333] flex items-center justify-center text-[#FF7A30]">
-                    <Store size={28} />
-                  </div>
+                  <div className="w-16 h-16 bg-[#1A1A1A] rounded-2xl border border-[#333] flex items-center justify-center text-[#FF7A30] overflow-hidden relative">{restaurant?.image ? <Image src={restaurant.image} alt={restaurant?.name || "Logo"} fill className="object-cover" sizes="64px" /> : <Store size={28} />}</div>
                   <div>
                     <h2 className="text-2xl font-bold">{restaurant?.name || "Your Restaurant"}</h2>
-                    {restaurant?.franchiseName && (
-                      <p className="text-sm font-semibold text-[#FF7A30] mt-0.5">{restaurant.franchiseName}</p>
-                    )}
+                    {restaurant?.franchiseName && <p className="text-sm font-semibold text-[#FF7A30] mt-0.5">{restaurant.franchiseName}</p>}
                     <div className="flex items-center gap-2 mt-1">
                       <span className={`px-2.5 py-0.5 rounded-full text-xs font-semibold ${restaurant?.status === "active" ? "bg-[#00C853]/10 text-[#00C853] border border-[#00C853]/20" : "bg-yellow-500/10 text-yellow-500 border border-yellow-500/20"}`}>{restaurant?.status?.toUpperCase() || "PENDING"}</span>
                       {!isOnboarded && <span className="text-xs text-[#888]">(Pending Onboarding)</span>}
@@ -125,19 +122,13 @@ export default function PartnerDashboardPage() {
                   </div>
                 </div>
 
-
-
                 <div className="flex items-start gap-3">
                   <div className="p-2 bg-[#1A1A1A] rounded-lg text-[#666]">
                     <Clock size={18} />
                   </div>
                   <div>
                     <p className="text-xs font-semibold text-[#666] uppercase tracking-wider mb-1">Operating Days</p>
-                    <p className="text-sm text-[#CCC]">
-                      {restaurant?.operatingDays?.length > 0 
-                        ? restaurant.operatingDays.join(", ") 
-                        : "Not specified"}
-                    </p>
+                    <p className="text-sm text-[#CCC]">{restaurant?.operatingDays?.length > 0 ? restaurant.operatingDays.join(", ") : "Not specified"}</p>
                   </div>
                 </div>
 
@@ -151,24 +142,28 @@ export default function PartnerDashboardPage() {
                       {restaurant?.mealTimings?.breakfast?.open ? (
                         <div className="flex justify-between gap-4">
                           <span className="text-[#888]">Breakfast:</span>
-                          <span>{restaurant.mealTimings.breakfast.open} - {restaurant.mealTimings.breakfast.close}</span>
+                          <span>
+                            {restaurant.mealTimings.breakfast.open} - {restaurant.mealTimings.breakfast.close}
+                          </span>
                         </div>
                       ) : null}
                       {restaurant?.mealTimings?.lunch?.open ? (
                         <div className="flex justify-between gap-4">
                           <span className="text-[#888]">Lunch:</span>
-                          <span>{restaurant.mealTimings.lunch.open} - {restaurant.mealTimings.lunch.close}</span>
+                          <span>
+                            {restaurant.mealTimings.lunch.open} - {restaurant.mealTimings.lunch.close}
+                          </span>
                         </div>
                       ) : null}
                       {restaurant?.mealTimings?.dinner?.open ? (
                         <div className="flex justify-between gap-4">
                           <span className="text-[#888]">Dinner:</span>
-                          <span>{restaurant.mealTimings.dinner.open} - {restaurant.mealTimings.dinner.close}</span>
+                          <span>
+                            {restaurant.mealTimings.dinner.open} - {restaurant.mealTimings.dinner.close}
+                          </span>
                         </div>
                       ) : null}
-                      {(!restaurant?.mealTimings?.breakfast?.open && !restaurant?.mealTimings?.lunch?.open && !restaurant?.mealTimings?.dinner?.open) && (
-                        <span>Not specified</span>
-                      )}
+                      {!restaurant?.mealTimings?.breakfast?.open && !restaurant?.mealTimings?.lunch?.open && !restaurant?.mealTimings?.dinner?.open && <span>Not specified</span>}
                     </div>
                   </div>
                 </div>

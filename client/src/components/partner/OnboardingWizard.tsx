@@ -4,7 +4,10 @@ import { useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { CheckCircle2, MapPin, Store, Clock, ChevronRight, ChevronLeft } from "lucide-react";
+import { CheckCircle2, MapPin, Store, Clock, ChevronRight, ChevronLeft, UploadCloud } from "lucide-react";
+import { IKContext, IKUpload } from "imagekitio-react";
+import Image from "next/image";
+import api from "@/lib/axios";
 
 const onboardingSchema = z.object({
   name: z.string().min(2, "Restaurant name must be at least 2 characters"),
@@ -21,6 +24,7 @@ const onboardingSchema = z.object({
   lunchClose: z.string().optional(),
   dinnerOpen: z.string().optional(),
   dinnerClose: z.string().optional(),
+  image: z.string().optional(),
 });
 
 type OnboardingFormValues = z.infer<typeof onboardingSchema>;
@@ -28,6 +32,7 @@ type OnboardingFormValues = z.infer<typeof onboardingSchema>;
 interface InitialData {
   name?: string;
   franchiseName?: string;
+  image?: string;
   address?: string;
   location?: { coordinates?: number[] };
   operatingDays?: string[];
@@ -55,11 +60,13 @@ const steps = [
 
 export default function OnboardingWizard({ onComplete, onClose, isLoading = false, initialData, isEditMode = false }: Props) {
   const [currentStep, setCurrentStep] = useState(1);
+  const [isUploadingLogo, setIsUploadingLogo] = useState(false);
 
   // Map initial data to form values
   const defaultValues = {
     name: initialData?.name || "",
     franchiseName: initialData?.franchiseName || "",
+    image: initialData?.image || "",
     address: initialData?.address || "",
     lat: initialData?.location?.coordinates?.[1] || undefined,
     lng: initialData?.location?.coordinates?.[0] || undefined,
@@ -88,6 +95,11 @@ export default function OnboardingWizard({ onComplete, onClose, isLoading = fals
   });
 
   const selectedDays = useWatch({ control, name: "operatingDays" }) || [];
+  const uploadedImage = useWatch({ control, name: "image" });
+
+  let uploadLabel = "Upload Logo";
+  if (isUploadingLogo) uploadLabel = "Uploading...";
+  else if (uploadedImage) uploadLabel = "Change Logo";
 
   const nextStep = async () => {
     let fieldsToValidate: (keyof OnboardingFormValues)[] = [];
@@ -98,9 +110,7 @@ export default function OnboardingWizard({ onComplete, onClose, isLoading = fals
     }
 
     const isValid = await trigger(fieldsToValidate);
-    if (isValid) {
-      setCurrentStep((prev) => Math.min(prev + 1, 3));
-    }
+    if (isValid) setCurrentStep((prev) => Math.min(prev + 1, 3));
   };
 
   const prevStep = () => setCurrentStep((prev) => Math.max(prev - 1, 1));
@@ -114,6 +124,7 @@ export default function OnboardingWizard({ onComplete, onClose, isLoading = fals
     const formattedData = {
       name: data.name,
       franchiseName: data.franchiseName || undefined,
+      image: data.image || undefined,
       address: data.address || undefined,
       lat: data.lat !== undefined && !Number.isNaN(data.lat) ? data.lat : undefined,
       lng: data.lng !== undefined && !Number.isNaN(data.lng) ? data.lng : undefined,
@@ -184,6 +195,44 @@ export default function OnboardingWizard({ onComplete, onClose, isLoading = fals
           {/* IDENTITY & LOCATION */}
           {currentStep === 1 && (
             <div className="space-y-5 animate-in fade-in slide-in-from-right-4 duration-500">
+              {/* Logo Upload */}
+              <div className="flex flex-col items-center gap-3 mb-2">
+                <div className="w-20 h-20 rounded-2xl bg-[#1A1A1A] border border-[#2A2A2A] flex items-center justify-center overflow-hidden relative">{uploadedImage ? <Image src={getValues("image") || ""} alt="Logo" fill className="object-cover" sizes="80px" /> : <Store className="text-[#555]" size={28} />}</div>
+
+                <IKContext
+                  publicKey={process.env.NEXT_PUBLIC_IMAGE_PUBLIC_KEY}
+                  urlEndpoint={process.env.NEXT_PUBLIC_IMAGE_URL_ENDPOINT}
+                  authenticator={async () => {
+                    try {
+                      const response = await api.get("/upload/auth");
+                      return response.data;
+                    } catch (error) {
+                      console.error("Authentication failed:", error);
+                      throw new Error("Authentication failed");
+                    }
+                  }}
+                >
+                  <label className="cursor-pointer flex items-center gap-1.5 text-[12px] font-semibold text-[#FF7A30] hover:text-[#FF8E4D] transition-colors relative">
+                    <UploadCloud size={14} />
+                    {uploadLabel}
+                    <IKUpload
+                      fileName="restaurant_logo"
+                      className="hidden"
+                      onUploadStart={() => setIsUploadingLogo(true)}
+                      onSuccess={(res: { url: string }) => {
+                        setIsUploadingLogo(false);
+                        setValue("image", res.url, { shouldValidate: true, shouldDirty: true });
+                      }}
+                      onError={(err: unknown) => {
+                        setIsUploadingLogo(false);
+                        console.error("Upload error:", err);
+                        alert("Failed to upload image. Please check your ImageKit credentials.");
+                      }}
+                    />
+                  </label>
+                </IKContext>
+              </div>
+
               <div>
                 <label htmlFor="name" className="block text-[11px] font-semibold uppercase tracking-widest text-[#777777] mb-1.5">
                   Restaurant Name
@@ -337,6 +386,17 @@ export default function OnboardingWizard({ onComplete, onClose, isLoading = fals
                       <span className="font-medium text-[#FF7A30]">{getValues("franchiseName")}</span>
                     </div>
                   )}
+                  {getValues("image") && (
+                    <div className="flex justify-between pb-3 border-b border-[#222]">
+                      <span className="text-[#666]">Logo:</span>
+                      <span className="text-white font-medium flex items-center gap-2">
+                        <div className="relative w-6 h-6 rounded-md overflow-hidden border border-[#333]">
+                          <Image src={getValues("image") || ""} alt="Logo" fill className="object-cover" sizes="24px" />
+                        </div>{" "}
+                        Uploaded
+                      </span>
+                    </div>
+                  )}
                   <div className="flex justify-between pb-3 border-b border-[#222]">
                     <span className="text-[#666]">Address:</span>
                     <span className="text-white text-right font-medium max-w-50 truncate">{getValues("address")}</span>
@@ -377,7 +437,7 @@ export default function OnboardingWizard({ onComplete, onClose, isLoading = fals
             )}
 
             {currentStep < 3 ? (
-              <button key="btn-continue" type="button" onClick={nextStep} className="cursor-pointer flex-1 px-6 py-3.5 rounded-xl text-[14px] font-semibold text-white bg-linear-to-r from-[#FF3D57] to-[#FF7A30] hover:from-[#FF4E66] hover:to-[#FF8E4D] shadow-lg outline-none focus:ring-4 focus:ring-[#FF7A30]/30 transition-all flex items-center justify-center gap-2 active:scale-[0.98]">
+              <button key="btn-continue" type="button" onClick={nextStep} disabled={isUploadingLogo} className="cursor-pointer flex-1 px-6 py-3.5 rounded-xl text-[14px] font-semibold text-white bg-linear-to-r from-[#FF3D57] to-[#FF7A30] hover:from-[#FF4E66] hover:to-[#FF8E4D] shadow-lg outline-none focus:ring-4 focus:ring-[#FF7A30]/30 transition-all flex items-center justify-center gap-2 active:scale-[0.98] disabled:opacity-50">
                 Continue <ChevronRight size={16} />
               </button>
             ) : (

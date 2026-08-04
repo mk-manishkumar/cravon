@@ -10,7 +10,7 @@ export const onboardRestaurant = async (ownerId: string, data: any) => {
     status: "pending",
   });
 
-  const { name, franchiseName, address, lat, lng, operatingDays, operatingHours, mealTimings } = data;
+  const { name, franchiseName, address, lat, lng, operatingDays, operatingHours, mealTimings, image } = data;
 
   restaurant.name = name;
   if (franchiseName) restaurant.franchiseName = franchiseName;
@@ -26,6 +26,7 @@ export const onboardRestaurant = async (ownerId: string, data: any) => {
   restaurant.operatingDays = operatingDays;
   restaurant.operatingHours = operatingHours;
   restaurant.mealTimings = mealTimings;
+  if (image) restaurant.image = image;
 
   restaurant.isOnboarded = true;
   restaurant.status = "active";
