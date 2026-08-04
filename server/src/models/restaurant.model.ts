@@ -3,6 +3,7 @@ import mongoose, { Document, Schema } from 'mongoose';
 export interface IRestaurant extends Document {
   ownerId: mongoose.Types.ObjectId;
   name: string;
+  franchiseName?: string;
   description?: string;
   address?: string;
   location?: {
@@ -31,6 +32,7 @@ export interface IRestaurant extends Document {
 const restaurantSchema = new Schema<IRestaurant>({
   ownerId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
   name: { type: String, required: true },
+  franchiseName: { type: String, trim: true },
   description: { type: String },
   address: { type: String },
   location: {

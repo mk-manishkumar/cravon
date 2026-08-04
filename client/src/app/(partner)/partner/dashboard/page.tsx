@@ -80,6 +80,9 @@ export default function PartnerDashboardPage() {
                   </div>
                   <div>
                     <h2 className="text-2xl font-bold">{restaurant?.name || "Your Restaurant"}</h2>
+                    {restaurant?.franchiseName && (
+                      <p className="text-sm font-semibold text-[#FF7A30] mt-0.5">{restaurant.franchiseName}</p>
+                    )}
                     <div className="flex items-center gap-2 mt-1">
                       <span className={`px-2.5 py-0.5 rounded-full text-xs font-semibold ${restaurant?.status === "active" ? "bg-[#00C853]/10 text-[#00C853] border border-[#00C853]/20" : "bg-yellow-500/10 text-yellow-500 border border-yellow-500/20"}`}>{restaurant?.status?.toUpperCase() || "PENDING"}</span>
                       {!isOnboarded && <span className="text-xs text-[#888]">(Pending Onboarding)</span>}

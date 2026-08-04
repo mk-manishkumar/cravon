@@ -10,9 +10,10 @@ export const onboardRestaurant = async (ownerId: string, data: any) => {
     status: "pending",
   });
 
-  const { name, address, lat, lng, operatingDays, operatingHours, mealTimings } = data;
+  const { name, franchiseName, address, lat, lng, operatingDays, operatingHours, mealTimings } = data;
 
   restaurant.name = name;
+  if (franchiseName) restaurant.franchiseName = franchiseName;
   if (address) restaurant.address = address;
   if (lat !== undefined && lng !== undefined) {
     restaurant.location = {

@@ -8,6 +8,7 @@ import { CheckCircle2, MapPin, Store, Clock, ChevronRight, ChevronLeft } from "l
 
 const onboardingSchema = z.object({
   name: z.string().min(2, "Restaurant name must be at least 2 characters"),
+  franchiseName: z.union([z.string(), z.literal("")]).optional(),
   address: z.union([z.string().min(10, "Please provide a complete address"), z.literal("")]).optional(),
   lat: z.union([z.number().min(-90).max(90, "Invalid latitude"), z.number().refine(Number.isNaN)]).optional(),
   lng: z.union([z.number().min(-180).max(180, "Invalid longitude"), z.number().refine(Number.isNaN)]).optional(),
@@ -26,6 +27,7 @@ type OnboardingFormValues = z.infer<typeof onboardingSchema>;
 
 interface InitialData {
   name?: string;
+  franchiseName?: string;
   address?: string;
   location?: { coordinates?: number[] };
   operatingDays?: string[];
@@ -57,6 +59,7 @@ export default function OnboardingWizard({ onComplete, onClose, isLoading = fals
   // Map initial data to form values
   const defaultValues = {
     name: initialData?.name || "",
+    franchiseName: initialData?.franchiseName || "",
     address: initialData?.address || "",
     lat: initialData?.location?.coordinates?.[1] || undefined,
     lng: initialData?.location?.coordinates?.[0] || undefined,
@@ -110,6 +113,7 @@ export default function OnboardingWizard({ onComplete, onClose, isLoading = fals
 
     const formattedData = {
       name: data.name,
+      franchiseName: data.franchiseName || undefined,
       address: data.address || undefined,
       lat: data.lat !== undefined && !Number.isNaN(data.lat) ? data.lat : undefined,
       lng: data.lng !== undefined && !Number.isNaN(data.lng) ? data.lng : undefined,
@@ -186,6 +190,14 @@ export default function OnboardingWizard({ onComplete, onClose, isLoading = fals
                 </label>
                 <input id="name" {...register("name")} className="w-full px-4 py-3 bg-[#1A1A1A] border border-[#2A2A2A] rounded-xl text-[14px] text-white outline-none transition-all focus:bg-[#222222] focus:border-[#FF7A30] focus:ring-1 focus:ring-[#FF7A30]" placeholder="e.g. The Golden Wok" />
                 {errors.name && <p className="text-[#FF3D57] text-xs mt-1.5">{errors.name.message}</p>}
+              </div>
+
+              <div>
+                <label htmlFor="franchiseName" className="block text-[11px] font-semibold uppercase tracking-widest text-[#777777] mb-1.5">
+                  Franchise Name (Optional)
+                </label>
+                <input id="franchiseName" {...register("franchiseName")} className="w-full px-4 py-3 bg-[#1A1A1A] border border-[#2A2A2A] rounded-xl text-[14px] text-white outline-none transition-all focus:bg-[#222222] focus:border-[#FF7A30] focus:ring-1 focus:ring-[#FF7A30]" placeholder="e.g. KFC, Subway" />
+                {errors.franchiseName && <p className="text-[#FF3D57] text-xs mt-1.5">{errors.franchiseName.message}</p>}
               </div>
 
               <div>
@@ -319,6 +331,12 @@ export default function OnboardingWizard({ onComplete, onClose, isLoading = fals
                     <span className="text-[#666]">Restaurant Name:</span>
                     <span className="text-white font-medium">{getValues("name")}</span>
                   </div>
+                  {getValues("franchiseName") && (
+                    <div className="flex justify-between pb-3 border-b border-[#222]">
+                      <span className="text-[#666]">Franchise:</span>
+                      <span className="font-medium text-[#FF7A30]">{getValues("franchiseName")}</span>
+                    </div>
+                  )}
                   <div className="flex justify-between pb-3 border-b border-[#222]">
                     <span className="text-[#666]">Address:</span>
                     <span className="text-white text-right font-medium max-w-50 truncate">{getValues("address")}</span>
