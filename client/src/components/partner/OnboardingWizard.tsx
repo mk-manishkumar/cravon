@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm, useWatch, UseFormReturn } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -8,8 +8,11 @@ import { CheckCircle2, MapPin, Store, Clock, ChevronRight, ChevronLeft, UploadCl
 import { IKContext, IKUpload } from "imagekitio-react";
 import Image from "next/image";
 import api from "@/lib/axios";
-import { GoogleMap, useJsApiLoader, Marker } from "@react-google-maps/api";
-import usePlacesAutocomplete, { getGeocode, getLatLng } from "use-places-autocomplete";
+import dynamic from "next/dynamic";
+const MapWidget = dynamic(() => import("./MapWidget"), {
+  ssr: false,
+  loading: () => <div className="w-full h-full flex items-center justify-center text-[#555] text-sm">Loading Map...</div>
+});
 
 const onboardingSchema = z.object({
   name: z.string().min(2, "Restaurant name must be at least 2 characters"),
@@ -63,89 +66,6 @@ const steps = [
   { id: 3, title: "Review & Launch", icon: CheckCircle2 },
 ];
 
-const mapDarkStyle = [
-  { elementType: "geometry", stylers: [{ color: "#242f3e" }] },
-  { elementType: "labels.text.stroke", stylers: [{ color: "#242f3e" }] },
-  { elementType: "labels.text.fill", stylers: [{ color: "#746855" }] },
-  {
-    featureType: "administrative.locality",
-    elementType: "labels.text.fill",
-    stylers: [{ color: "#d59563" }],
-  },
-  {
-    featureType: "poi",
-    elementType: "labels.text.fill",
-    stylers: [{ color: "#d59563" }],
-  },
-  {
-    featureType: "poi.park",
-    elementType: "geometry",
-    stylers: [{ color: "#263c3f" }],
-  },
-  {
-    featureType: "poi.park",
-    elementType: "labels.text.fill",
-    stylers: [{ color: "#6b9a76" }],
-  },
-  {
-    featureType: "road",
-    elementType: "geometry",
-    stylers: [{ color: "#38414e" }],
-  },
-  {
-    featureType: "road",
-    elementType: "geometry.stroke",
-    stylers: [{ color: "#212a37" }],
-  },
-  {
-    featureType: "road",
-    elementType: "labels.text.fill",
-    stylers: [{ color: "#9ca5b3" }],
-  },
-  {
-    featureType: "road.highway",
-    elementType: "geometry",
-    stylers: [{ color: "#746855" }],
-  },
-  {
-    featureType: "road.highway",
-    elementType: "geometry.stroke",
-    stylers: [{ color: "#1f2835" }],
-  },
-  {
-    featureType: "road.highway",
-    elementType: "labels.text.fill",
-    stylers: [{ color: "#f3d19c" }],
-  },
-  {
-    featureType: "transit",
-    elementType: "geometry",
-    stylers: [{ color: "#2f3948" }],
-  },
-  {
-    featureType: "transit.station",
-    elementType: "labels.text.fill",
-    stylers: [{ color: "#d59563" }],
-  },
-  {
-    featureType: "water",
-    elementType: "geometry",
-    stylers: [{ color: "#17263c" }],
-  },
-  {
-    featureType: "water",
-    elementType: "labels.text.fill",
-    stylers: [{ color: "#515c6d" }],
-  },
-  {
-    featureType: "water",
-    elementType: "labels.text.stroke",
-    stylers: [{ color: "#17263c" }],
-  },
-];
-
-const libraries = ["places"] as ("places")[];
-
 // --- STEP 1 COMPONENT ---
 const Step1Location = ({ form, isUploadingLogo, setIsUploadingLogo }: { form: UseFormReturn<OnboardingFormValues>; isUploadingLogo: boolean; setIsUploadingLogo: (v: boolean) => void }) => {
   const { register, setValue, getValues, control, formState: { errors } } = form;
@@ -153,39 +73,46 @@ const Step1Location = ({ form, isUploadingLogo, setIsUploadingLogo }: { form: Us
   const lat = useWatch({ control, name: "lat" });
   const lng = useWatch({ control, name: "lng" });
 
-  const { isLoaded } = useJsApiLoader({
-    id: "google-map-script",
-    googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "",
-    libraries,
-  });
+  const [mapSearchValue, setMapSearchValue] = useState("");
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [suggestions, setSuggestions] = useState<any[]>([]);
 
-  const {
-    ready,
-    value: mapSearchValue,
-    suggestions: { status, data: suggestionsData },
-    setValue: setAutocompleteValue,
-    clearSuggestions,
-  } = usePlacesAutocomplete({ requestOptions: {}, debounce: 300, initOnMount: isLoaded });
-
-  const handleSelectPlace = async (address: string) => {
-    setAutocompleteValue(address, false);
-    clearSuggestions();
-    try {
-      const results = await getGeocode({ address });
-      const { lat: newLat, lng: newLng } = getLatLng(results[0]);
-      setValue("lat", newLat, { shouldValidate: true });
-      setValue("lng", newLng, { shouldValidate: true });
-
-      const components = results[0].address_components;
-      const getComp = (type: string, short = false) => components.find((c) => c.types.includes(type))?.[short ? "short_name" : "long_name"] || "";
-
-      setValue("street", `${getComp("street_number")} ${getComp("route")}`.trim() || address.split(",")[0], { shouldValidate: true });
-      setValue("city", getComp("locality"), { shouldValidate: true });
-      setValue("state", getComp("administrative_area_level_1", true), { shouldValidate: true });
-      setValue("zip", getComp("postal_code"), { shouldValidate: true });
-    } catch (error) {
-      console.error("Error fetching geocode:", error);
+  useEffect(() => {
+    if (!mapSearchValue || mapSearchValue.length < 3) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setSuggestions([]);
+      return;
     }
+    const timeout = setTimeout(async () => {
+      try {
+        const res = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(mapSearchValue)}&format=json&addressdetails=1&limit=5`, {
+          headers: { "User-Agent": "CravonApp/1.0" }
+        });
+        const data = await res.json();
+        setSuggestions(data);
+      } catch (e) {
+        console.error("Error fetching Nominatim autocomplete:", e);
+      }
+    }, 500);
+    return () => clearTimeout(timeout);
+  }, [mapSearchValue]);
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const handleSelectPlace = (place: any) => {
+    setMapSearchValue(place.display_name);
+    setSuggestions([]);
+    
+    const newLat = Number.parseFloat(place.lat);
+    const newLng = Number.parseFloat(place.lon);
+    setValue("lat", newLat, { shouldValidate: true });
+    setValue("lng", newLng, { shouldValidate: true });
+
+    const addr = place.address || {};
+    const street = [addr.house_number, addr.road].filter(Boolean).join(" ");
+    setValue("street", street || place.display_name.split(",")[0], { shouldValidate: true });
+    setValue("city", addr.city || addr.town || addr.village || "", { shouldValidate: true });
+    setValue("state", addr.state || "", { shouldValidate: true });
+    setValue("zip", addr.postcode || "", { shouldValidate: true });
   };
 
   let uploadLabel = "Upload Logo";
@@ -247,29 +174,28 @@ const Step1Location = ({ form, isUploadingLogo, setIsUploadingLogo }: { form: Us
         <div className="space-y-4 mb-4">
           <div className="relative">
             <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#555]" size={16} />
-            <input value={mapSearchValue} onChange={(e) => setAutocompleteValue(e.target.value)} disabled={!ready} className="w-full pl-10 pr-4 py-3 bg-[#1A1A1A] border border-[#2A2A2A] rounded-xl text-[14px] text-white outline-none transition-all focus:bg-[#222222] focus:border-[#FF7A30] focus:ring-1 focus:ring-[#FF7A30]" placeholder="Search for your restaurant on Google Maps..." />
-            {status === "OK" && (
+            <input value={mapSearchValue} onChange={(e) => setMapSearchValue(e.target.value)} className="w-full pl-10 pr-4 py-3 bg-[#1A1A1A] border border-[#2A2A2A] rounded-xl text-[14px] text-white outline-none transition-all focus:bg-[#222222] focus:border-[#FF7A30] focus:ring-1 focus:ring-[#FF7A30]" placeholder="Search for your restaurant location..." />
+            {suggestions.length > 0 && (
               <ul className="absolute z-50 w-full mt-2 bg-[#1A1A1A] border border-[#2A2A2A] rounded-xl overflow-hidden shadow-2xl">
-                {suggestionsData.map(({ place_id, description }) => (
-                  <li key={place_id} className="border-b border-[#2A2A2A] last:border-none">
-                    <button type="button" onClick={() => handleSelectPlace(description)} className="w-full text-left px-4 py-3 cursor-pointer text-sm text-[#CCC] hover:bg-[#FF7A30] hover:text-white transition-colors">
-                      {description}
+                {suggestions.map((place) => (
+                  <li key={place.place_id} className="border-b border-[#2A2A2A] last:border-none">
+                    <button type="button" onClick={() => handleSelectPlace(place)} className="w-full text-left px-4 py-3 cursor-pointer text-sm text-[#CCC] hover:bg-[#FF7A30] hover:text-white transition-colors">
+                      {place.display_name}
                     </button>
                   </li>
                 ))}
               </ul>
             )}
           </div>
-          <div className="w-full h-64 rounded-xl overflow-hidden border border-[#2A2A2A] bg-[#1A1A1A]">
-            {isLoaded ? (
-              <GoogleMap mapContainerStyle={{ width: "100%", height: "100%" }} center={lat && lng ? { lat, lng } : { lat: 40.7128, lng: -74.0060 }} zoom={lat && lng ? 15 : 4} options={{ disableDefaultUI: true, zoomControl: true, styles: mapDarkStyle }} onClick={(e) => { if (e.latLng) { setValue("lat", e.latLng.lat(), { shouldValidate: true }); setValue("lng", e.latLng.lng(), { shouldValidate: true }); } }}>
-                {lat && lng && (
-                  <Marker position={{ lat, lng }} draggable={true} onDragEnd={(e) => { if (e.latLng) { setValue("lat", e.latLng.lat(), { shouldValidate: true }); setValue("lng", e.latLng.lng(), { shouldValidate: true }); } }} />
-                )}
-              </GoogleMap>
-            ) : (
-              <div className="w-full h-full flex items-center justify-center text-[#555] text-sm">Loading Map...</div>
-            )}
+          <div className="w-full h-64 rounded-xl overflow-hidden border border-[#2A2A2A] bg-[#1A1A1A] relative z-0">
+            <MapWidget 
+              lat={lat} 
+              lng={lng} 
+              setCoordinates={(newLat, newLng) => {
+                setValue("lat", newLat, { shouldValidate: true });
+                setValue("lng", newLng, { shouldValidate: true });
+              }} 
+            />
           </div>
           {(errors.lat || errors.lng) && <p className="text-[#FF3D57] text-xs">Please pin your exact location on the map.</p>}
         </div>
