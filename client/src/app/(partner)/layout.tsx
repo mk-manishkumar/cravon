@@ -7,7 +7,7 @@ export default function PartnerLayout({ children }: Readonly<{ children: React.R
     <div className="flex-1 flex flex-col bg-[#050505]">
       <PartnerHeader />
       <main className="flex-1 flex flex-col w-full">
-        <ProtectedRoute redirectTo="/auth/restaurant/login">
+        <ProtectedRoute>
           {children}
         </ProtectedRoute>
       </main>

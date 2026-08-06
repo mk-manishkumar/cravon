@@ -41,7 +41,7 @@ export default function CustomerHeader() {
             {!isLoading &&
               (user ? (
                 <div className="relative" onMouseEnter={() => setShowDropdown(true)} onMouseLeave={() => setShowDropdown(false)}>
-                  <button className="flex items-center justify-center w-10 h-10 rounded-full bg-linear-to-br from-[#FF3D57] to-[#FF7A30] text-white font-bold text-lg shadow-md cursor-pointer outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#FF3D57]">
+                  <button type="button" className="flex items-center justify-center w-10 h-10 rounded-full bg-linear-to-br from-[#FF3D57] to-[#FF7A30] text-white font-bold text-lg shadow-md cursor-pointer outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#FF3D57]">
                     {user.firstName[0]}
                     {user.lastName[0]}
                   </button>
@@ -64,6 +64,7 @@ export default function CustomerHeader() {
                           </Link>
                           <div className="w-full h-px bg-gray-50 my-2" />
                           <button 
+                            type="button"
                             onClick={() => logout()}
                             className="flex items-center gap-3 w-full text-left px-5 py-2.5 text-[14px] text-[#FF3D57] hover:bg-[#FFF1F0] transition-colors cursor-pointer"
                           >
