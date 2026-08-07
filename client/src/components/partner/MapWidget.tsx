@@ -17,7 +17,7 @@ L.Marker.prototype.options.icon = DefaultIcon;
 
 function DraggableMarker({ lat, lng, setPosition }: Readonly<{ lat: number; lng: number; setPosition: (lat: number, lng: number) => void }>) {
   const map = useMap();
-  
+
   useMapEvents({
     click(e) {
       setPosition(e.latlng.lat, e.latlng.lng);
@@ -32,16 +32,16 @@ function DraggableMarker({ lat, lng, setPosition }: Readonly<{ lat: number; lng:
   }, [lat, lng, map]);
 
   return (
-    <Marker 
-      position={[lat, lng]} 
-      draggable={true} 
-      eventHandlers={{ 
-        dragend(e) { 
-          const marker = e.target; 
-          const pos = marker.getLatLng(); 
-          setPosition(pos.lat, pos.lng); 
-        } 
-      }} 
+    <Marker
+      position={[lat, lng]}
+      draggable={true}
+      eventHandlers={{
+        dragend(e) {
+          const marker = e.target;
+          const pos = marker.getLatLng();
+          setPosition(pos.lat, pos.lng);
+        },
+      }}
     />
   );
 }
@@ -53,18 +53,13 @@ interface MapWidgetProps {
 }
 
 export default function MapWidget({ lat, lng, setCoordinates }: Readonly<MapWidgetProps>) {
-  const position: [number, number] = lat && lng ? [lat, lng] : [40.7128, -74.0060];
+  const position: [number, number] = lat && lng ? [lat, lng] : [40.7128, -74.006];
   const zoom = lat && lng ? 15 : 3;
 
   return (
     <MapContainer center={position} zoom={zoom} style={{ width: "100%", height: "100%", zIndex: 0 }} scrollWheelZoom={true} className="z-0">
-      <TileLayer 
-        url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png" 
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>' 
-      />
-      {Boolean(lat) && Boolean(lng) && lat !== undefined && lng !== undefined && (
-        <DraggableMarker lat={lat} lng={lng} setPosition={setCoordinates} />
-      )}
+      <TileLayer url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png" attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>' />
+      {Boolean(lat) && Boolean(lng) && lat !== undefined && lng !== undefined && <DraggableMarker lat={lat} lng={lng} setPosition={setCoordinates} />}
     </MapContainer>
   );
 }
