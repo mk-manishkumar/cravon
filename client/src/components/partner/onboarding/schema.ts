@@ -19,6 +19,16 @@ export const onboardingSchema = z.object({
   dinnerOpen: z.string().optional(),
   dinnerClose: z.string().optional(),
   image: z.string().optional(),
+  menu: z.array(z.object({
+    category: z.string().min(1, "Category is required"),
+    name: z.string().min(1, "Dish name is required"),
+    price: z.number().min(0, "Price must be positive"),
+    dietary: z.string().optional(),
+    spiceLevel: z.string().optional(),
+    prepTime: z.string().optional(),
+    mealType: z.string().optional(),
+    description: z.string().optional()
+  })).optional()
 });
 
 export type OnboardingFormValues = z.infer<typeof onboardingSchema>;

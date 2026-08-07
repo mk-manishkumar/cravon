@@ -7,7 +7,7 @@ import { CheckCircle2, MapPin, Store, ChevronRight, ChevronLeft } from "lucide-r
 import { OnboardingFormValues, onboardingSchema, InitialData } from "./onboarding/schema";
 import { StepOneLocation } from "./onboarding/StepOneLocation";
 import { StepTwoOperations } from "./onboarding/StepTwoOperations";
-import { StepThreeReview } from "./onboarding/StepThreeReview";
+import { StepThreeMenu } from "./onboarding/StepThreeMenu";
 
 interface Props {
   readonly onComplete: (data: Record<string, unknown>) => void;
@@ -20,7 +20,7 @@ interface Props {
 const steps = [
   { id: 1, title: "Identity & Location", icon: MapPin },
   { id: 2, title: "Operations", icon: Store },
-  { id: 3, title: "Review & Launch", icon: CheckCircle2 },
+  { id: 3, title: "Menu Upload", icon: CheckCircle2 },
 ];
 
 export default function OnboardingWizard({ onComplete, onClose, isLoading = false, initialData, isEditMode = false }: Props) {
@@ -65,6 +65,7 @@ export default function OnboardingWizard({ onComplete, onClose, isLoading = fals
     let fieldsToValidate: (keyof OnboardingFormValues)[] = [];
     if (currentStep === 1) fieldsToValidate = ["name", "street", "city", "state", "zip", "lat", "lng"];
     else if (currentStep === 2) fieldsToValidate = ["openTime", "closeTime", "operatingDays", "breakfastOpen", "breakfastClose", "lunchOpen", "lunchClose", "dinnerOpen", "dinnerClose"];
+    else if (currentStep === 3) fieldsToValidate = ["menu"];
 
     const isValid = await trigger(fieldsToValidate);
     if (isValid) setCurrentStep((prev) => Math.min(prev + 1, 3));
@@ -89,6 +90,7 @@ export default function OnboardingWizard({ onComplete, onClose, isLoading = fals
         lunch: data.lunchOpen && data.lunchClose ? { open: data.lunchOpen, close: data.lunchClose } : undefined,
         dinner: data.dinnerOpen && data.dinnerClose ? { open: data.dinnerOpen, close: data.dinnerClose } : undefined,
       },
+      menu: data.menu
     });
   };
 
@@ -140,7 +142,7 @@ export default function OnboardingWizard({ onComplete, onClose, isLoading = fals
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           {currentStep === 1 && <StepOneLocation form={form} isUploadingLogo={isUploadingLogo} setIsUploadingLogo={setIsUploadingLogo} />}
           {currentStep === 2 && <StepTwoOperations form={form} />}
-          {currentStep === 3 && <StepThreeReview form={form} isEditMode={isEditMode} />}
+          {currentStep === 3 && <StepThreeMenu form={form} />}
 
           <div className="flex gap-4 pt-4 mt-8 border-t border-[#1F1F1F]">
             {currentStep > 1 && (
