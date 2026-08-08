@@ -5,11 +5,10 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { restaurantService } from "@/services/restaurant.service";
 import OnboardingWidget from "@/components/partner/OnboardingWidget";
 import OnboardingWizard from "@/components/partner/OnboardingWizard";
-import { MapPin, Clock, Store, Pencil, Trash2, Utensils } from "lucide-react";
 import toast from "react-hot-toast";
-import Image from "next/image";
 
-type DashboardMenuItem = { category: string; name: string; price: number; description?: string; dietary?: string; spiceLevel?: string; prepTime?: string };
+import DashboardProfileCard from "./components/DashboardProfileCard";
+import DashboardMenuDisplay from "./components/DashboardMenuDisplay";
 
 export default function PartnerDashboardPage() {
   const queryClient = useQueryClient();
@@ -69,153 +68,11 @@ export default function PartnerDashboardPage() {
       </div>
 
       <div className={`grid grid-cols-1 ${!isOnboarded ? "lg:grid-cols-3" : ""} gap-8`}>
-        {/* Left Side: Restaurant Profile */}
+        {/* Left Side: Restaurant Profile & Menu */}
         <div className="lg:col-span-2 space-y-6">
-          <div className="bg-[#111] border border-[#222] rounded-3xl p-8 relative overflow-hidden">
-            {/* Background Glow */}
-            <div className="absolute top-0 right-0 w-64 h-64 bg-[#FF7A30]/5 rounded-full blur-3xl pointer-events-none"></div>
+          <DashboardProfileCard restaurant={restaurant} isOnboarded={isOnboarded} onEdit={() => setIsEditModalOpen(true)} onDelete={() => deleteMutation.mutate()} isDeleting={deleteMutation.isPending} />
 
-            <div className="relative z-10">
-              <div className="flex items-center justify-between mb-8">
-                <div className="flex items-center gap-4">
-                  <div className="w-16 h-16 bg-[#1A1A1A] rounded-2xl border border-[#333] flex items-center justify-center text-[#FF7A30] overflow-hidden relative">{restaurant?.image ? <Image src={restaurant.image} alt={restaurant?.name || "Logo"} fill className="object-cover" sizes="64px" /> : <Store size={28} />}</div>
-                  <div>
-                    <h2 className="text-2xl font-bold">{restaurant?.name || "Your Restaurant"}</h2>
-                    {restaurant?.franchiseName && <p className="text-sm font-semibold text-[#FF7A30] mt-0.5">{restaurant.franchiseName}</p>}
-                    <div className="flex items-center gap-2 mt-1">
-                      <span className={`px-2.5 py-0.5 rounded-full text-xs font-semibold ${restaurant?.status === "active" ? "bg-[#00C853]/10 text-[#00C853] border border-[#00C853]/20" : "bg-yellow-500/10 text-yellow-500 border border-yellow-500/20"}`}>{restaurant?.status?.toUpperCase() || "PENDING"}</span>
-                      {!isOnboarded && <span className="text-xs text-[#888]">(Pending Onboarding)</span>}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Edit & Delete Actions */}
-                {isOnboarded && (
-                  <div className="flex items-center gap-3">
-                    <button type="button" className="cursor-pointer p-2.5 bg-[#1A1A1A] border border-[#333] hover:border-[#FF7A30] hover:text-[#FF7A30] text-[#888] rounded-xl transition-all" onClick={() => setIsEditModalOpen(true)} title="Edit Restaurant">
-                      <Pencil size={18} />
-                    </button>
-                    <button
-                      type="button"
-                      disabled={deleteMutation.isPending}
-                      className="cursor-pointer p-2.5 bg-[#1A1A1A] border border-[#333] hover:border-red-500 hover:text-red-500 text-[#888] rounded-xl transition-all disabled:opacity-50"
-                      onClick={() => {
-                        if (confirm("Are you sure you want to delete your restaurant? This action cannot be undone.")) {
-                          deleteMutation.mutate();
-                        }
-                      }}
-                      title="Delete Restaurant"
-                    >
-                      <Trash2 size={18} />
-                    </button>
-                  </div>
-                )}
-              </div>
-
-              {/* Profile Details Grid */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                <div className="flex items-start gap-3">
-                  <div className="p-2 bg-[#1A1A1A] rounded-lg text-[#666]">
-                    <MapPin size={18} />
-                  </div>
-                  <div>
-                    <p className="text-xs font-semibold text-[#666] uppercase tracking-wider mb-1">Address</p>
-                    <p className="text-sm text-[#CCC]">{restaurant?.address || "Address not provided yet"}</p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3">
-                  <div className="p-2 bg-[#1A1A1A] rounded-lg text-[#666]">
-                    <Clock size={18} />
-                  </div>
-                  <div>
-                    <p className="text-xs font-semibold text-[#666] uppercase tracking-wider mb-1">Operating Days</p>
-                    <p className="text-sm text-[#CCC]">{restaurant?.operatingDays?.length > 0 ? restaurant.operatingDays.join(", ") : "Not specified"}</p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3">
-                  <div className="p-2 bg-[#1A1A1A] rounded-lg text-[#666]">
-                    <Utensils size={18} />
-                  </div>
-                  <div>
-                    <p className="text-xs font-semibold text-[#666] uppercase tracking-wider mb-1">Meal Timings</p>
-                    <div className="space-y-1 text-sm text-[#CCC]">
-                      {restaurant?.mealTimings?.breakfast?.open ? (
-                        <div className="flex justify-between gap-4">
-                          <span className="text-[#888]">Breakfast:</span>
-                          <span>
-                            {restaurant.mealTimings.breakfast.open} - {restaurant.mealTimings.breakfast.close}
-                          </span>
-                        </div>
-                      ) : null}
-                      {restaurant?.mealTimings?.lunch?.open ? (
-                        <div className="flex justify-between gap-4">
-                          <span className="text-[#888]">Lunch:</span>
-                          <span>
-                            {restaurant.mealTimings.lunch.open} - {restaurant.mealTimings.lunch.close}
-                          </span>
-                        </div>
-                      ) : null}
-                      {restaurant?.mealTimings?.dinner?.open ? (
-                        <div className="flex justify-between gap-4">
-                          <span className="text-[#888]">Dinner:</span>
-                          <span>
-                            {restaurant.mealTimings.dinner.open} - {restaurant.mealTimings.dinner.close}
-                          </span>
-                        </div>
-                      ) : null}
-                      {!restaurant?.mealTimings?.breakfast?.open && !restaurant?.mealTimings?.lunch?.open && !restaurant?.mealTimings?.dinner?.open && <span>Not specified</span>}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Menu Display Section */}
-          {restaurant?.menu && restaurant.menu.length > 0 && (
-            <div className="bg-[#111] border border-[#222] rounded-3xl p-8 mt-6">
-              <div className="flex items-center justify-between mb-6">
-                <h3 className="text-xl font-bold flex items-center gap-2">
-                  <Utensils className="text-[#FF7A30]" size={22} /> Your Menu
-                </h3>
-                <span className="text-sm text-[#888] bg-[#1A1A1A] px-3 py-1 rounded-full border border-[#333]">{restaurant.menu.length} Items</span>
-              </div>
-
-              <div className="space-y-8">
-                {Object.entries(
-                  (restaurant.menu as DashboardMenuItem[]).reduce((acc, item) => {
-                    if (!acc[item.category]) acc[item.category] = [];
-                    acc[item.category].push(item);
-                    return acc;
-                  }, {} as Record<string, DashboardMenuItem[]>)
-                ).map(([category, items]) => (
-                  <div key={category} className="space-y-4">
-                    <h4 className="text-[13px] font-bold uppercase tracking-widest text-[#FF7A30] border-b border-[#222] pb-2">
-                      {category}
-                    </h4>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {items.map((item) => (
-                        <div key={item.name} className="bg-[#1A1A1A] border border-[#2A2A2A] rounded-xl p-4 hover:border-[#FF7A30]/50 transition-colors">
-                          <div className="flex justify-between items-start mb-2">
-                            <h5 className="font-semibold text-white">{item.name}</h5>
-                            <span className="font-bold text-[#00C853]">₹{item.price}</span>
-                          </div>
-                          {item.description && <p className="text-xs text-[#888] mb-3">{item.description}</p>}
-                          <div className="flex flex-wrap gap-2">
-                            {item.dietary && <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${item.dietary.toLowerCase() === "veg" ? "bg-green-500/10 text-green-500 border border-green-500/20" : "bg-red-500/10 text-red-500 border border-red-500/20"}`}>{item.dietary}</span>}
-                            {item.spiceLevel && <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-orange-500/10 text-orange-500 border border-orange-500/20">🌶 {item.spiceLevel}</span>}
-                            {item.prepTime && <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20">⏱ {item.prepTime}</span>}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
+          {restaurant?.menu && restaurant.menu.length > 0 && <DashboardMenuDisplay menu={restaurant.menu} />}
         </div>
 
         {/* Right Side */}
