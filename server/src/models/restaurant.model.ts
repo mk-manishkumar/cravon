@@ -8,7 +8,7 @@ export interface IRestaurant extends Document {
   address?: string;
   location?: {
     type: 'Point';
-    coordinates: number[]; // [longitude, latitude]
+    coordinates: number[]; 
   };
   operatingDays: string[];
   operatingHours?: {
@@ -38,7 +38,7 @@ const restaurantSchema = new Schema<IRestaurant>({
   address: { type: String },
   location: {
     type: { type: String, enum: ['Point'] },
-    coordinates: { type: [Number] } // [longitude, latitude]
+    coordinates: { type: [Number] } 
   },
   operatingDays: { type: [String], default: [] },
   operatingHours: {

@@ -1,6 +1,19 @@
 import Restaurant from "../models/restaurant.model.js";
 import { ApiError } from "../utils/errorHandler.js";
 
+// Get the restaurant details for the logged-in user
+export const getMyRestaurant = async (userId: string, firstName?: string) => {
+  let restaurant = await Restaurant.findOne({ ownerId: userId });
+
+  restaurant ??= await Restaurant.create({
+    ownerId: userId,
+    name: `${firstName || 'Partner'}'s Restaurant`,
+    status: "pending",
+  });
+
+  return restaurant;
+};
+
 // Onboard a restaurant for the logged-in user
 export const onboardRestaurant = async (ownerId: string, data: any) => {
   let restaurant = await Restaurant.findOne({ ownerId });

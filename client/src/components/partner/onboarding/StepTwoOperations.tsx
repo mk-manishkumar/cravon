@@ -14,6 +14,8 @@ export const StepTwoOperations = ({ form }: { form: UseFormReturn<OnboardingForm
   return (
     <div className="space-y-5 animate-in fade-in slide-in-from-right-4 duration-500">
       <div className="grid grid-cols-2 gap-4">
+
+        {/* Opening Time */}
         <div>
           <label htmlFor="openTime" className="block text-[11px] font-semibold uppercase tracking-widest text-[#777777] mb-1.5">
             Opening Time
@@ -24,6 +26,8 @@ export const StepTwoOperations = ({ form }: { form: UseFormReturn<OnboardingForm
           </div>
           {errors.openTime && <p className="text-[#FF3D57] text-xs mt-1.5">{errors.openTime.message}</p>}
         </div>
+
+        {/* Closing Time */}
         <div>
           <label htmlFor="closeTime" className="block text-[11px] font-semibold uppercase tracking-widest text-[#777777] mb-1.5">
             Closing Time
@@ -36,6 +40,7 @@ export const StepTwoOperations = ({ form }: { form: UseFormReturn<OnboardingForm
         </div>
       </div>
 
+    {/* Meal Timings */}
       <div className="pt-4 border-t border-[#1F1F1F]">
         <h4 className="text-[13px] font-semibold text-white uppercase tracking-wider mb-4">Meal Timings (Optional)</h4>
         <div className="space-y-4">
@@ -63,6 +68,7 @@ export const StepTwoOperations = ({ form }: { form: UseFormReturn<OnboardingForm
         </div>
       </div>
 
+      {/* Operating Days */}
       <div className="pt-4 border-t border-[#1F1F1F]">
         <div className="block text-[13px] font-semibold text-white uppercase tracking-wider mb-3">Operating Days</div>
         <div className="flex flex-wrap gap-2">

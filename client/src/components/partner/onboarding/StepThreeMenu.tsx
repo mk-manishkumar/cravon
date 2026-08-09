@@ -5,7 +5,11 @@ import Papa from "papaparse";
 import { OnboardingFormValues } from "./schema";
 
 export const StepThreeMenu = ({ form }: { form: UseFormReturn<OnboardingFormValues> }) => {
-  const { setValue, control, formState: { errors } } = form;
+  const {
+    setValue,
+    control,
+    formState: { errors },
+  } = form;
   const menuItems = useWatch({ control, name: "menu" }) || [];
   const [isParsing, setIsParsing] = useState(false);
   const [parseError, setParseError] = useState<string | null>(null);
@@ -37,12 +41,12 @@ export const StepThreeMenu = ({ form }: { form: UseFormReturn<OnboardingFormValu
               spiceLevel: row["Spice Level"] || "",
               prepTime: row["Prep Time"] || "",
               mealType: row["Meal Type"] || "",
-              description: row["Description"] || ""
+              description: row["Description"] || "",
             };
           });
 
           if (parsedMenu.length === 0) throw new Error("No menu items found in the file.");
-          
+
           setValue("menu", parsedMenu, { shouldValidate: true, shouldDirty: true });
         } catch (err: unknown) {
           if (err instanceof Error) {
@@ -51,14 +55,14 @@ export const StepThreeMenu = ({ form }: { form: UseFormReturn<OnboardingFormValu
             setParseError("An unknown error occurred while parsing the CSV.");
           }
         }
-        
+
         // Reset file input so same file can be uploaded again if needed
         e.target.value = "";
       },
       error: (error) => {
         setIsParsing(false);
         setParseError(`CSV Parsing Error: ${error.message}`);
-      }
+      },
     });
   };
 
@@ -67,11 +71,14 @@ export const StepThreeMenu = ({ form }: { form: UseFormReturn<OnboardingFormValu
   };
 
   // Group menu items by category for preview
-  const groupedMenu = menuItems.reduce((acc, item) => {
-    if (!acc[item.category]) acc[item.category] = [];
-    acc[item.category].push(item);
-    return acc;
-  }, {} as Record<string, typeof menuItems>);
+  const groupedMenu = menuItems.reduce(
+    (acc, item) => {
+      if (!acc[item.category]) acc[item.category] = [];
+      acc[item.category].push(item);
+      return acc;
+    },
+    {} as Record<string, typeof menuItems>,
+  );
 
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500">
@@ -81,20 +88,13 @@ export const StepThreeMenu = ({ form }: { form: UseFormReturn<OnboardingFormValu
             <FileSpreadsheet className="text-[#FF7A30]" size={20} /> Menu Upload
           </h3>
         </div>
-        
-        <p className="text-[#888] text-sm leading-relaxed mb-6">
-          Upload your restaurant&apos;s menu using a CSV or Excel file.
-        </p>
 
+        <p className="text-[#888] text-sm leading-relaxed mb-6">Upload your restaurant&apos;s menu using a CSV or Excel file.</p>
+
+        {/* File Upload Area */}
         {menuItems.length === 0 ? (
           <div className="border-2 border-dashed border-[#2A2A2A] rounded-xl p-10 flex flex-col items-center justify-center text-center relative hover:bg-[#1A1A1A] hover:border-[#FF7A30] transition-all group">
-            <input 
-              type="file" 
-              accept=".csv" 
-              onChange={handleFileUpload} 
-              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-              disabled={isParsing}
-            />
+            <input type="file" accept=".csv" onChange={handleFileUpload} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" disabled={isParsing} />
             <div className="w-16 h-16 bg-[#222] rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
               <UploadCloud className="text-[#555] group-hover:text-[#FF7A30]" size={32} />
             </div>
@@ -116,6 +116,7 @@ export const StepThreeMenu = ({ form }: { form: UseFormReturn<OnboardingFormValu
               </div>
             </div>
 
+            {/* Menu Preview */}
             <div className="space-y-6 max-h-75 overflow-y-auto pr-2 custom-scrollbar">
               {Object.entries(groupedMenu).map(([category, items]) => (
                 <div key={category} className="space-y-3">
@@ -141,15 +142,9 @@ export const StepThreeMenu = ({ form }: { form: UseFormReturn<OnboardingFormValu
           </div>
         )}
 
-        {parseError && (
-          <div className="mt-4 p-4 bg-[#FF3D57]/10 border border-[#FF3D57]/20 rounded-xl text-[#FF3D57] text-sm">
-            {parseError}
-          </div>
-        )}
-        
-        {errors.menu && (
-          <p className="text-[#FF3D57] text-xs mt-4">Please upload your menu to continue.</p>
-        )}
+        {parseError && <div className="mt-4 p-4 bg-[#FF3D57]/10 border border-[#FF3D57]/20 rounded-xl text-[#FF3D57] text-sm">{parseError}</div>}
+
+        {errors.menu && <p className="text-[#FF3D57] text-xs mt-4">Please upload your menu to continue.</p>}
       </div>
     </div>
   );
