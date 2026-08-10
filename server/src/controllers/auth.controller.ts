@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import asyncHandler from "../utils/asyncHandler.js";
 import * as authService from "../services/auth.service.js";
-import { registerSchema, loginSchema, restaurantRegisterSchema } from "../utils/zod.js";
+import { registerSchema, loginSchema, restaurantRegisterSchema, updateProfileSchema, changePasswordSchema, deleteAccountSchema, requestEmailChangeSchema, verifyEmailChangeSchema } from "../utils/zod.js";
 import { setAuthCookies, formatLoginResponse } from "../utils/auth.utils.js";
 
 // CUSTOMER CONTROLLERS
@@ -79,4 +79,50 @@ export const logout = asyncHandler(async (req: Request, res: Response) => {
   res.clearCookie("refreshToken", cookieOptions);
 
   res.status(200).json({ message: "Logged out successfully" });
+});
+
+// SETTINGS CONTROLLERS
+export const updateProfile = asyncHandler(async (req: Request, res: Response) => {
+  const parsedData = updateProfileSchema.parse(req.body);
+  const userId = (req as any).user.id;
+  const updatedUser = await authService.updateProfile(userId, parsedData);
+  res.status(200).json({ message: "Profile updated successfully", user: updatedUser });
+});
+
+export const changePassword = asyncHandler(async (req: Request, res: Response) => {
+  const parsedData = changePasswordSchema.parse(req.body);
+  const userId = (req as any).user.id;
+  const result = await authService.changePassword(userId, parsedData);
+  res.status(200).json(result);
+});
+
+export const requestEmailChange = asyncHandler(async (req: Request, res: Response) => {
+  const parsedData = requestEmailChangeSchema.parse(req.body);
+  const userId = (req as any).user.id;
+  const result = await authService.requestEmailChange(userId, parsedData);
+  res.status(200).json(result);
+});
+
+export const verifyEmailChange = asyncHandler(async (req: Request, res: Response) => {
+  const parsedData = verifyEmailChangeSchema.parse(req.body);
+  const userId = (req as any).user.id;
+  const result = await authService.verifyEmailChange(userId, parsedData);
+  res.status(200).json(result);
+});
+
+export const deleteAccount = asyncHandler(async (req: Request, res: Response) => {
+  const parsedData = deleteAccountSchema.parse(req.body);
+  const userId = (req as any).user.id;
+  const result = await authService.deleteAccount(userId, parsedData);
+  
+  // Clear cookies upon deletion
+  const cookieOptions = {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax" as const,
+  };
+  res.clearCookie("accessToken", cookieOptions);
+  res.clearCookie("refreshToken", cookieOptions);
+
+  res.status(200).json(result);
 });

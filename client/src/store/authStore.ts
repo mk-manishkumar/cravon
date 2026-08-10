@@ -7,6 +7,7 @@ interface User {
   firstName: string;
   lastName: string;
   email: string;
+  phone?: string;
   roles: string[];
 }
 
@@ -18,6 +19,7 @@ interface AuthState {
   // Actions
   checkAuth: () => Promise<void>;
   logout: () => Promise<void>;
+  updateUser: (data: Partial<User>) => void;
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
@@ -48,5 +50,11 @@ export const useAuthStore = create<AuthState>((set) => ({
       // Regardless of success/fail, clear local state
       set({ user: null, isLoggingOut: false });
     }
+  },
+
+  updateUser: (data: Partial<User>) => {
+    set((state) => ({
+      user: state.user ? { ...state.user, ...data } : null,
+    }));
   },
 }));

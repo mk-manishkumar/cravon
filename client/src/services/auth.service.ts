@@ -43,5 +43,27 @@ export const authService = {
   logout: async () => {
     const response = await api.post('/auth/logout');
     return response.data;
+  },
+
+  // Settings
+  updateProfile: async (data: Record<string, string>) => {
+    const response = await api.put('/auth/profile', data);
+    return response.data;
+  },
+  changePassword: async (data: Record<string, string>) => {
+    const response = await api.put('/auth/change-password', data);
+    return response.data;
+  },
+  requestEmailChange: async (data: Record<string, string>) => {
+    const response = await api.post('/auth/request-email-change', data);
+    return response.data;
+  },
+  verifyEmailChange: async (data: Record<string, string>) => {
+    const response = await api.post('/auth/verify-email-change', data);
+    return response.data;
+  },
+  deleteAccount: async (data: Record<string, string>) => {
+    const response = await api.delete('/auth/account', { data });
+    return response.data;
   }
 };
