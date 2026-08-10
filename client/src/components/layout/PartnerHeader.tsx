@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { useAuthStore } from "@/store/authStore";
 
@@ -9,8 +10,18 @@ export default function PartnerHeader() {
   const logout = useAuthStore((state) => state.logout);
   const isLoading = useAuthStore((state) => state.isLoading);
   const [showDropdown, setShowDropdown] = useState(false);
+  const pathname = usePathname();
 
   const displayFont = "'Baloo 2', 'Poppins', 'Segoe UI', sans-serif";
+
+  const getNavClass = (path: string) => {
+    const isActive = pathname.startsWith(path);
+    return `text-[13px] font-semibold transition-all ${
+      isActive
+        ? "text-[#FF7A30] drop-shadow-[0_0_10px_rgba(255,122,48,0.3)]"
+        : "text-[#888888] hover:text-white"
+    }`;
+  };
 
   return (
     <header className="sticky top-0 z-50 w-full bg-[#121212]/90 backdrop-blur-md border-b border-[#222222]">
@@ -25,14 +36,14 @@ export default function PartnerHeader() {
 
           {/* Navigation */}
           <nav className="hidden md:flex gap-8">
-            <Link href="/partner/dashboard" className="text-[13px] font-semibold text-[#888888] hover:text-white transition-colors">
+            <Link href="/partner/dashboard" className={getNavClass("/partner/dashboard")}>
               Dashboard
             </Link>
-            <Link href="/partner/orders" className="text-[13px] font-semibold text-[#888888] hover:text-white transition-colors">
-              Orders
+            <Link href="/partner/restaurants" className={getNavClass("/partner/restaurants")}>
+              Restaurants
             </Link>
-            <Link href="/partner/menu" className="text-[13px] font-semibold text-[#888888] hover:text-white transition-colors">
-              Menu Manager
+            <Link href="/partner/pricing" className={getNavClass("/partner/pricing")}>
+              Pricing
             </Link>
           </nav>
 
