@@ -56,3 +56,18 @@ export const deleteRestaurant = async (ownerId: string) => {
   if (!restaurant) throw new ApiError(404, "Restaurant not found");
   return restaurant;
 };
+
+// Toggle the active/inactive status of the restaurant
+export const toggleRestaurantStatus = async (ownerId: string, status: 'active' | 'inactive') => {
+  const restaurant = await Restaurant.findOne({ ownerId });
+  if (!restaurant) throw new ApiError(404, "Restaurant not found");
+  
+  if (restaurant.status === 'pending') {
+    throw new ApiError(400, "Cannot change status of a pending restaurant. Please complete onboarding first.");
+  }
+
+  restaurant.status = status;
+  await restaurant.save();
+
+  return restaurant;
+};

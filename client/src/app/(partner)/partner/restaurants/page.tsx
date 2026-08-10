@@ -8,7 +8,6 @@ import OnboardingWizard from "@/components/partner/OnboardingWizard";
 import toast from "react-hot-toast";
 
 import DashboardProfileCard from "./components/DashboardProfileCard";
-import DashboardMenuDisplay from "./components/DashboardMenuDisplay";
 
 export default function PartnerRestaurantsPage() {
   const queryClient = useQueryClient();
@@ -48,6 +47,20 @@ export default function PartnerRestaurantsPage() {
     },
   });
 
+  const toggleStatusMutation = useMutation({
+    mutationFn: (status: "active" | "inactive") => restaurantService.toggleStatus(status),
+    onSuccess: (data) => {
+      toast.success(data.message || "Restaurant status updated");
+      queryClient.invalidateQueries({ queryKey: ["myRestaurant"] });
+    },
+    onError: (error: unknown) => {
+      console.error(error);
+      const err = error as { response?: { data?: { message?: string } }; message?: string };
+      const message = err.response?.data?.message || err.message || "Failed to update status";
+      toast.error(`Status update failed: ${message}`);
+    },
+  });
+
   if (isLoading) {
     return (
       <div className="flex-1 flex items-center justify-center min-h-screen">
@@ -68,11 +81,15 @@ export default function PartnerRestaurantsPage() {
       </div>
 
       <div className={`grid grid-cols-1 ${!isOnboarded ? "lg:grid-cols-3" : ""} gap-8`}>
-        {/* Left Side: Restaurant Profile & Menu */}
-        <div className="lg:col-span-2 space-y-6">
-          <DashboardProfileCard restaurant={restaurant} isOnboarded={isOnboarded} onEdit={() => setIsEditModalOpen(true)} onDelete={() => deleteMutation.mutate()} isDeleting={deleteMutation.isPending} />
-
-          {restaurant?.menu && restaurant.menu.length > 0 && <DashboardMenuDisplay menu={restaurant.menu} />}
+        {/* Left Side: Restaurants Grid */}
+        <div className="lg:col-span-2">
+          {/* 
+            Render as a grid for future-proofing multiple restaurants.
+            Currently only supports one restaurant natively due to backend design.
+          */}
+          <div className="grid grid-cols-[repeat(auto-fill,minmax(340px,1fr))] gap-6">
+            <DashboardProfileCard restaurant={restaurant} isOnboarded={isOnboarded} onEdit={() => setIsEditModalOpen(true)} onDelete={() => deleteMutation.mutate()} isDeleting={deleteMutation.isPending} onToggleStatus={() => toggleStatusMutation.mutate(restaurant?.status === "active" ? "inactive" : "active")} isTogglingStatus={toggleStatusMutation.isPending} />
+          </div>
         </div>
 
         {/* Right Side */}

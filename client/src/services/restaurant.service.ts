@@ -18,4 +18,10 @@ export const restaurantService = {
     const response = await api.delete("/restaurants/me");
     return response.data;
   },
+
+  // Toggle restaurant active/inactive status
+  toggleStatus: async (status: 'active' | 'inactive') => {
+    const response = await api.patch("/restaurants/me/status", { status });
+    return response.data;
+  },
 };
