@@ -7,7 +7,7 @@ import OnboardingWidget from "@/components/partner/OnboardingWidget";
 import OnboardingWizard from "@/components/partner/OnboardingWizard";
 import toast from "react-hot-toast";
 
-import DashboardProfileCard from "./components/DashboardProfileCard";
+import RestaurantProfileCard from "./components/RestaurantProfileCard";
 
 export default function PartnerRestaurantsPage() {
   const queryClient = useQueryClient();
@@ -88,11 +88,9 @@ export default function PartnerRestaurantsPage() {
             Currently only supports one restaurant natively due to backend design.
           */}
           <div className="grid grid-cols-[repeat(auto-fill,minmax(340px,1fr))] gap-6">
-            <DashboardProfileCard restaurant={restaurant} isOnboarded={isOnboarded} onEdit={() => setIsEditModalOpen(true)} onDelete={() => deleteMutation.mutate()} isDeleting={deleteMutation.isPending} onToggleStatus={() => toggleStatusMutation.mutate(restaurant?.status === "active" ? "inactive" : "active")} isTogglingStatus={toggleStatusMutation.isPending} />
+            <RestaurantProfileCard restaurant={restaurant} isOnboarded={isOnboarded} onEdit={() => setIsEditModalOpen(true)} onDelete={() => deleteMutation.mutate()} isDeleting={deleteMutation.isPending} onToggleStatus={() => toggleStatusMutation.mutate(restaurant?.status === "active" ? "inactive" : "active")} isTogglingStatus={toggleStatusMutation.isPending} />
           </div>
         </div>
-
-        {/* Right Side */}
         {!isOnboarded && (
           <div className="lg:col-span-1">
             {/* The widget component manages its own modal */}

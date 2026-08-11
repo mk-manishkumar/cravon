@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { restaurantService } from "@/services/restaurant.service";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
-import DashboardMenuDisplay from "../components/DashboardMenuDisplay";
+import RestaurantMenuDisplay from "../components/RestaurantMenuDisplay";
 
 export default function RestaurantMenuPage() {
   const { data: restaurant, isLoading } = useQuery({
@@ -48,7 +48,7 @@ export default function RestaurantMenuPage() {
       </div>
 
       {restaurant.menu && restaurant.menu.length > 0 ? (
-        <DashboardMenuDisplay menu={restaurant.menu} />
+        <RestaurantMenuDisplay menu={restaurant.menu} />
       ) : (
         <div className="bg-[#111] border border-[#222] rounded-3xl p-12 text-center mt-6">
           <p className="text-[#888]">No menu items found for this restaurant.</p>

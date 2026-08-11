@@ -13,7 +13,7 @@ interface Props {
   readonly isTogglingStatus?: boolean;
 }
 
-export default function DashboardProfileCard({ restaurant, isOnboarded, onEdit, onDelete, onToggleStatus, isDeleting, isTogglingStatus }: Props) {
+export default function RestaurantProfileCard({ restaurant, isOnboarded, onEdit, onDelete, onToggleStatus, isDeleting, isTogglingStatus }: Props) {
   const slug = restaurant?.name
     ? restaurant.name
         .toString()

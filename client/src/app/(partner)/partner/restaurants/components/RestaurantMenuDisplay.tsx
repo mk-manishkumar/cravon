@@ -1,6 +1,6 @@
 import { Utensils } from "lucide-react";
 
-export type DashboardMenuItem = {
+export type RestaurantMenuItem = {
   category: string;
   name: string;
   price: number;
@@ -11,10 +11,10 @@ export type DashboardMenuItem = {
 };
 
 interface Props {
-  readonly menu?: readonly DashboardMenuItem[];
+  readonly menu?: readonly RestaurantMenuItem[];
 }
 
-export default function DashboardMenuDisplay({ menu }: Props) {
+export default function RestaurantMenuDisplay({ menu }: Props) {
   if (!menu || menu.length === 0) return null;
 
   return (
@@ -28,13 +28,13 @@ export default function DashboardMenuDisplay({ menu }: Props) {
 
       <div className="space-y-8">
         {Object.entries(
-          (menu as DashboardMenuItem[]).reduce(
+          (menu as RestaurantMenuItem[]).reduce(
             (acc, item) => {
               if (!acc[item.category]) acc[item.category] = [];
               acc[item.category].push(item);
               return acc;
             },
-            {} as Record<string, DashboardMenuItem[]>,
+            {} as Record<string, RestaurantMenuItem[]>,
           ),
         ).map(([category, items]) => (
           <div key={category} className="space-y-4">
