@@ -14,6 +14,13 @@ export const getMyRestaurant = async (userId: string, firstName?: string) => {
   return restaurant;
 };
 
+// Get a specific restaurant by ID ensuring it belongs to the logged-in user
+export const getRestaurantById = async (ownerId: string, restaurantId: string) => {
+  const restaurant = await Restaurant.findOne({ _id: restaurantId, ownerId });
+  if (!restaurant) throw new ApiError(404, "Restaurant not found");
+  return restaurant;
+};
+
 // Onboard a restaurant for the logged-in user
 export const onboardRestaurant = async (ownerId: string, data: any) => {
   let restaurant = await Restaurant.findOne({ ownerId });

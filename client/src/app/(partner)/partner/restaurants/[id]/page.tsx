@@ -6,11 +6,11 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import RestaurantMenuDisplay from "../components/RestaurantMenuDisplay";
 
-export default function RestaurantMenuPage() {
+export default function RestaurantMenuPage({ params }: { readonly params: { readonly id: string } }) {
   const { data: restaurant, isLoading } = useQuery({
-    queryKey: ["myRestaurant"],
+    queryKey: ["restaurant", params.id],
     queryFn: async () => {
-      const response = await restaurantService.getMyRestaurant();
+      const response = await restaurantService.getRestaurantById(params.id);
       return response.data;
     },
   });

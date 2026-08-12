@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import asyncHandler from "../utils/asyncHandler.js";
-import { onboardRestaurant, deleteRestaurant, getMyRestaurant as getMyRestaurantService, toggleRestaurantStatus } from "../services/restaurant.service.js";
+import { onboardRestaurant, deleteRestaurant, getMyRestaurant as getMyRestaurantService, toggleRestaurantStatus, getRestaurantById } from "../services/restaurant.service.js";
 import { ApiError } from "../utils/errorHandler.js";
 
 //  Complete restaurant onboarding
@@ -25,6 +25,22 @@ export const getMyRestaurant = asyncHandler(async (req: Request, res: Response) 
   if (!userId) throw new ApiError(401, "Unauthorized");
 
   const restaurant = await getMyRestaurantService(userId, user.firstName);
+
+  res.status(200).json({
+    status: "success",
+    data: restaurant,
+  });
+});
+
+// Get a specific restaurant by ID
+export const getRestaurant = asyncHandler(async (req: Request, res: Response) => {
+  const userId = (req as any).user?.id;
+  if (!userId) throw new ApiError(401, "Unauthorized");
+
+  const { id } = req.params;
+  if (!id) throw new ApiError(400, "Restaurant ID is required");
+
+  const restaurant = await getRestaurantById(userId, id);
 
   res.status(200).json({
     status: "success",

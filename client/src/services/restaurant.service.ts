@@ -13,6 +13,12 @@ export const restaurantService = {
     return response.data;
   },
 
+  // Get a specific restaurant by its ID
+  getRestaurantById: async (id: string) => {
+    const response = await api.get(`/restaurants/${id}`);
+    return response.data;
+  },
+
   // Delete the restaurant
   deleteMyRestaurant: async () => {
     const response = await api.delete("/restaurants/me");

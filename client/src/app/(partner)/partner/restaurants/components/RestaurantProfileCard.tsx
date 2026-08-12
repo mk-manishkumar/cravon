@@ -14,17 +14,6 @@ interface Props {
 }
 
 export default function RestaurantProfileCard({ restaurant, isOnboarded, onEdit, onDelete, onToggleStatus, isDeleting, isTogglingStatus }: Props) {
-  const slug = restaurant?.name
-    ? restaurant.name
-        .toString()
-        .toLowerCase()
-        .replace(/\s+/g, "-") 
-        .replace(/[^\w-]+/g, "")
-        .split("-")
-        .filter(Boolean)
-        .join("-")
-    : "menu";
-
   const isActive = restaurant?.status === "active";
 
   return (
@@ -151,7 +140,7 @@ export default function RestaurantProfileCard({ restaurant, isOnboarded, onEdit,
           </button>
 
           <Link
-            href={`/partner/restaurants/${slug}`}
+            href={`/partner/restaurants/${restaurant?._id || ''}`}
             className="flex items-center gap-2 px-4 py-2 bg-[#FF7A30]/10 text-[#FF7A30] hover:bg-[#FF7A30]/20 rounded-xl text-xs font-bold transition-all cursor-pointer"
           >
             View Menu <ChevronRight size={14} />
