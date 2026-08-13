@@ -4,13 +4,16 @@ import { useQuery } from "@tanstack/react-query";
 import { restaurantService } from "@/services/restaurant.service";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
+import React from "react";
 import RestaurantMenuDisplay from "../components/RestaurantMenuDisplay";
 
-export default function RestaurantMenuPage({ params }: { readonly params: { readonly id: string } }) {
+export default function RestaurantMenuPage({ params }: { readonly params: Promise<{ readonly id: string }> }) {
+  const unwrappedParams = React.use(params);
+  
   const { data: restaurant, isLoading } = useQuery({
-    queryKey: ["restaurant", params.id],
+    queryKey: ["restaurant", unwrappedParams.id],
     queryFn: async () => {
-      const response = await restaurantService.getRestaurantById(params.id);
+      const response = await restaurantService.getRestaurantById(unwrappedParams.id);
       return response.data;
     },
   });

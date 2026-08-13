@@ -1,14 +1,20 @@
 import api from "../lib/axios";
 
 export const restaurantService = {
-  // Onboard the restaurant with the 3-step form data
-  onboard: async (data: Record<string, unknown>) => {
-    const response = await api.put("/restaurants/onboard", data);
+  // Create a new restaurant
+  createRestaurant: async (data: Record<string, unknown>) => {
+    const response = await api.post("/restaurants", data);
     return response.data;
   },
 
-  // Get the current restaurant details (to check onboarding status)
-  getMyRestaurant: async () => {
+  // Update an existing restaurant
+  updateRestaurant: async (id: string, data: Record<string, unknown>) => {
+    const response = await api.put(`/restaurants/${id}`, data);
+    return response.data;
+  },
+
+  // Get all restaurants for the logged-in user
+  getMyRestaurants: async () => {
     const response = await api.get("/restaurants/me");
     return response.data;
   },
@@ -19,15 +25,15 @@ export const restaurantService = {
     return response.data;
   },
 
-  // Delete the restaurant
-  deleteMyRestaurant: async () => {
-    const response = await api.delete("/restaurants/me");
+  // Delete a specific restaurant
+  deleteRestaurant: async (id: string) => {
+    const response = await api.delete(`/restaurants/${id}`);
     return response.data;
   },
 
-  // Toggle restaurant active/inactive status
-  toggleStatus: async (status: 'active' | 'inactive') => {
-    const response = await api.patch("/restaurants/me/status", { status });
+  // Toggle active/inactive status of a specific restaurant
+  toggleStatus: async (id: string, status: 'active' | 'inactive') => {
+    const response = await api.patch(`/restaurants/${id}/status`, { status });
     return response.data;
   },
 };

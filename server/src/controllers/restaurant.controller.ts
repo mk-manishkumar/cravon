@@ -1,34 +1,53 @@
 import { Request, Response } from "express";
+import mongoose from "mongoose";
 import asyncHandler from "../utils/asyncHandler.js";
-import { onboardRestaurant, deleteRestaurant, getMyRestaurant as getMyRestaurantService, toggleRestaurantStatus, getRestaurantById } from "../services/restaurant.service.js";
+import { createRestaurant, updateRestaurant, deleteRestaurant, getMyRestaurants as getMyRestaurantsService, toggleRestaurantStatus, getRestaurantById } from "../services/restaurant.service.js";
 import { ApiError } from "../utils/errorHandler.js";
 
-//  Complete restaurant onboarding
-export const completeOnboarding = asyncHandler(async (req: Request, res: Response) => {
+// Create a completely new restaurant
+export const createNewRestaurant = asyncHandler(async (req: Request, res: Response) => {
   const userId = (req as any).user?.id;
   if (!userId) throw new ApiError(401, "Unauthorized");
 
-  const updatedRestaurant = await onboardRestaurant(userId, req.body);
+  const newRestaurant = await createRestaurant(userId, req.body);
+
+  res.status(201).json({
+    status: "success",
+    message: "Restaurant created successfully",
+    data: newRestaurant,
+  });
+});
+
+// Update an existing restaurant
+export const updateExistingRestaurant = asyncHandler(async (req: Request, res: Response) => {
+  const userId = (req as any).user?.id;
+  if (!userId) throw new ApiError(401, "Unauthorized");
+
+  const { id } = req.params;
+  if (!id) throw new ApiError(400, "Restaurant ID is required");
+  if (!mongoose.isValidObjectId(id)) throw new ApiError(400, "Invalid Restaurant ID format");
+
+  const updatedRestaurant = await updateRestaurant(userId, id, req.body);
 
   res.status(200).json({
     status: "success",
-    message: "Onboarding completed successfully",
+    message: "Restaurant updated successfully",
     data: updatedRestaurant,
   });
 });
 
-// Get the restaurant details for the logged-in user
-export const getMyRestaurant = asyncHandler(async (req: Request, res: Response) => {
+// Get all restaurants for the logged-in user
+export const getMyRestaurants = asyncHandler(async (req: Request, res: Response) => {
   const user = (req as any).user;
   const userId = user?.id;
 
   if (!userId) throw new ApiError(401, "Unauthorized");
 
-  const restaurant = await getMyRestaurantService(userId, user.firstName);
+  const restaurants = await getMyRestaurantsService(userId);
 
   res.status(200).json({
     status: "success",
-    data: restaurant,
+    data: restaurants,
   });
 });
 
@@ -39,6 +58,7 @@ export const getRestaurant = asyncHandler(async (req: Request, res: Response) =>
 
   const { id } = req.params;
   if (!id) throw new ApiError(400, "Restaurant ID is required");
+  if (!mongoose.isValidObjectId(id)) throw new ApiError(400, "Invalid Restaurant ID format");
 
   const restaurant = await getRestaurantById(userId, id);
 
@@ -48,12 +68,16 @@ export const getRestaurant = asyncHandler(async (req: Request, res: Response) =>
   });
 });
 
-// Delete the restaurant for the logged-in user
+// Delete a specific restaurant for the logged-in user
 export const deleteMyRestaurant = asyncHandler(async (req: Request, res: Response) => {
   const userId = (req as any).user?.id;
   if (!userId) throw new ApiError(401, "Unauthorized");
 
-  await deleteRestaurant(userId);
+  const { id } = req.params;
+  if (!id) throw new ApiError(400, "Restaurant ID is required");
+  if (!mongoose.isValidObjectId(id)) throw new ApiError(400, "Invalid Restaurant ID format");
+
+  await deleteRestaurant(userId, id);
 
   res.status(200).json({
     status: "success",
@@ -61,15 +85,19 @@ export const deleteMyRestaurant = asyncHandler(async (req: Request, res: Respons
   });
 });
 
-// Toggle the active/inactive status of the restaurant
+// Toggle the active/inactive status of a specific restaurant
 export const toggleStatus = asyncHandler(async (req: Request, res: Response) => {
   const userId = (req as any).user?.id;
   if (!userId) throw new ApiError(401, "Unauthorized");
 
+  const { id } = req.params;
+  if (!id) throw new ApiError(400, "Restaurant ID is required");
+  if (!mongoose.isValidObjectId(id)) throw new ApiError(400, "Invalid Restaurant ID format");
+
   const { status } = req.body;
   if (status !== "active" && status !== "inactive") throw new ApiError(400, "Invalid status. Must be 'active' or 'inactive'");
 
-  const updatedRestaurant = await toggleRestaurantStatus(userId, status);
+  const updatedRestaurant = await toggleRestaurantStatus(userId, id, status);
 
   res.status(200).json({
     status: "success",
