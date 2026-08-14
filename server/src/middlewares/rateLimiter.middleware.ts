@@ -29,3 +29,13 @@ export const authLimiter = rateLimit({
     message: `Too many login/register attempts from this IP, please try again after ${windowMsg}`,
   },
 });
+
+// Rate limiter for payments
+export const paymentLimiter = rateLimit({
+  ...baseConfig,
+  max: Number.parseInt(process.env.RATE_LIMIT_PAYMENT || "10", 10),
+  message: {
+    status: "error",
+    message: `Too many payment requests from this IP, please try again after ${windowMsg}`,
+  },
+});

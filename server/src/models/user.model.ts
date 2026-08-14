@@ -8,6 +8,11 @@ export interface IUser extends Document {
   phone?: string;
   status: string;
   isVerified: boolean;
+  subscription: {
+    tier: string;
+    status: 'active' | 'expired' | 'cancelled';
+    expiresAt?: Date;
+  };
   createdAt: Date;
   updatedAt: Date;
 }
@@ -19,7 +24,12 @@ const UserSchema: Schema = new Schema({
   password: { type: String, required: true },
   phone: { type: String },
   status: { type: String, enum: ['active', 'suspended', 'deleted'], default: 'active' },
-  isVerified: { type: Boolean, default: false }
+  isVerified: { type: Boolean, default: false },
+  subscription: {
+    tier: { type: String, default: 'free' },
+    status: { type: String, enum: ['active', 'expired', 'cancelled'], default: 'active' },
+    expiresAt: { type: Date }
+  }
 }, { timestamps: true });
 
 export default mongoose.model<IUser>('User', UserSchema);

@@ -3,11 +3,26 @@ import mongoose from "mongoose";
 import asyncHandler from "../utils/asyncHandler.js";
 import { createRestaurant, updateRestaurant, deleteRestaurant, getMyRestaurants as getMyRestaurantsService, toggleRestaurantStatus, getRestaurantById } from "../services/restaurant.service.js";
 import { ApiError } from "../utils/errorHandler.js";
+import User from "../models/user.model.js";
+import { getTierConfig } from "../config/pricing.config.js";
+import Restaurant from "../models/restaurant.model.js";
 
 // Create a completely new restaurant
 export const createNewRestaurant = asyncHandler(async (req: Request, res: Response) => {
   const userId = (req as any).user?.id;
   if (!userId) throw new ApiError(401, "Unauthorized");
+
+  // Check Subscription Limits
+  const user = await User.findById(userId);
+  if (!user) throw new ApiError(404, "User not found");
+
+  const tier = user.subscription?.tier || 'free';
+  const tierConfig = getTierConfig(tier);
+
+  const restaurantCount = await Restaurant.countDocuments({ ownerId: userId });
+  if (restaurantCount >= tierConfig.maxRestaurants) {
+    throw new ApiError(403, `LIMIT_EXCEEDED: You can only have ${tierConfig.maxRestaurants} restaurants on the ${tierConfig.name} plan. Please upgrade your plan to add more.`);
+  }
 
   const newRestaurant = await createRestaurant(userId, req.body);
 

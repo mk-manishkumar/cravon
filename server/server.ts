@@ -6,6 +6,7 @@ import connectDB from "./src/config/db.js";
 import authRoutes from "./src/routes/auth.routes.js";
 import restaurantRoutes from "./src/routes/restaurant.routes.js";
 import uploadRoutes from "./src/routes/upload.routes.js";
+import paymentRoutes from "./src/routes/payment.routes.js";
 import { errorHandler } from "./src/utils/errorHandler.js";
 import { globalLimiter } from "./src/middlewares/rateLimiter.middleware.js";
 
@@ -38,6 +39,7 @@ app.use("/api", globalLimiter);
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/restaurants", restaurantRoutes);
 app.use("/api/v1/upload", uploadRoutes);
+app.use("/api/v1/payments", paymentRoutes);
 
 // ERROR HANDLING
 // 404 Route Not Found Middleware

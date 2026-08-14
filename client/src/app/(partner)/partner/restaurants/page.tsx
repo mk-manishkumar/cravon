@@ -1,16 +1,20 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { restaurantService } from "@/services/restaurant.service";
 import OnboardingWizard from "@/components/partner/OnboardingWizard";
 import toast from "react-hot-toast";
+import { Sparkles } from "lucide-react";
 
 import RestaurantProfileCard from "./components/RestaurantProfileCard";
 
 export default function PartnerRestaurantsPage() {
   const queryClient = useQueryClient();
+  const router = useRouter();
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [editingRestaurant, setEditingRestaurant] = useState<any>(null);
 
@@ -33,7 +37,13 @@ export default function PartnerRestaurantsPage() {
     onError: (error: any) => {
       console.error(error);
       const message = error.response?.data?.message || error.message || "Failed to create restaurant";
-      toast.error(`Creation failed: ${message}`);
+
+      if (message.includes("LIMIT_EXCEEDED")) {
+        setIsCreateModalOpen(false);
+        setShowUpgradeModal(true);
+      } else {
+        toast.error(`Creation failed: ${message}`);
+      }
     },
   });
 
@@ -92,11 +102,7 @@ export default function PartnerRestaurantsPage() {
           <h1 className="text-3xl font-bold">Partner Hub</h1>
           <p className="text-[#888] mt-1">Manage your restaurants and operations</p>
         </div>
-        <button
-          type="button"
-          onClick={() => setIsCreateModalOpen(true)}
-          className="px-6 py-2.5 bg-[#FF7A30] text-white font-bold rounded-xl hover:bg-[#FF7A30]/90 transition-all cursor-pointer"
-        >
+        <button type="button" onClick={() => setIsCreateModalOpen(true)} className="px-6 py-2.5 bg-[#FF7A30] text-white font-bold rounded-xl hover:bg-[#FF7A30]/90 transition-all cursor-pointer">
           New Onboard
         </button>
       </div>
@@ -108,28 +114,13 @@ export default function PartnerRestaurantsPage() {
             {restaurants.length === 0 ? (
               <div className="col-span-full flex flex-col items-center justify-center p-12 bg-[#111] border border-[#222] rounded-3xl">
                 <p className="text-[#888] mb-4">You haven&apos;t onboarded any restaurants yet.</p>
-                <button
-                  type="button"
-                  onClick={() => setIsCreateModalOpen(true)}
-                  className="px-6 py-2.5 bg-white/5 border border-white/10 hover:bg-white/10 text-white font-bold rounded-xl transition-all cursor-pointer"
-                >
+                <button type="button" onClick={() => setIsCreateModalOpen(true)} className="px-6 py-2.5 bg-white/5 border border-white/10 hover:bg-white/10 text-white font-bold rounded-xl transition-all cursor-pointer">
                   Create Your First Restaurant
                 </button>
               </div>
             ) : (
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              restaurants.map((rest: any) => (
-                <RestaurantProfileCard 
-                  key={rest._id}
-                  restaurant={rest} 
-                  isOnboarded={rest.isOnboarded} 
-                  onEdit={() => setEditingRestaurant(rest)} 
-                  onDelete={() => deleteMutation.mutate(rest._id)} 
-                  isDeleting={deleteMutation.isPending} 
-                  onToggleStatus={() => toggleStatusMutation.mutate({ id: rest._id, status: rest.status === "active" ? "inactive" : "active" })} 
-                  isTogglingStatus={toggleStatusMutation.isPending} 
-                />
-              ))
+              restaurants.map((rest: any) => <RestaurantProfileCard key={rest._id} restaurant={rest} isOnboarded={rest.isOnboarded} onEdit={() => setEditingRestaurant(rest)} onDelete={() => deleteMutation.mutate(rest._id)} isDeleting={deleteMutation.isPending} onToggleStatus={() => toggleStatusMutation.mutate({ id: rest._id, status: rest.status === "active" ? "inactive" : "active" })} isTogglingStatus={toggleStatusMutation.isPending} />)
             )}
           </div>
         </div>
@@ -153,6 +144,33 @@ export default function PartnerRestaurantsPage() {
 
           <div className="relative z-10 w-full max-w-2xl my-auto">
             <OnboardingWizard initialData={editingRestaurant} isEditMode={true} onComplete={(data) => updateMutation.mutate({ id: editingRestaurant._id, data })} isLoading={updateMutation.isPending} onClose={() => setEditingRestaurant(null)} />
+          </div>
+        </div>
+      )}
+
+      {/* Upgrade Required Modal */}
+      {showUpgradeModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <button 
+            type="button"
+            className="absolute inset-0 w-full h-full bg-black/80 backdrop-blur-sm cursor-default outline-none" 
+            onClick={() => setShowUpgradeModal(false)} 
+            aria-label="Close modal"
+          />
+          <div className="relative z-10 w-full max-w-md bg-[#111] border border-[#333] rounded-3xl p-8 text-center shadow-2xl animate-in zoom-in-95">
+            <div className="w-16 h-16 bg-[#FF7A30]/20 text-[#FF7A30] rounded-full flex items-center justify-center mx-auto mb-6">
+              <Sparkles className="w-8 h-8" />
+            </div>
+            <h3 className="text-2xl font-bold text-white mb-3">Upgrade Required</h3>
+            <p className="text-[#888] mb-8">You&apos;ve reached the maximum number of restaurants for your current plan. Upgrade to a higher tier to add more locations!</p>
+            <div className="flex gap-4">
+              <button type="button" onClick={() => setShowUpgradeModal(false)} className="flex-1 px-4 py-3 bg-[#222] text-white rounded-xl font-bold hover:bg-[#333] transition-colors">
+                Cancel
+              </button>
+              <button type="button" onClick={() => router.push("/partner/pricing")} className="flex-1 px-4 py-3 bg-[#FF7A30] text-white rounded-xl font-bold hover:bg-[#FF7A30]/90 transition-colors shadow-lg shadow-[#FF7A30]/20">
+                View Plans
+              </button>
+            </div>
           </div>
         </div>
       )}
