@@ -9,6 +9,11 @@ interface User {
   email: string;
   phone?: string;
   roles: string[];
+  subscription?: {
+    tier: string;
+    status: string;
+    expiresAt: string;
+  };
 }
 
 interface AuthState {

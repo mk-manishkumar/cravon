@@ -6,6 +6,7 @@ export const PRICING_TIERS = {
     price: 0,
     maxRestaurants: 3,
     maxStaff: 0,
+    validityMonths: 0,
   },
   MID: {
     id: 'mid',
@@ -13,6 +14,7 @@ export const PRICING_TIERS = {
     price: 4000, // INR 
     maxRestaurants: 50,
     maxStaff: 3,
+    validityMonths: 6,
   },
   ADVANCED: {
     id: 'advanced',
@@ -20,6 +22,7 @@ export const PRICING_TIERS = {
     price: 8000, // INR 
     maxRestaurants: 100,
     maxStaff: 10,
+    validityMonths: 12,
   }
 };
 

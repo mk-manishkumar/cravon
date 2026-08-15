@@ -15,14 +15,14 @@ const TIERS = [
     description: "Perfect for new partners testing the waters.",
     features: ["Up to 3 Restaurant Listings", "No staff accounts", "Basic Analytics", "Standard Support"],
     icon: <Sparkles className="w-6 h-6 text-[#888]" />,
-    buttonText: "Current Plan",
+    buttonText: "Starter Plan",
     popular: false,
   },
   {
     id: "mid",
     name: "Professional",
     price: "₹4,000",
-    period: "/month",
+    period: "/6 months",
     description: "Ideal for growing businesses with multiple locations.",
     features: ["Up to 50 Restaurant Listings", "3 Staff Accounts", "Advanced Analytics", "Priority Support", "Custom Branding"],
     icon: <Zap className="w-6 h-6 text-[#FF7A30]" />,
@@ -33,7 +33,7 @@ const TIERS = [
     id: "advanced",
     name: "Enterprise",
     price: "₹8,000",
-    period: "/month",
+    period: "/year",
     description: "For large scale operations and franchises.",
     features: ["Up to 100 Restaurant Listings", "10 Staff Accounts", "Enterprise Analytics", "24/7 Dedicated Support", "Custom Branding", "API Access"],
     icon: <Building2 className="w-6 h-6 text-white" />,
@@ -123,12 +123,19 @@ export default function PricingPage() {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
         {TIERS.map((tier) => {
-          let buttonClass = "bg-white text-black hover:bg-gray-200";
-          if (tier.popular) {
-            buttonClass = "bg-[#FF7A30] text-white hover:bg-[#FF7A30]/90 hover:shadow-[0_0_20px_rgba(255,122,48,0.3)]";
-          } else if (tier.id === "free") {
-            buttonClass = "bg-[#222] text-[#888] cursor-not-allowed";
-          }
+          const currentTierId = user?.subscription?.tier || "free";
+          const isCurrentPlan = currentTierId === tier.id;
+          
+          const TIER_ORDER = ["free", "mid", "advanced"];
+          const currentTierIndex = TIER_ORDER.indexOf(currentTierId);
+          const renderedTierIndex = TIER_ORDER.indexOf(tier.id);
+          const isDowngrade = renderedTierIndex < currentTierIndex;
+
+          let buttonClass = "bg-white text-black hover:bg-gray-200 cursor-pointer";
+          if (isCurrentPlan || isDowngrade)   buttonClass = "bg-[#222] text-[#888] cursor-not-allowed";
+           else if (tier.id === "free") buttonClass = "bg-[#222] text-[#888] cursor-not-allowed"; 
+           else if (tier.popular) buttonClass = "bg-[#FF7A30] text-white hover:bg-[#FF7A30]/90 hover:shadow-[0_0_20px_rgba(255,122,48,0.3)] cursor-pointer";
+          
 
           return (
             <div key={tier.id} className={`relative flex flex-col p-8 rounded-3xl border transition-all duration-300 ${tier.popular ? "bg-linear-to-b from-[#FF7A30]/10 to-[#111] border-[#FF7A30] shadow-[0_0_40px_rgba(255,122,48,0.15)] scale-105 z-10" : "bg-[#111] border-[#222] hover:border-[#333]"}`}>
@@ -146,8 +153,10 @@ export default function PricingPage() {
                 {tier.period && <span className="text-[#888] font-medium">{tier.period}</span>}
               </div>
 
-              <button type="button" onClick={() => handleSubscribe(tier.id)} disabled={tier.id === "free" || loadingTier === tier.id} className={`w-full py-4 rounded-xl font-bold transition-all flex items-center justify-center ${buttonClass}`}>
-                {loadingTier === tier.id ? <div className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin"></div> : tier.buttonText}
+              <button type="button" onClick={() => handleSubscribe(tier.id)} disabled={isCurrentPlan || isDowngrade || tier.id === "free" || loadingTier === tier.id} className={`w-full py-4 rounded-xl font-bold transition-all flex items-center justify-center ${buttonClass}`}>
+                {loadingTier === tier.id && <div className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin"></div>}
+                {loadingTier !== tier.id && isCurrentPlan && "Current Plan"}
+                {loadingTier !== tier.id && !isCurrentPlan && tier.buttonText}
               </button>
 
               <div className="mt-8 pt-8 border-t border-[#222] flex-1">

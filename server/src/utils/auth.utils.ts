@@ -79,5 +79,7 @@ export const formatLoginResponse = (data: any) => ({
     firstName: data.user.firstName,
     lastName: data.user.lastName,
     email: data.user.email,
+    phone: data.user.phone,
+    subscription: data.user.subscription,
   },
 });

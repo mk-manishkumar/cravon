@@ -59,9 +59,9 @@ export const verifyPaymentAndUpgradeUser = async (
   const user = await User.findById(userId);
   if (!user) throw new ApiError(404, "User not found");
 
-  // Add 30 days of access
+  // Calculate expiry date based on tier config
   const expiresAt = new Date();
-  expiresAt.setDate(expiresAt.getDate() + 30);
+  expiresAt.setMonth(expiresAt.getMonth() + (tierConfig.validityMonths || 1));
 
   user.subscription = {
     tier: tierConfig.id,
