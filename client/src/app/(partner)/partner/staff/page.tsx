@@ -137,19 +137,19 @@ export default function GlobalStaffManagementPage() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto p-4 sm:p-8 space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 relative">
+    <div className="flex-1 p-8 text-white max-w-7xl mx-auto w-full space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 relative">
       {/* Subtle Background Glow */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-200 h-75 bg-[#FF7A30]/5 rounded-full blur-[100px] -z-10 pointer-events-none" />
 
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 relative z-10">
+      <div className="flex flex-col max-[525px]:items-start min-[525px]:flex-row min-[525px]:items-center justify-between gap-4 min-[525px]:gap-0 mb-8 relative z-10">
         <div>
-          <h1 className="text-3xl font-extrabold text-white mb-2 tracking-tight">Staff Members</h1>
-          <p className="text-[#A0A0A0] text-lg">Manage staff access across all your restaurants.</p>
+          <h1 className="text-3xl font-bold">Staff Members</h1>
+          <p className="text-[#888] mt-1">Manage staff access across all your restaurants.</p>
         </div>
 
-        <button type="button" onClick={() => setShowInviteModal(true)} className="bg-linear-to-r from-[#FF7A30] to-[#FF5E00] text-white px-6 py-3.5 rounded-2xl font-bold hover:shadow-[0_0_20px_rgba(255,122,48,0.4)] hover:scale-[1.02] transition-all flex items-center gap-2 cursor-pointer shadow-lg">
-          <Plus className="w-5 h-5" />
+        <button type="button" onClick={() => setShowInviteModal(true)} className="px-6 py-2.5 bg-[#FF7A30] text-white font-bold rounded-xl hover:bg-[#FF7A30]/90 transition-all cursor-pointer shadow-lg shadow-[#FF7A30]/20 flex items-center gap-2">
+          <Plus size={18} />
           Invite Staff
         </button>
       </div>

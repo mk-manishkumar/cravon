@@ -22,7 +22,12 @@ export default function AcceptInvitePage() {
   });
 
   // 1. Fetch Invite Details (Runs immediately if token exists)
-  const { data: inviteDetails, isLoading: detailsLoading, isError: detailsError, error: detailsErrObj } = useQuery({
+  const {
+    data: inviteDetails,
+    isLoading: detailsLoading,
+    isError: detailsError,
+    error: detailsErrObj,
+  } = useQuery({
     queryKey: ["invite-details", token],
     queryFn: async () => {
       return await staffService.getInviteDetails(token as string);
@@ -33,7 +38,12 @@ export default function AcceptInvitePage() {
   });
 
   // 2. Accept Invite for EXISTING user (Runs if user is logged in & invite details say account exists)
-  const { data: acceptData, isLoading: acceptLoading, isError: acceptError, error: acceptErrObj } = useQuery({
+  const {
+    data: acceptData,
+    isLoading: acceptLoading,
+    isError: acceptError,
+    error: acceptErrObj,
+  } = useQuery({
     queryKey: ["accept-invite-existing", token, user?.id],
     queryFn: async () => {
       return await staffService.acceptInvite({ token: token as string, userId: user!.id });
@@ -59,7 +69,7 @@ export default function AcceptInvitePage() {
       await checkAuth();
       router.push("/partner/dashboard");
     },
-    onError: (err: any) => {
+    onError: (err: { response?: { data?: { message?: string } } }) => {
       toast.error(err.response?.data?.message || "Failed to create account");
     },
   });
@@ -68,16 +78,16 @@ export default function AcceptInvitePage() {
   const isInvalidToken = !token;
   const isGlobalLoading = detailsLoading || (user && acceptLoading);
   const showSuccessExisting = !!acceptData;
-  const showRegistrationForm = inviteDetails && !inviteDetails.accountExists;
-  const showAuthRequired = inviteDetails && inviteDetails.accountExists && !user;
+  const showRegistrationForm = inviteDetails?.accountExists === false;
+  const showAuthRequired = inviteDetails?.accountExists === true && !user;
 
   // Extract error messages
-  const errDetail = detailsErrObj as any;
-  const errAccept = acceptErrObj as any;
+  const errDetail = detailsErrObj as { response?: { data?: { message?: string } } } | null;
+  const errAccept = acceptErrObj as { response?: { data?: { message?: string } } } | null;
   const globalErrorMsg = errDetail?.response?.data?.message || errAccept?.response?.data?.message;
   const isGlobalError = detailsError || acceptError;
 
-  const handleRegister = (e: React.FormEvent) => {
+  const handleRegister = (e: React.SyntheticEvent) => {
     e.preventDefault();
     if (!formData.firstName || !formData.password) {
       toast.error("Please fill in all required fields");
@@ -90,7 +100,7 @@ export default function AcceptInvitePage() {
     <div className="min-h-screen bg-black text-white flex items-center justify-center p-4">
       <div className="max-w-md w-full bg-[#111] p-8 rounded-3xl border border-[#222] text-center shadow-2xl relative overflow-hidden">
         {/* Decorative background blur */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[150px] bg-[#FF7A30]/10 rounded-full blur-[80px] -z-10 pointer-events-none" />
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-37.5 bg-[#FF7A30]/10 rounded-full blur-[80px] -z-10 pointer-events-none" />
 
         {isInvalidToken && (
           <div className="flex flex-col items-center">
@@ -135,7 +145,7 @@ export default function AcceptInvitePage() {
             <p className="text-[#888] mb-6">
               You already have a Cravon account associated with <span className="text-white font-medium">{inviteDetails?.email}</span>. Please log in to accept your invite to <span className="text-[#FF7A30] font-medium">{inviteDetails?.restaurantName}</span>.
             </p>
-            <button type="button" onClick={() => router.push("/auth/restaurant/login")} className="w-full py-4 bg-gradient-to-r from-[#FF7A30] to-[#FF5E00] hover:scale-[1.02] text-white rounded-xl font-bold transition-all shadow-lg cursor-pointer">
+            <button type="button" onClick={() => router.push("/auth/restaurant/login")} className="w-full py-4 bg-linear-to-r from-[#FF7A30] to-[#FF5E00] hover:scale-[1.02] text-white rounded-xl font-bold transition-all shadow-lg cursor-pointer">
               Go to Login
             </button>
           </div>
@@ -147,8 +157,10 @@ export default function AcceptInvitePage() {
               <CheckCircle2 className="w-8 h-8" />
             </div>
             <h2 className="text-2xl font-bold mb-4 text-white">Invite Accepted!</h2>
-            <p className="text-[#888] mb-8">You now have staff access to <span className="text-white font-medium">{inviteDetails?.restaurantName}</span>. Welcome to the team!</p>
-            <button type="button" onClick={() => router.push("/partner/dashboard")} className="w-full py-4 bg-gradient-to-r from-[#FF7A30] to-[#FF5E00] hover:scale-[1.02] text-white rounded-xl font-bold transition-all shadow-lg cursor-pointer">
+            <p className="text-[#888] mb-8">
+              You now have staff access to <span className="text-white font-medium">{inviteDetails?.restaurantName}</span>. Welcome to the team!
+            </p>
+            <button type="button" onClick={() => router.push("/partner/dashboard")} className="w-full py-4 bg-linear-to-r from-[#FF7A30] to-[#FF5E00] hover:scale-[1.02] text-white rounded-xl font-bold transition-all shadow-lg cursor-pointer">
               Go to Dashboard
             </button>
           </div>
@@ -162,63 +174,41 @@ export default function AcceptInvitePage() {
               </div>
               <h2 className="text-2xl font-bold text-white mb-2">Welcome to the Team!</h2>
               <p className="text-[#888]">
-                You've been invited to join <span className="text-[#FF7A30] font-medium">{inviteDetails?.restaurantName}</span>. 
-                Set up your profile to accept the invite.
+                You&apos;ve been invited to join <span className="text-[#FF7A30] font-medium">{inviteDetails?.restaurantName}</span>. Set up your profile to accept the invite.
               </p>
             </div>
 
             <form onSubmit={handleRegister} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-[#888] mb-1">Email Address</label>
-                <input 
-                  type="email" 
-                  value={inviteDetails?.email} 
-                  disabled
-                  className="w-full px-4 py-3 bg-[#1A1A1A] border border-[#333] rounded-xl text-[#888] cursor-not-allowed outline-none"
-                />
+                <label htmlFor="email" className="block text-sm font-medium text-[#888] mb-1">
+                  Email Address
+                </label>
+                <input id="email" type="email" value={inviteDetails?.email} disabled className="w-full px-4 py-3 bg-[#1A1A1A] border border-[#333] rounded-xl text-[#888] cursor-not-allowed outline-none" />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-[#888] mb-1">First Name</label>
-                  <input 
-                    type="text" 
-                    value={formData.firstName}
-                    onChange={(e) => setFormData({...formData, firstName: e.target.value})}
-                    placeholder="John"
-                    className="w-full px-4 py-3 bg-transparent border border-[#333] rounded-xl text-white focus:border-[#FF7A30] focus:ring-1 focus:ring-[#FF7A30] transition outline-none"
-                    required
-                  />
+                  <label htmlFor="firstName" className="block text-sm font-medium text-[#888] mb-1">
+                    First Name
+                  </label>
+                  <input id="firstName" type="text" value={formData.firstName} onChange={(e) => setFormData({ ...formData, firstName: e.target.value })} placeholder="John" className="w-full px-4 py-3 bg-transparent border border-[#333] rounded-xl text-white focus:border-[#FF7A30] focus:ring-1 focus:ring-[#FF7A30] transition outline-none" required />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-[#888] mb-1">Last Name</label>
-                  <input 
-                    type="text" 
-                    value={formData.lastName}
-                    onChange={(e) => setFormData({...formData, lastName: e.target.value})}
-                    placeholder="Doe"
-                    className="w-full px-4 py-3 bg-transparent border border-[#333] rounded-xl text-white focus:border-[#FF7A30] focus:ring-1 focus:ring-[#FF7A30] transition outline-none"
-                  />
+                  <label htmlFor="lastName" className="block text-sm font-medium text-[#888] mb-1">
+                    Last Name
+                  </label>
+                  <input id="lastName" type="text" value={formData.lastName} onChange={(e) => setFormData({ ...formData, lastName: e.target.value })} placeholder="Doe" className="w-full px-4 py-3 bg-transparent border border-[#333] rounded-xl text-white focus:border-[#FF7A30] focus:ring-1 focus:ring-[#FF7A30] transition outline-none" />
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-[#888] mb-1">Create Password</label>
-                <input 
-                  type="password" 
-                  value={formData.password}
-                  onChange={(e) => setFormData({...formData, password: e.target.value})}
-                  placeholder="••••••••"
-                  className="w-full px-4 py-3 bg-transparent border border-[#333] rounded-xl text-white focus:border-[#FF7A30] focus:ring-1 focus:ring-[#FF7A30] transition outline-none"
-                  required
-                />
+                <label htmlFor="password" className="block text-sm font-medium text-[#888] mb-1">
+                  Create Password
+                </label>
+                <input id="password" type="password" value={formData.password} onChange={(e) => setFormData({ ...formData, password: e.target.value })} placeholder="••••••••" className="w-full px-4 py-3 bg-transparent border border-[#333] rounded-xl text-white focus:border-[#FF7A30] focus:ring-1 focus:ring-[#FF7A30] transition outline-none" required />
               </div>
 
-              <button 
-                type="submit" 
-                disabled={registerMutation.isPending}
-                className="w-full py-4 mt-6 bg-gradient-to-r from-[#FF7A30] to-[#FF5E00] hover:scale-[1.02] text-white rounded-xl font-bold transition-all shadow-lg disabled:opacity-50 cursor-pointer flex items-center justify-center gap-2"
-              >
+              <button type="submit" disabled={registerMutation.isPending} className="w-full py-4 mt-6 bg-linear-to-r from-[#FF7A30] to-[#FF5E00] hover:scale-[1.02] text-white rounded-xl font-bold transition-all shadow-lg disabled:opacity-50 cursor-pointer flex items-center justify-center gap-2">
                 {registerMutation.isPending && <Loader2 className="w-5 h-5 animate-spin" />}
                 Create Account & Accept
               </button>

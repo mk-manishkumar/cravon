@@ -13,6 +13,12 @@ interface Props {
   readonly isTogglingStatus?: boolean;
 }
 
+const getRoleBadgeClasses = (role: string) => {
+  if (role === "Owner") return "bg-[#FF7A30]/20 text-[#FF7A30]";
+  if (role === "Manager") return "bg-purple-500/20 text-purple-400";
+  return "bg-blue-500/20 text-blue-400";
+};
+
 export default function RestaurantProfileCard({ restaurant, isOnboarded, onEdit, onDelete, onToggleStatus, isDeleting, isTogglingStatus }: Props) {
   const isActive = restaurant?.status === "active";
 
@@ -31,11 +37,7 @@ export default function RestaurantProfileCard({ restaurant, isOnboarded, onEdit,
               <h2 className="text-xl font-bold flex items-center gap-2">
                 {restaurant?.name || "Your Restaurant"}
                 {restaurant?.userRole && (
-                  <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
-                    restaurant.userRole === "Owner" ? "bg-[#FF7A30]/20 text-[#FF7A30]" :
-                    restaurant.userRole === "Manager" ? "bg-purple-500/20 text-purple-400" :
-                    "bg-blue-500/20 text-blue-400"
-                  }`}>
+                  <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${getRoleBadgeClasses(restaurant.userRole)}`}>
                     {restaurant.userRole}
                   </span>
                 )}
