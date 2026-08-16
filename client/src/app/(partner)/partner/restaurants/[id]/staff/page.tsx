@@ -121,7 +121,7 @@ export default function StaffManagementPage() {
           <p className="text-[#888]">Invite and manage employees for this restaurant.</p>
         </div>
 
-        <button type="button" onClick={() => setShowInviteModal(true)} className="bg-[#FF7A30] text-white px-6 py-3 rounded-xl font-bold hover:bg-[#FF7A30]/90 transition flex items-center gap-2">
+        <button type="button" onClick={() => setShowInviteModal(true)} className="bg-[#FF7A30] text-white px-6 py-3 rounded-xl font-bold hover:bg-[#FF7A30]/90 transition flex items-center gap-2 cursor-pointer">
           <Plus className="w-5 h-5" />
           Invite Staff
         </button>
@@ -188,7 +188,7 @@ export default function StaffManagementPage() {
                     </td>
                     <td className="p-4 text-right">
                       {member.role !== "Owner" && (
-                        <button type="button" onClick={() => handleRemove(member._id)} className="p-2 text-red-400 hover:bg-red-400/10 rounded-lg transition" title="Remove Staff">
+                        <button type="button" onClick={() => handleRemove(member._id)} className="p-2 text-red-400 hover:bg-red-400/10 rounded-lg transition cursor-pointer" title="Remove Staff">
                           <Trash2 className="w-5 h-5" />
                         </button>
                       )}
@@ -206,7 +206,7 @@ export default function StaffManagementPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <button type="button" className="absolute inset-0 w-full h-full bg-black/80 backdrop-blur-sm cursor-default outline-none" onClick={() => setShowInviteModal(false)} aria-label="Close modal" />
           <div className="relative z-10 w-full max-w-lg bg-[#111] border border-[#333] rounded-3xl p-8 shadow-2xl animate-in zoom-in-95">
-            <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
+            <h2 className="text-2xl font-bold mb-6 flex items-center gap-2 text-white">
               <Mail className="text-[#FF7A30]" /> Invite Staff
             </h2>
 
@@ -235,17 +235,17 @@ export default function StaffManagementPage() {
                     <label key={opt.id} className="flex items-center gap-3 cursor-pointer group">
                       <input type="checkbox" className="sr-only" checked={inviteForm.permissions.includes(opt.id)} onChange={() => togglePermission(opt.id)} />
                       <div className={`w-5 h-5 rounded border flex items-center justify-center transition-colors ${inviteForm.permissions.includes(opt.id) ? "bg-[#FF7A30] border-[#FF7A30]" : "border-[#444] group-hover:border-[#666]"}`}>{inviteForm.permissions.includes(opt.id) && <Check className="w-3 h-3 text-white" />}</div>
-                      <span className="text-sm">{opt.label}</span>
+                      <span className="text-sm text-white">{opt.label}</span>
                     </label>
                   ))}
                 </div>
               </div>
 
               <div className="flex gap-4 pt-4 border-t border-[#333]">
-                <button type="button" onClick={() => setShowInviteModal(false)} className="flex-1 py-3 font-bold text-[#888] hover:text-white transition">
+                <button type="button" onClick={() => setShowInviteModal(false)} className="flex-1 py-3 font-bold text-[#888] hover:text-white transition cursor-pointer">
                   Cancel
                 </button>
-                <button type="submit" disabled={inviteMutation.isPending} className="flex-1 py-3 bg-[#FF7A30] hover:bg-[#FF7A30]/90 text-white rounded-xl font-bold transition disabled:opacity-50">
+                <button type="submit" disabled={inviteMutation.isPending} className="flex-1 py-3 bg-[#FF7A30] hover:bg-[#FF7A30]/90 text-white rounded-xl font-bold transition disabled:opacity-50 cursor-pointer">
                   {inviteMutation.isPending ? "Sending..." : "Send Invite"}
                 </button>
               </div>

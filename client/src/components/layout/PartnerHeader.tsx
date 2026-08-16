@@ -16,11 +16,7 @@ export default function PartnerHeader() {
 
   const getNavClass = (path: string) => {
     const isActive = pathname.startsWith(path);
-    return `text-[13px] font-semibold transition-all ${
-      isActive
-        ? "text-[#FF7A30] drop-shadow-[0_0_10px_rgba(255,122,48,0.3)]"
-        : "text-[#888888] hover:text-white"
-    }`;
+    return `text-[13px] font-semibold transition-all ${isActive ? "text-[#FF7A30] drop-shadow-[0_0_10px_rgba(255,122,48,0.3)]" : "text-[#888888] hover:text-white"}`;
   };
 
   return (
@@ -74,6 +70,15 @@ export default function PartnerHeader() {
                             <circle cx="12" cy="12" r="3" />
                           </svg>
                           Account Settings
+                        </Link>
+                        <Link href="/partner/staff" className="flex items-center gap-3 px-5 py-2.5 text-[13px] text-[#BBBBBB] hover:bg-[#2A2A2A] hover:text-white transition-colors">
+                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="9" cy="7" r="4"></circle>
+                            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                          </svg>
+                          Staff Members
                         </Link>
                         <div className="w-full h-px bg-[#333333] my-2" />
                         <button type="button" onClick={() => logout()} className="flex items-center gap-3 w-full text-left px-5 py-2.5 text-[13px] text-[#FF6B7D] hover:bg-[#3A1515] transition-colors cursor-pointer">

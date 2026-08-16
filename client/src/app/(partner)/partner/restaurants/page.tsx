@@ -102,9 +102,30 @@ export default function PartnerRestaurantsPage() {
           <h1 className="text-3xl font-bold">Partner Hub</h1>
           <p className="text-[#888] mt-1">Manage your restaurants and operations</p>
         </div>
-        <button type="button" onClick={() => setIsCreateModalOpen(true)} className="px-6 py-2.5 bg-[#FF7A30] text-white font-bold rounded-xl hover:bg-[#FF7A30]/90 transition-all cursor-pointer">
-          New Onboard
-        </button>
+        
+        {/* Only show onboarding actions if the user owns at least one restaurant */}
+        {restaurants.some((r: any) => r.userRole === "Owner") && (
+          <>
+            {restaurants.length === 1 && !restaurants[0].isOnboarded ? (
+              <button 
+                type="button" 
+                onClick={() => setEditingRestaurant(restaurants[0])} 
+                className="px-6 py-2.5 bg-[#FF7A30] text-white font-bold rounded-xl hover:bg-[#FF7A30]/90 transition-all cursor-pointer shadow-lg shadow-[#FF7A30]/20 flex items-center gap-2"
+              >
+                <Sparkles size={18} />
+                Complete Onboarding
+              </button>
+            ) : (
+              <button 
+                type="button" 
+                onClick={() => setIsCreateModalOpen(true)} 
+                className="px-6 py-2.5 bg-[#FF7A30] text-white font-bold rounded-xl hover:bg-[#FF7A30]/90 transition-all cursor-pointer shadow-lg shadow-[#FF7A30]/20"
+              >
+                New Onboard
+              </button>
+            )}
+          </>
+        )}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">

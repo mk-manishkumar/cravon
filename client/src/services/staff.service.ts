@@ -1,8 +1,13 @@
-import api from './api';
+import api from "../lib/axios";
 
 export const staffService = {
   getStaff: async (restaurantId: string) => {
     const res = await api.get(`/staff/${restaurantId}`);
+    return res.data;
+  },
+
+  getAllStaff: async () => {
+    const res = await api.get(`/staff`);
     return res.data;
   },
 
@@ -13,6 +18,16 @@ export const staffService = {
 
   acceptInvite: async (data: { token: string; userId: string }) => {
     const res = await api.post('/staff/accept-invite', data);
+    return res.data;
+  },
+
+  getInviteDetails: async (token: string) => {
+    const res = await api.get(`/staff/invite/${token}`);
+    return res.data;
+  },
+
+  acceptInviteNewUser: async (data: any) => {
+    const res = await api.post('/staff/accept-invite-new', data);
     return res.data;
   },
 

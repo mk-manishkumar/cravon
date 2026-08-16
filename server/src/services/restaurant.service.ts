@@ -1,15 +1,42 @@
 import Restaurant from "../models/restaurant.model.js";
 import { ApiError } from "../utils/errorHandler.js";
 
-// Get all restaurants for the logged-in user
+import RestaurantStaff from "../models/restaurantStaff.model.js";
+
+// Get all restaurants for the logged-in user (owned or staff)
 export const getMyRestaurants = async (userId: string) => {
-  return await Restaurant.find({ ownerId: userId });
+  const ownedRestaurants = await Restaurant.find({ ownerId: userId }).lean();
+  
+  const staffRecords = await RestaurantStaff.find({ userId, status: "active" });
+  const staffRestaurantIds = staffRecords.map(record => record.restaurantId);
+  
+  const staffRestaurants = await Restaurant.find({ _id: { $in: staffRestaurantIds } }).lean();
+  
+  // Combine and deduplicate, attaching the user's role
+  const allRestaurants = ownedRestaurants.map(r => ({ ...r, userRole: "Owner" }));
+  const ownedIds = new Set(ownedRestaurants.map(r => r._id.toString()));
+  
+  for (const r of staffRestaurants) {
+    if (!ownedIds.has(r._id.toString())) {
+      const staffRecord = staffRecords.find(sr => sr.restaurantId.toString() === r._id.toString());
+      allRestaurants.push({ ...r, userRole: staffRecord?.role || "Staff" });
+    }
+  }
+  
+  return allRestaurants;
 };
 
-// Get a specific restaurant by ID ensuring it belongs to the logged-in user
-export const getRestaurantById = async (ownerId: string, restaurantId: string) => {
-  const restaurant = await Restaurant.findOne({ _id: restaurantId, ownerId });
+// Get a specific restaurant by ID ensuring it belongs to the logged-in user or they are staff
+export const getRestaurantById = async (userId: string, restaurantId: string) => {
+  const restaurant = await Restaurant.findById(restaurantId);
   if (!restaurant) throw new ApiError(404, "Restaurant not found");
+
+  const isOwner = restaurant.ownerId.toString() === userId;
+  if (!isOwner) {
+    const isStaff = await RestaurantStaff.findOne({ userId, restaurantId, status: "active" });
+    if (!isStaff) throw new ApiError(403, "You do not have access to this restaurant");
+  }
+
   return restaurant;
 };
 
