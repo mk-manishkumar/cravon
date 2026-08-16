@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { AlertCircle } from "lucide-react";
 
@@ -23,7 +22,7 @@ export default function RestaurantDashboardPage() {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="bg-[#111] border border-[#222] rounded-2xl p-6">
-          <h4 className="text-[#888] font-medium mb-2">Today's Orders</h4>
+          <h4 className="text-[#888] font-medium mb-2">Today&apos;s Orders</h4>
           <p className="text-4xl font-bold">0</p>
         </div>
         <div className="bg-[#111] border border-[#222] rounded-2xl p-6">

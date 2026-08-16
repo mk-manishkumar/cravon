@@ -2,7 +2,7 @@ import { ReactNode } from "react";
 import Link from "next/link";
 import { Store, Settings, PieChart, Users, Menu, Package } from "lucide-react";
 
-export default function RestaurantDashboardLayout({ children, params }: { children: ReactNode; params: { restaurantId: string } }) {
+export default function RestaurantDashboardLayout({ children, params }: Readonly<{ children: ReactNode; params: Readonly<{ restaurantId: string }> }>) {
   const { restaurantId } = params;
 
   return (
