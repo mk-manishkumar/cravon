@@ -9,7 +9,7 @@ export interface IRestaurantStaff extends Document {
   inviteToken?: string;
   inviteExpiresAt?: Date;
   invitedBy: mongoose.Types.ObjectId;
-  email: string; // The email the invite was sent to
+  email: string;
   createdAt: Date;
   updatedAt: Date;
 }
