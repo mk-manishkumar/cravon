@@ -19,6 +19,13 @@ export default function PartnerHeader() {
     return `text-[13px] font-semibold transition-all ${isActive ? "text-[#FF7A30] drop-shadow-[0_0_10px_rgba(255,122,48,0.3)]" : "text-[#888888] hover:text-white"}`;
   };
 
+  const getDisplayTier = (tier?: string) => {
+    if (!tier) return "Free";
+    if (tier === "mid") return "PRO";
+    if (tier === "advanced") return "ENT";
+    return tier;
+  };
+
   return (
     <header className="sticky top-0 z-50 w-full bg-[#121212]/90 backdrop-blur-md border-b border-[#222222]">
       <div className="max-w-360 mx-auto px-4 sm:px-6 lg:px-8">
@@ -47,7 +54,10 @@ export default function PartnerHeader() {
           <div className="flex items-center gap-4">
             {!isLoading && user && (
               <div className="relative" onMouseEnter={() => setShowDropdown(true)} onMouseLeave={() => setShowDropdown(false)}>
-                <div className="flex items-center gap-3 cursor-pointer">
+                <div className="flex items-center gap-4 cursor-pointer">
+                  <span className="px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider bg-[#FF7A30]/10 text-[#FF7A30] border border-[#FF7A30]/20">
+                    {getDisplayTier(user.subscription?.tier)}
+                  </span>
                   <button type="button" className="flex items-center justify-center w-9 h-9 rounded-full bg-[#2A2A2A] border border-[#333333] text-white font-bold text-sm shadow-sm outline-none focus:border-[#FF7A30]">
                     {user.firstName[0]}
                     {user.lastName[0]}

@@ -2,22 +2,22 @@
 export const PRICING_TIERS = {
   FREE: {
     id: 'free',
-    name: 'Starter',
+    name: 'Free',
     price: 0,
     maxRestaurants: 3,
     maxStaff: 0,
     validityMonths: 0,
   },
-  MID: {
-    id: 'mid',
+  PRO: {
+    id: 'pro',
     name: 'Professional',
     price: 4000, // INR 
     maxRestaurants: 50,
     maxStaff: 3,
     validityMonths: 6,
   },
-  ADVANCED: {
-    id: 'advanced',
+  ENT: {
+    id: 'ent',
     name: 'Enterprise',
     price: 8000, // INR 
     maxRestaurants: 100,

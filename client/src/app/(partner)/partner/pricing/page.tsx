@@ -10,7 +10,7 @@ import { paymentService } from "@/services/payment.service";
 const TIERS = [
   {
     id: "free",
-    name: "Starter",
+    name: "Free",
     price: "₹0",
     description: "Perfect for new partners testing the waters.",
     features: ["Up to 3 Restaurant Listings", "No staff accounts", "Basic Analytics", "Standard Support"],
@@ -19,7 +19,7 @@ const TIERS = [
     popular: false,
   },
   {
-    id: "mid",
+    id: "pro",
     name: "Professional",
     price: "₹4,000",
     period: "/6 months",
@@ -30,7 +30,7 @@ const TIERS = [
     popular: true,
   },
   {
-    id: "advanced",
+    id: "ent",
     name: "Enterprise",
     price: "₹8,000",
     period: "/year",
@@ -68,7 +68,7 @@ export default function PricingPage() {
         amount: order.amount,
         currency: order.currency,
         name: "Cravon Partners",
-        description: `Upgrade to ${tierId === "mid" ? "Professional" : "Enterprise"} Plan`,
+        description: `Upgrade to ${tierId === "pro" ? "Professional" : "Enterprise"} Plan`,
         order_id: order.id,
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         handler: async function (response: any) {
@@ -126,7 +126,7 @@ export default function PricingPage() {
           const currentTierId = user?.subscription?.tier || "free";
           const isCurrentPlan = currentTierId === tier.id;
           
-          const TIER_ORDER = ["free", "mid", "advanced"];
+          const TIER_ORDER = ["free", "pro", "ent"];
           const currentTierIndex = TIER_ORDER.indexOf(currentTierId);
           const renderedTierIndex = TIER_ORDER.indexOf(tier.id);
           const isDowngrade = renderedTierIndex < currentTierIndex;

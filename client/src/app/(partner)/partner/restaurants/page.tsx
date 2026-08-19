@@ -6,7 +6,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { restaurantService } from "@/services/restaurant.service";
 import OnboardingWizard from "@/components/partner/OnboardingWizard";
 import toast from "react-hot-toast";
-import { Sparkles } from "lucide-react";
+import { Sparkles, Plus } from "lucide-react";
 
 import RestaurantProfileCard from "./components/RestaurantProfileCard";
 
@@ -102,26 +102,19 @@ export default function PartnerRestaurantsPage() {
           <h1 className="text-3xl font-bold">Partner Hub</h1>
           <p className="text-[#888] mt-1">Manage your restaurants and operations</p>
         </div>
-        
+
         {/* Only show onboarding actions if the user owns at least one restaurant */}
-        {restaurants.some((r: any) => r.userRole === "Owner") && (
+        {restaurants.some((r: { userRole?: string }) => r.userRole === "Owner") && (
           <>
             {restaurants.length === 1 && !restaurants[0].isOnboarded ? (
-              <button 
-                type="button" 
-                onClick={() => setEditingRestaurant(restaurants[0])} 
-                className="px-6 py-2.5 bg-[#FF7A30] text-white font-bold rounded-xl hover:bg-[#FF7A30]/90 transition-all cursor-pointer shadow-lg shadow-[#FF7A30]/20 flex items-center gap-2"
-              >
+              <button type="button" onClick={() => setEditingRestaurant(restaurants[0])} className="px-6 py-2.5 bg-[#FF7A30] text-white font-bold rounded-xl hover:bg-[#FF7A30]/90 transition-all cursor-pointer shadow-lg shadow-[#FF7A30]/20 flex items-center gap-2">
                 <Sparkles size={18} />
                 Complete Onboarding
               </button>
             ) : (
-              <button 
-                type="button" 
-                onClick={() => setIsCreateModalOpen(true)} 
-                className="px-6 py-2.5 bg-[#FF7A30] text-white font-bold rounded-xl hover:bg-[#FF7A30]/90 transition-all cursor-pointer shadow-lg shadow-[#FF7A30]/20"
-              >
-                New Onboard
+              <button type="button" onClick={() => setIsCreateModalOpen(true)} className="px-6 py-2.5 bg-[#e65c00] text-white font-bold rounded-xl hover:bg-[#cc5200] transition-all cursor-pointer shadow-lg shadow-[#e65c00]/20 flex items-center gap-2">
+                <Plus size={18} />
+                New Restaurant
               </button>
             )}
           </>
@@ -172,12 +165,7 @@ export default function PartnerRestaurantsPage() {
       {/* Upgrade Required Modal */}
       {showUpgradeModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <button 
-            type="button"
-            className="absolute inset-0 w-full h-full bg-black/80 backdrop-blur-sm cursor-default outline-none" 
-            onClick={() => setShowUpgradeModal(false)} 
-            aria-label="Close modal"
-          />
+          <button type="button" className="absolute inset-0 w-full h-full bg-black/80 backdrop-blur-sm cursor-default outline-none" onClick={() => setShowUpgradeModal(false)} aria-label="Close modal" />
           <div className="relative z-10 w-full max-w-md bg-[#111] border border-[#333] rounded-3xl p-8 text-center shadow-2xl animate-in zoom-in-95">
             <div className="w-16 h-16 bg-[#FF7A30]/20 text-[#FF7A30] rounded-full flex items-center justify-center mx-auto mb-6">
               <Sparkles className="w-8 h-8" />
