@@ -50,19 +50,20 @@ export default function PartnerHeader() {
             </Link>
           </nav>
 
-          {/* Right side (Profile / Auth) */}
+          {/* Right side ) */}
           <div className="flex items-center gap-4">
             {!isLoading && user && (
-              <div className="relative" onMouseEnter={() => setShowDropdown(true)} onMouseLeave={() => setShowDropdown(false)}>
-                <div className="flex items-center gap-4 cursor-pointer">
-                  <span className="px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider bg-[#FF7A30]/10 text-[#FF7A30] border border-[#FF7A30]/20">
-                    {getDisplayTier(user.subscription?.tier)}
-                  </span>
-                  <button type="button" className="flex items-center justify-center w-9 h-9 rounded-full bg-[#2A2A2A] border border-[#333333] text-white font-bold text-sm shadow-sm outline-none focus:border-[#FF7A30]">
-                    {user.firstName[0]}
-                    {user.lastName[0]}
-                  </button>
-                </div>
+              <>
+                <span className="px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider bg-[#FF7A30]/10 text-[#FF7A30] border border-[#FF7A30]/20">
+                  {getDisplayTier(user.subscription?.tier)}
+                </span>
+                <div className="relative" onMouseEnter={() => setShowDropdown(true)} onMouseLeave={() => setShowDropdown(false)}>
+                  <div className="flex items-center cursor-pointer">
+                    <button type="button" className="flex items-center justify-center w-9 h-9 rounded-full bg-[#2A2A2A] border border-[#333333] text-white font-bold text-sm shadow-sm outline-none focus:border-[#FF7A30] cursor-pointer">
+                      {user.firstName[0]}
+                      {user.lastName[0]}
+                    </button>
+                  </div>
 
                 {/* Dropdown Menu */}
                 {showDropdown && (
@@ -104,6 +105,7 @@ export default function PartnerHeader() {
                   </div>
                 )}
               </div>
+              </>
             )}
           </div>
         </div>

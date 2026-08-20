@@ -123,19 +123,22 @@ export default function PricingPage() {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
         {TIERS.map((tier) => {
-          const currentTierId = user?.subscription?.tier || "free";
+          const tierRaw = user?.subscription?.tier || "free";
+          let currentTierId = tierRaw;
+          if (tierRaw === "mid") currentTierId = "pro";
+          else if (tierRaw === "advanced") currentTierId = "ent";
+
           const isCurrentPlan = currentTierId === tier.id;
-          
+
           const TIER_ORDER = ["free", "pro", "ent"];
           const currentTierIndex = TIER_ORDER.indexOf(currentTierId);
           const renderedTierIndex = TIER_ORDER.indexOf(tier.id);
           const isDowngrade = renderedTierIndex < currentTierIndex;
 
           let buttonClass = "bg-white text-black hover:bg-gray-200 cursor-pointer";
-          if (isCurrentPlan || isDowngrade)   buttonClass = "bg-[#222] text-[#888] cursor-not-allowed";
-           else if (tier.id === "free") buttonClass = "bg-[#222] text-[#888] cursor-not-allowed"; 
-           else if (tier.popular) buttonClass = "bg-[#FF7A30] text-white hover:bg-[#FF7A30]/90 hover:shadow-[0_0_20px_rgba(255,122,48,0.3)] cursor-pointer";
-          
+          if (isCurrentPlan || isDowngrade) buttonClass = "bg-[#222] text-[#888] cursor-not-allowed";
+          else if (tier.id === "free") buttonClass = "bg-[#222] text-[#888] cursor-not-allowed";
+          else if (tier.popular) buttonClass = "bg-[#FF7A30] text-white hover:bg-[#FF7A30]/90 hover:shadow-[0_0_20px_rgba(255,122,48,0.3)] cursor-pointer";
 
           return (
             <div key={tier.id} className={`relative flex flex-col p-8 rounded-3xl border transition-all duration-300 ${tier.popular ? "bg-linear-to-b from-[#FF7A30]/10 to-[#111] border-[#FF7A30] shadow-[0_0_40px_rgba(255,122,48,0.15)] scale-105 z-10" : "bg-[#111] border-[#222] hover:border-[#333]"}`}>
