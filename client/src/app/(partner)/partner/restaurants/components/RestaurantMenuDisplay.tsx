@@ -1,4 +1,9 @@
-import { Utensils } from "lucide-react";
+import { useState } from "react";
+import { Utensils, Pencil, Check, X } from "lucide-react";
+import { restaurantService } from "@/services/restaurant.service";
+import toast from "react-hot-toast";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import axios from "axios";
 
 export type RestaurantMenuItem = {
   category: string;
@@ -12,9 +17,51 @@ export type RestaurantMenuItem = {
 
 interface Props {
   readonly menu?: readonly RestaurantMenuItem[];
+  readonly restaurantId?: string;
 }
 
-export default function RestaurantMenuDisplay({ menu }: Props) {
+export default function RestaurantMenuDisplay({ menu, restaurantId }: Props) {
+  const [editingItem, setEditingItem] = useState<string | null>(null);
+  const [newPrice, setNewPrice] = useState<string>("");
+  const queryClient = useQueryClient();
+
+  const updatePriceMutation = useMutation({
+    mutationFn: async ({ itemName, price }: { itemName: string; price: number }) => {
+      if (!restaurantId) throw new Error("No restaurant ID");
+      return restaurantService.updateMenuPrice(restaurantId, itemName, price);
+    },
+    onSuccess: () => {
+      toast.success("Price updated successfully!");
+      setEditingItem(null);
+      if (restaurantId) {
+        queryClient.invalidateQueries({ queryKey: ["restaurant", restaurantId] });
+      }
+    },
+    onError: (error: unknown) => {
+      let msg = "Failed to update price";
+      if (axios.isAxiosError(error) && error.response?.data?.message) {
+        msg = error.response.data.message;
+      } else if (error instanceof Error) {
+        msg = error.message;
+      }
+      toast.error(msg);
+    },
+  });
+
+  const handleEditClick = (item: RestaurantMenuItem) => {
+    setEditingItem(item.name);
+    setNewPrice(item.price.toString());
+  };
+
+  const handleSave = (itemName: string) => {
+    const parsedPrice = Number.parseFloat(newPrice);
+    if (Number.isNaN(parsedPrice) || parsedPrice < 0) {
+      toast.error("Please enter a valid price");
+      return;
+    }
+    updatePriceMutation.mutate({ itemName, price: parsedPrice });
+  };
+
   if (!menu || menu.length === 0) return null;
 
   return (
@@ -41,10 +88,31 @@ export default function RestaurantMenuDisplay({ menu }: Props) {
             <h4 className="text-[13px] font-bold uppercase tracking-widest text-[#FF7A30] border-b border-[#222] pb-2">{category}</h4>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {items.map((item) => (
-                <div key={item.name} className="bg-[#1A1A1A] border border-[#2A2A2A] rounded-xl p-4 hover:border-[#FF7A30]/50 transition-colors">
+                <div key={item.name} className="bg-[#1A1A1A] border border-[#2A2A2A] rounded-xl p-4 hover:border-[#FF7A30]/50 transition-colors group">
                   <div className="flex justify-between items-start mb-2">
                     <h5 className="font-semibold text-white">{item.name}</h5>
-                    <span className="font-bold text-[#00C853]">₹{item.price}</span>
+
+                    <div className="flex items-center gap-2">
+                      {editingItem === item.name ? (
+                        <div className="flex items-center gap-1 bg-[#222] rounded-md px-2 py-1">
+                          <span className="text-white text-sm">₹</span>
+                          <input type="number" className="w-16 bg-transparent text-white text-sm outline-none font-bold" value={newPrice} onChange={(e) => setNewPrice(e.target.value)} autoFocus onKeyDown={(e) => e.key === "Enter" && handleSave(item.name)} />
+                          <button type="button" onClick={() => handleSave(item.name)} disabled={updatePriceMutation.isPending} className="text-green-500 hover:text-green-400 p-1 cursor-pointer">
+                            <Check size={16} />
+                          </button>
+                          <button type="button" onClick={() => setEditingItem(null)} disabled={updatePriceMutation.isPending} className="text-red-500 hover:text-red-400 p-1 cursor-pointer">
+                            <X size={16} />
+                          </button>
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-2">
+                          <span className="font-bold text-[#00C853]">₹{item.price}</span>
+                          <button type="button" onClick={() => handleEditClick(item)} className="text-[#555] hover:text-white transition-colors opacity-0 group-hover:opacity-100 cursor-pointer p-1" aria-label="Edit price">
+                            <Pencil size={14} />
+                          </button>
+                        </div>
+                      )}
+                    </div>
                   </div>
                   {item.description && <p className="text-xs text-[#888] mb-3">{item.description}</p>}
                   <div className="flex flex-wrap gap-2">

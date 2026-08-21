@@ -14,6 +14,7 @@ interface User {
     status: string;
     expiresAt: string;
   };
+  isPureStaff?: boolean;
 }
 
 interface AuthState {

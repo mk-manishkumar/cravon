@@ -145,7 +145,7 @@ export default function AcceptInvitePage() {
             <p className="text-[#888] mb-6">
               You already have a Cravon account associated with <span className="text-white font-medium">{inviteDetails?.email}</span>. Please log in to accept your invite to <span className="text-[#FF7A30] font-medium">{inviteDetails?.restaurantName}</span>.
             </p>
-            <button type="button" onClick={() => router.push("/auth/restaurant/login")} className="w-full py-4 bg-linear-to-r from-[#FF7A30] to-[#FF5E00] hover:scale-[1.02] text-white rounded-xl font-bold transition-all shadow-lg cursor-pointer">
+            <button type="button" onClick={() => router.push("/auth/restaurant/login?redirect=" + encodeURIComponent("/staff/accept-invite?token=" + (token as string)))} className="w-full py-4 bg-linear-to-r from-[#FF7A30] to-[#FF5E00] hover:scale-[1.02] text-white rounded-xl font-bold transition-all shadow-lg cursor-pointer">
               Go to Login
             </button>
           </div>

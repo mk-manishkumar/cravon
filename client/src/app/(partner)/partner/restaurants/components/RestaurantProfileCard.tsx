@@ -30,23 +30,15 @@ export default function RestaurantProfileCard({ restaurant, isOnboarded, onEdit,
       <div className="relative z-10 flex-1">
         <div className="flex items-start justify-between mb-6">
           <div className="flex items-center gap-4">
-            <div className="w-14 h-14 bg-[#1A1A1A] rounded-2xl border border-[#333] flex items-center justify-center text-[#FF7A30] overflow-hidden relative shrink-0">
-              {restaurant?.image ? <Image src={restaurant.image} alt={restaurant?.name || "Logo"} fill className="object-cover" sizes="56px" /> : <Store size={24} />}
-            </div>
+            <div className="w-14 h-14 bg-[#1A1A1A] rounded-2xl border border-[#333] flex items-center justify-center text-[#FF7A30] overflow-hidden relative shrink-0">{restaurant?.image ? <Image src={restaurant.image} alt={restaurant?.name || "Logo"} fill className="object-cover" sizes="56px" /> : <Store size={24} />}</div>
             <div>
               <h2 className="text-xl font-bold flex items-center gap-2">
                 {restaurant?.name || "Your Restaurant"}
-                {restaurant?.userRole && (
-                  <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${getRoleBadgeClasses(restaurant.userRole)}`}>
-                    {restaurant.userRole}
-                  </span>
-                )}
+                {restaurant?.userRole && <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${getRoleBadgeClasses(restaurant.userRole)}`}>{restaurant.userRole}</span>}
               </h2>
               {restaurant?.franchiseName && <p className="text-[13px] font-semibold text-[#FF7A30]">{restaurant.franchiseName}</p>}
               <div className="flex items-center gap-2 mt-1">
-                <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${isActive ? "bg-[#00C853]/10 text-[#00C853] border border-[#00C853]/20" : "bg-red-500/10 text-red-500 border border-red-500/20"}`}>
-                  {restaurant?.status || "PENDING"}
-                </span>
+                <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${isActive ? "bg-[#00C853]/10 text-[#00C853] border border-[#00C853]/20" : "bg-red-500/10 text-red-500 border border-red-500/20"}`}>{restaurant?.status || "PENDING"}</span>
                 {!isOnboarded && <span className="text-[10px] text-[#888]">(Pending Onboarding)</span>}
               </div>
             </div>
@@ -54,34 +46,31 @@ export default function RestaurantProfileCard({ restaurant, isOnboarded, onEdit,
 
           {/* Actions */}
           <div className="flex items-center gap-2 shrink-0">
-            {!isOnboarded ? (
-              <button
-                type="button"
-                onClick={onEdit}
-                className="cursor-pointer px-4 py-2 bg-[#FF7A30]/10 text-[#FF7A30] hover:bg-[#FF7A30]/20 rounded-xl text-xs font-bold transition-all border border-[#FF7A30]/20 flex items-center gap-1.5"
-              >
-                Complete Onboarding
-              </button>
-            ) : (
-              <>
-                <button type="button" className="cursor-pointer p-2 bg-[#1A1A1A] border border-[#333] hover:border-[#FF7A30] hover:text-[#FF7A30] text-[#888] rounded-xl transition-all" onClick={onEdit} title="Edit Restaurant">
-                  <Pencil size={16} />
+            {restaurant?.userRole === "Owner" &&
+              (!isOnboarded ? (
+                <button type="button" onClick={onEdit} className="cursor-pointer px-4 py-2 bg-[#FF7A30]/10 text-[#FF7A30] hover:bg-[#FF7A30]/20 rounded-xl text-xs font-bold transition-all border border-[#FF7A30]/20 flex items-center gap-1.5">
+                  Complete Onboarding
                 </button>
-                <button
-                  type="button"
-                  disabled={isDeleting}
-                  className="cursor-pointer p-2 bg-[#1A1A1A] border border-[#333] hover:border-red-500 hover:text-red-500 text-[#888] rounded-xl transition-all disabled:opacity-50"
-                  onClick={() => {
-                    if (confirm("Are you sure you want to delete your restaurant? This action cannot be undone.")) {
-                      onDelete();
-                    }
-                  }}
-                  title="Delete Restaurant"
-                >
-                  <Trash2 size={16} />
-                </button>
-              </>
-            )}
+              ) : (
+                <>
+                  <button type="button" className="cursor-pointer p-2 bg-[#1A1A1A] border border-[#333] hover:border-[#FF7A30] hover:text-[#FF7A30] text-[#888] rounded-xl transition-all" onClick={onEdit} title="Edit Restaurant">
+                    <Pencil size={16} />
+                  </button>
+                  <button
+                    type="button"
+                    disabled={isDeleting}
+                    className="cursor-pointer p-2 bg-[#1A1A1A] border border-[#333] hover:border-red-500 hover:text-red-500 text-[#888] rounded-xl transition-all disabled:opacity-50"
+                    onClick={() => {
+                      if (confirm("Are you sure you want to delete your restaurant? This action cannot be undone.")) {
+                        onDelete();
+                      }
+                    }}
+                    title="Delete Restaurant"
+                  >
+                    <Trash2 size={16} />
+                  </button>
+                </>
+              ))}
           </div>
         </div>
 
@@ -144,28 +133,16 @@ export default function RestaurantProfileCard({ restaurant, isOnboarded, onEdit,
           </div>
         </div>
       </div>
-      
+
       {/* Bottom Actions */}
       {isOnboarded && (
         <div className="mt-6 pt-5 border-t border-[#222] flex items-center justify-between gap-4">
-          <button
-            type="button"
-            onClick={onToggleStatus}
-            disabled={isTogglingStatus}
-            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all disabled:opacity-50 cursor-pointer ${
-              isActive 
-                ? "bg-yellow-500/10 text-yellow-500 hover:bg-yellow-500/20" 
-                : "bg-[#00C853]/10 text-[#00C853] hover:bg-[#00C853]/20"
-            }`}
-          >
+          <button type="button" onClick={onToggleStatus} disabled={isTogglingStatus} className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all disabled:opacity-50 cursor-pointer ${isActive ? "bg-yellow-500/10 text-yellow-500 hover:bg-yellow-500/20" : "bg-[#00C853]/10 text-[#00C853] hover:bg-[#00C853]/20"}`}>
             {isActive ? <Pause size={14} /> : <Play size={14} />}
             {isActive ? "Pause Orders" : "Accept Orders"}
           </button>
 
-          <Link
-            href={`/partner/restaurants/${restaurant?._id || ''}`}
-            className="flex items-center gap-2 px-4 py-2 bg-[#FF7A30]/10 text-[#FF7A30] hover:bg-[#FF7A30]/20 rounded-xl text-xs font-bold transition-all cursor-pointer"
-          >
+          <Link href={`/partner/restaurants/${restaurant?._id || ""}`} className="flex items-center gap-2 px-4 py-2 bg-[#FF7A30]/10 text-[#FF7A30] hover:bg-[#FF7A30]/20 rounded-xl text-xs font-bold transition-all cursor-pointer">
             View Menu <ChevronRight size={14} />
           </Link>
         </div>

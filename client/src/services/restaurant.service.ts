@@ -36,4 +36,10 @@ export const restaurantService = {
     const response = await api.patch(`/restaurants/${id}/status`, { status });
     return response.data;
   },
+
+  // Update a specific menu item's price
+  updateMenuPrice: async (id: string, itemName: string, newPrice: number) => {
+    const response = await api.patch(`/restaurants/${id}/menu/price`, { itemName, newPrice });
+    return response.data;
+  },
 };

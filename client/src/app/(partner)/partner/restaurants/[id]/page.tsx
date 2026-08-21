@@ -51,7 +51,7 @@ export default function RestaurantMenuPage({ params }: { readonly params: Promis
       </div>
 
       {restaurant.menu && restaurant.menu.length > 0 ? (
-        <RestaurantMenuDisplay menu={restaurant.menu} />
+        <RestaurantMenuDisplay menu={restaurant.menu} restaurantId={unwrappedParams.id} />
       ) : (
         <div className="bg-[#111] border border-[#222] rounded-3xl p-12 text-center mt-6">
           <p className="text-[#888]">No menu items found for this restaurant.</p>

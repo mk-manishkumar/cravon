@@ -15,11 +15,16 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
   const pathname = usePathname();
 
   useEffect(() => {
-    if (!isLoading && !user) {
-      if (pathname.startsWith("/partner") || pathname.startsWith("/auth/restaurant")) {
-        router.push("/auth/restaurant/login");
-      } else {
-        router.push("/auth/login");
+    if (!isLoading) {
+      if (!user) {
+        if (pathname.startsWith("/partner") || pathname.startsWith("/auth/restaurant")) {
+          router.push("/auth/restaurant/login");
+        } else {
+          router.push("/auth/login");
+        }
+      } else if (user.isPureStaff && (pathname.startsWith("/partner/pricing") || pathname.startsWith("/partner/staff"))) {
+        // Block pure staff from accessing pricing or staff management pages
+        router.push("/partner/dashboard");
       }
     }
   }, [isLoading, user, router, pathname]);

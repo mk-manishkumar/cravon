@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { authService } from "@/services/auth.service";
 import axios from "axios";
 import toast from "react-hot-toast";
@@ -10,6 +10,9 @@ import { useAuthStore } from "@/store/authStore";
 
 export default function RestaurantLoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectPath = searchParams.get("redirect");
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -23,7 +26,12 @@ export default function RestaurantLoginPage() {
       await authService.loginRestaurant({ email, password });
       await useAuthStore.getState().checkAuth();
       toast.success("Welcome back, partner!");
-      router.push("/partner/dashboard");
+      
+      if (redirectPath) {
+        router.push(redirectPath);
+      } else {
+        router.push("/partner/dashboard");
+      }
     } catch (err) {
       if (axios.isAxiosError(err)) {
         toast.error(err.response?.data?.message || err.response?.data?.error || "Invalid credentials or unauthorized access.");

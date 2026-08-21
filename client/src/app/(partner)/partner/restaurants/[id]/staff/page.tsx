@@ -219,16 +219,6 @@ export default function StaffManagementPage() {
               </div>
 
               <div>
-                <label htmlFor="inviteRole" className="block text-sm font-semibold text-[#888] mb-2">
-                  Role
-                </label>
-                <select id="inviteRole" value={inviteForm.role} onChange={(e) => setInviteForm({ ...inviteForm, role: e.target.value })} className="w-full bg-[#222] border border-[#333] rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#FF7A30] transition">
-                  <option value="Staff">Staff</option>
-                  <option value="Manager">Manager</option>
-                </select>
-              </div>
-
-              <div>
                 <div className="block text-sm font-semibold text-[#888] mb-2">Permissions</div>
                 <div className="space-y-3 bg-[#1a1a1a] p-4 rounded-xl border border-[#333]">
                   {PERMISSION_OPTIONS.map((opt) => (

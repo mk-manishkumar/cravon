@@ -28,7 +28,8 @@ api.interceptors.response.use(
         const currentPath = window.location.pathname;
 
         // Don't redirect if we are already on a login page to avoid loops
-        if (!currentPath.includes("/login")) {
+        // Also don't redirect on accept-invite as it handles its own logic
+        if (!currentPath.includes("/login") && !currentPath.includes("/accept-invite")) {
           if (currentPath.startsWith("/partner") || currentPath.startsWith("/staff")) {
             window.location.href = "/auth/restaurant/login";
           } else if (currentPath.startsWith("/admin")) {

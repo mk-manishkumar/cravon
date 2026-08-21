@@ -45,18 +45,22 @@ export default function PartnerHeader() {
             <Link href="/partner/restaurants" className={getNavClass("/partner/restaurants")}>
               Restaurants
             </Link>
-            <Link href="/partner/pricing" className={getNavClass("/partner/pricing")}>
-              Pricing
-            </Link>
+            {!user?.isPureStaff && (
+              <Link href="/partner/pricing" className={getNavClass("/partner/pricing")}>
+                Pricing
+              </Link>
+            )}
           </nav>
 
           {/* Right side ) */}
           <div className="flex items-center gap-4">
             {!isLoading && user && (
               <>
-                <span className="px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider bg-[#FF7A30]/10 text-[#FF7A30] border border-[#FF7A30]/20">
-                  {getDisplayTier(user.subscription?.tier)}
-                </span>
+                {!user.isPureStaff && (
+                  <span className="px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider bg-[#FF7A30]/10 text-[#FF7A30] border border-[#FF7A30]/20">
+                    {getDisplayTier(user.subscription?.tier)}
+                  </span>
+                )}
                 <div className="relative" onMouseEnter={() => setShowDropdown(true)} onMouseLeave={() => setShowDropdown(false)}>
                   <div className="flex items-center cursor-pointer">
                     <button type="button" className="flex items-center justify-center w-9 h-9 rounded-full bg-[#2A2A2A] border border-[#333333] text-white font-bold text-sm shadow-sm outline-none focus:border-[#FF7A30] cursor-pointer">
@@ -82,15 +86,17 @@ export default function PartnerHeader() {
                           </svg>
                           Account Settings
                         </Link>
-                        <Link href="/partner/staff" className="flex items-center gap-3 px-5 py-2.5 text-[13px] text-[#BBBBBB] hover:bg-[#2A2A2A] hover:text-white transition-colors">
-                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                            <circle cx="9" cy="7" r="4"></circle>
-                            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-                          </svg>
-                          Staff Members
-                        </Link>
+                        {!user.isPureStaff && (
+                          <Link href="/partner/staff" className="flex items-center gap-3 px-5 py-2.5 text-[13px] text-[#BBBBBB] hover:bg-[#2A2A2A] hover:text-white transition-colors">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                              <circle cx="9" cy="7" r="4"></circle>
+                              <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                              <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                            </svg>
+                            Staff Members
+                          </Link>
+                        )}
                         <div className="w-full h-px bg-[#333333] my-2" />
                         <button type="button" onClick={() => logout()} className="flex items-center gap-3 w-full text-left px-5 py-2.5 text-[13px] text-[#FF6B7D] hover:bg-[#3A1515] transition-colors cursor-pointer">
                           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
