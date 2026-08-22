@@ -35,6 +35,13 @@ export const processLogin = async (data: any, expectedRoles: string[], skipPassw
   // Strict RBAC check
   await verifyUserRole(user._id.toString(), expectedRoles);
 
+  let isPureStaff = false;
+  if (expectedRoles.includes("RestaurantOwner")) {
+    const Restaurant = (await import("../models/restaurant.model.js")).default;
+    const count = await Restaurant.countDocuments({ ownerId: user._id });
+    isPureStaff = count === 0;
+  }
+
   const accessToken = generateAccessToken(user._id.toString());
   const refreshTokenStr = generateRefreshToken(user._id.toString());
 
@@ -48,7 +55,7 @@ export const processLogin = async (data: any, expectedRoles: string[], skipPassw
     isRevoked: false,
   });
 
-  return { user, accessToken, refreshToken: refreshTokenStr };
+  return { user, accessToken, refreshToken: refreshTokenStr, isPureStaff };
 };
 
 // Helper to set cookies
@@ -81,5 +88,6 @@ export const formatLoginResponse = (data: any) => ({
     email: data.user.email,
     phone: data.user.phone,
     subscription: data.user.subscription,
+    isPureStaff: data.isPureStaff,
   },
 });

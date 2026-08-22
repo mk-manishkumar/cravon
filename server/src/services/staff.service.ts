@@ -12,7 +12,7 @@ import { sendInviteEmail } from "../utils/mailer.js";
 import { getTierConfig } from "../config/pricing.config.js";
 
 // Invite a staff member to a restaurant
-export const inviteStaffService = async (userId: string, userSubscriptionTier: string, restaurantId: string, email: string, role: 'Owner' | 'Manager' | 'Staff', permissions: string[]) => {
+export const inviteStaffService = async (userId: string, userSubscriptionTier: string, restaurantId: string, email: string, role: 'Owner' | 'Staff', permissions: string[]) => {
   // Verify caller owns the restaurant or is a Manager/Owner in staff table
   const restaurant = await Restaurant.findById(restaurantId);
   if (!restaurant) throw new ApiError(404, "Restaurant not found");
@@ -20,7 +20,7 @@ export const inviteStaffService = async (userId: string, userSubscriptionTier: s
   const isDirectOwner = restaurant.ownerId.toString() === userId.toString();
   if (!isDirectOwner) {
     const staffRecord = await RestaurantStaff.findOne({ userId, restaurantId, status: "active" });
-    if (!staffRecord || (staffRecord.role !== "Owner" && staffRecord.role !== "Manager")) {
+    if (staffRecord?.role !== "Owner") {
       throw new ApiError(403, "You do not have permission to invite staff for this restaurant");
     }
   }
@@ -188,11 +188,11 @@ export const getAllStaffService = async (userId: string) => {
   const ownedRestaurants = await Restaurant.find({ ownerId: userId }).select("_id name");
   const restaurantIds = ownedRestaurants.map(r => r._id);
 
-  // Find all restaurants where user is an active Manager or Owner in staff table
+  // Find all restaurants where user is an active Owner in staff table
   const staffRecords = await RestaurantStaff.find({ 
     userId, 
     status: "active",
-    role: { $in: ["Manager", "Owner"] }
+    role: "Owner" 
   }).select("restaurantId");
   
   for (const record of staffRecords) {
@@ -210,7 +210,7 @@ export const getAllStaffService = async (userId: string) => {
 };
 
 // Update staff permissions
-export const updateStaffService = async (userId: string, staffId: string, role?: 'Owner' | 'Manager' | 'Staff', permissions?: string[]) => {
+export const updateStaffService = async (userId: string, staffId: string, role?: 'Owner' | 'Staff', permissions?: string[]) => {
   const staffRecord = await RestaurantStaff.findById(staffId);
   if (!staffRecord) throw new ApiError(404, "Staff record not found");
 
@@ -220,7 +220,7 @@ export const updateStaffService = async (userId: string, staffId: string, role?:
   const isDirectOwner = restaurant.ownerId.toString() === userId.toString();
   if (!isDirectOwner) {
     const callerStaffRecord = await RestaurantStaff.findOne({ userId, restaurantId: restaurant._id, status: "active" });
-    if (!callerStaffRecord || (callerStaffRecord.role !== "Owner" && callerStaffRecord.role !== "Manager")) {
+    if (callerStaffRecord?.role !== "Owner") {
       throw new ApiError(403, "Permission denied");
     }
   }
@@ -244,7 +244,7 @@ export const removeStaffService = async (userId: string, staffId: string) => {
   const isDirectOwner = restaurant.ownerId.toString() === userId.toString();
   if (!isDirectOwner) {
     const callerStaffRecord = await RestaurantStaff.findOne({ userId, restaurantId: restaurant._id, status: "active" });
-    if (!callerStaffRecord || (callerStaffRecord.role !== "Owner" && callerStaffRecord.role !== "Manager")) {
+    if (callerStaffRecord?.role !== "Owner") {
       throw new ApiError(403, "Permission denied");
     }
   }

@@ -64,7 +64,15 @@ export const loginAdmin = asyncHandler(async (req: Request, res: Response) => {
 // GET CURRENT USER PROFILE
 export const getMe = asyncHandler(async (req: Request, res: Response) => {
   // @ts-ignore - user is attached by verifyJWT middleware
-  res.status(200).json({ user: req.user });
+  const user = req.user;
+  
+  if (user.roles.includes("RestaurantOwner")) {
+    const Restaurant = (await import("../models/restaurant.model.js")).default;
+    const count = await Restaurant.countDocuments({ ownerId: user.id });
+    user.isPureStaff = count === 0;
+  }
+  
+  res.status(200).json({ user });
 });
 
 // LOGOUT

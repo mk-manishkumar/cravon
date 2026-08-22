@@ -13,7 +13,7 @@ export const inviteStaff = asyncHandler(async (req: Request, res: Response) => {
     throw new ApiError(400, "Restaurant ID and email are required");
   }
 
-  const result = await inviteStaffService(user.id, user.subscription?.tier || "free", restaurantId, email, role as "Owner" | "Manager" | "Staff", permissions);
+  const result = await inviteStaffService(user.id, user.subscription?.tier || "free", restaurantId, email, role as "Owner" | "Staff", permissions);
 
   res.status(200).json(result);
 });
@@ -85,7 +85,7 @@ export const updateStaff = asyncHandler(async (req: Request, res: Response) => {
   const { role, permissions } = req.body;
   const user = (req as any).user;
 
-  const staffRecord = await updateStaffService(user.id, id, role as "Owner" | "Manager" | "Staff", permissions);
+  const staffRecord = await updateStaffService(user.id, id, role as "Owner" | "Staff", permissions);
 
   res.status(200).json({ message: "Staff updated successfully", staffRecord });
 });

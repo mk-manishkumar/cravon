@@ -15,7 +15,6 @@ interface Props {
 
 const getRoleBadgeClasses = (role: string) => {
   if (role === "Owner") return "bg-[#FF7A30]/20 text-[#FF7A30]";
-  if (role === "Manager") return "bg-purple-500/20 text-purple-400";
   return "bg-blue-500/20 text-blue-400";
 };
 

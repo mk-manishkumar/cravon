@@ -31,7 +31,7 @@ export const getRestaurantById = async (userId: string, restaurantId: string) =>
   const restaurant = await Restaurant.findById(restaurantId);
   if (!restaurant) throw new ApiError(404, "Restaurant not found");
 
-  const isOwner = restaurant.ownerId.toString() === userId;
+  const isOwner = restaurant.ownerId.toString() === userId.toString();
   if (!isOwner) {
     const isStaff = await RestaurantStaff.findOne({ userId, restaurantId, status: "active" });
     if (!isStaff) throw new ApiError(403, "You do not have access to this restaurant");
@@ -121,4 +121,37 @@ export const toggleRestaurantStatus = async (ownerId: string, restaurantId: stri
   await restaurant.save();
 
   return restaurant;
+};
+
+// Update a specific menu item's price
+export const updateRestaurantMenuPrice = async (userId: string, restaurantId: string, itemName: string, newPrice: number) => {
+  const restaurant = await Restaurant.findById(restaurantId);
+  if (!restaurant) throw new ApiError(404, "Restaurant not found");
+
+  const isOwner = restaurant.ownerId.toString() === userId.toString();
+
+  if (!isOwner) {
+    const { default: RestaurantStaff } = await import("../models/restaurantStaff.model.js");
+    const staffRecord = await RestaurantStaff.findOne({ userId, restaurantId, status: "active" });
+
+    if (!staffRecord) throw new ApiError(403, "You do not have access to this restaurant");
+
+    if (staffRecord.role !== "Owner") {
+      if (!staffRecord.permissions.includes("edit_price")) {
+        throw new ApiError(403, "You do not have permission to edit prices");
+      }
+    }
+  }
+
+  if (!restaurant.menu) throw new ApiError(404, "Menu not found");
+
+  const itemIndex = restaurant.menu.findIndex((item) => item.name === itemName);
+  if (itemIndex === -1) throw new ApiError(404, "Menu item not found");
+
+  restaurant.menu[itemIndex].price = Number(newPrice);
+
+  restaurant.markModified("menu");
+  await restaurant.save();
+
+  return restaurant.menu[itemIndex];
 };

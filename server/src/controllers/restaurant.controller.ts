@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import mongoose from "mongoose";
 import asyncHandler from "../utils/asyncHandler.js";
-import { createRestaurant, updateRestaurant, deleteRestaurant, getMyRestaurants as getMyRestaurantsService, toggleRestaurantStatus, getRestaurantById } from "../services/restaurant.service.js";
+import { createRestaurant, updateRestaurant, deleteRestaurant, getMyRestaurants as getMyRestaurantsService, toggleRestaurantStatus, getRestaurantById, updateRestaurantMenuPrice } from "../services/restaurant.service.js";
 import { ApiError } from "../utils/errorHandler.js";
 import User from "../models/user.model.js";
 import { getTierConfig } from "../config/pricing.config.js";
@@ -16,7 +16,7 @@ export const createNewRestaurant = asyncHandler(async (req: Request, res: Respon
   const user = await User.findById(userId);
   if (!user) throw new ApiError(404, "User not found");
 
-  const tier = user.subscription?.tier || 'free';
+  const tier = user.subscription?.tier || "free";
   const tierConfig = getTierConfig(tier);
 
   const restaurantCount = await Restaurant.countDocuments({ ownerId: userId });
@@ -80,6 +80,27 @@ export const getRestaurant = asyncHandler(async (req: Request, res: Response) =>
   res.status(200).json({
     status: "success",
     data: restaurant,
+  });
+});
+
+// Update a specific menu item's price
+export const updateMenuPrice = asyncHandler(async (req: Request, res: Response) => {
+  const userId = (req as any).user?.id;
+  if (!userId) throw new ApiError(401, "Unauthorized");
+
+  const { id } = req.params;
+  const { itemName, newPrice } = req.body;
+
+  if (!id) throw new ApiError(400, "Restaurant ID is required");
+  if (!itemName || newPrice === undefined) throw new ApiError(400, "Item name and new price are required");
+  if (!mongoose.isValidObjectId(id)) throw new ApiError(400, "Invalid Restaurant ID format");
+
+  const updatedMenuItem = await updateRestaurantMenuPrice(userId, id, itemName, newPrice);
+
+  res.status(200).json({
+    status: "success",
+    message: "Price updated successfully",
+    data: updatedMenuItem,
   });
 });
 
