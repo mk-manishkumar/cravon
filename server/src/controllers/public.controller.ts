@@ -16,3 +16,24 @@ export const getActiveRestaurants = asyncHandler(async (req: Request, res: Respo
     data: restaurants,
   });
 });
+
+// Get a single restaurant by ID with its full menu
+export const getRestaurantById = asyncHandler(async (req: Request, res: Response) => {
+  const { id } = req.params;
+
+  const restaurant = await Restaurant.findOne({
+    _id: id,
+    status: "active",
+    isOnboarded: true
+  });
+
+  if (!restaurant) {
+    res.status(404);
+    throw new Error("Restaurant not found or is currently inactive");
+  }
+
+  res.status(200).json({
+    status: "success",
+    data: restaurant,
+  });
+});

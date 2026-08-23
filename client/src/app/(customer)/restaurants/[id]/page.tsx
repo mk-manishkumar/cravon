@@ -1,0 +1,138 @@
+"use client";
+
+import { useQuery } from "@tanstack/react-query";
+import { publicService } from "@/services/public.service";
+import { useParams } from "next/navigation";
+import Image from "next/image";
+import { Star, MapPin, Clock } from "lucide-react";
+
+export default function RestaurantDetailsPage() {
+  const params = useParams();
+  const id = params.id as string;
+
+  const { data: restaurant, isLoading, isError } = useQuery({
+    queryKey: ["restaurant", id],
+    queryFn: () => publicService.getRestaurantById(id),
+    enabled: !!id,
+  });
+
+  if (isLoading) {
+    return (
+      <div className="max-w-4xl mx-auto px-6 py-12 animate-pulse">
+        <div className="h-64 bg-gray-200 rounded-3xl mb-8"></div>
+        <div className="h-10 w-1/2 bg-gray-200 rounded mb-4"></div>
+        <div className="h-6 w-1/3 bg-gray-200 rounded mb-12"></div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {["skel-menu-1", "skel-menu-2", "skel-menu-3", "skel-menu-4"].map((id) => (
+            <div key={id} className="flex justify-between items-center bg-gray-50 p-4 rounded-xl">
+               <div className="space-y-2 w-2/3">
+                 <div className="h-6 bg-gray-200 w-1/2 rounded"></div>
+                 <div className="h-4 bg-gray-200 w-full rounded"></div>
+               </div>
+               <div className="h-10 w-24 bg-gray-200 rounded-lg"></div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (isError || !restaurant) {
+    return (
+      <div className="text-center py-20 text-red-500 font-medium">
+        Restaurant not found or is currently inactive.
+      </div>
+    );
+  }
+
+  return (
+    <div className="bg-white text-gray-900 font-sans min-h-screen pb-24">
+      {/* Header Banner */}
+      <div className="relative w-full h-75 md:h-100 bg-gray-900">
+        {restaurant.image && (
+          <Image 
+            src={restaurant.image} 
+            alt={restaurant.name}
+            fill
+            className="object-cover opacity-60"
+          />
+        )}
+        <div className="absolute inset-0 bg-linear-to-t from-black/80 via-transparent to-transparent"></div>
+        
+        <div className="absolute bottom-0 left-0 w-full p-6 md:p-12">
+          <div className="max-w-5xl mx-auto flex flex-col md:flex-row md:items-end justify-between gap-6">
+            <div className="text-white">
+              <h1 className="text-4xl md:text-5xl font-black mb-3">{restaurant.name}</h1>
+              <div className="flex flex-wrap items-center gap-4 text-sm font-medium opacity-90">
+                <div className="flex items-center gap-1">
+                  <MapPin className="w-4 h-4" />
+                  <span>{restaurant.address || "Local Area"}</span>
+                </div>
+                <div className="flex items-center gap-1 bg-green-600 px-2 py-1 rounded-md text-white">
+                  <Star className="w-4 h-4 fill-white" />
+                  <span>{restaurant.rating && restaurant.rating > 0 ? restaurant.rating.toFixed(1) : "New"}</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <Clock className="w-4 h-4" />
+                  <span>{restaurant.deliveryTime || "30-40"} mins</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Menu Section */}
+      <div className="max-w-4xl mx-auto px-6 py-12">
+        <h2 className="text-2xl font-bold mb-8 flex items-center gap-2">
+          Menu{" "}
+          <span className="text-gray-400 text-lg font-normal">({restaurant.menu?.length || 0} items)</span>
+        </h2>
+
+        {!restaurant.menu || restaurant.menu.length === 0 ? (
+          <div className="text-center py-12 text-gray-500 bg-gray-50 rounded-2xl">
+            This restaurant hasn&apos;t added any menu items yet.
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+            {restaurant.menu.map((item: any, idx: number) => (
+              <div key={item._id || `menu-${idx}`} className="flex justify-between items-start p-6 bg-white border border-gray-100 shadow-sm rounded-2xl hover:shadow-md transition-shadow">
+                
+                <div className="flex-1 pr-6">
+                  <div className="flex items-center gap-2 mb-1">
+                    
+                    <div className={`w-4 h-4 flex items-center justify-center border-2 rounded-sm ${item.isVeg !== false ? 'border-green-600' : 'border-red-600'}`}>
+                      <div className={`w-2 h-2 rounded-full ${item.isVeg !== false ? 'bg-green-600' : 'bg-red-600'}`}></div>
+                    </div>
+                    <h3 className="text-lg font-bold text-gray-900">{item.name}</h3>
+                  </div>
+                  <p className="font-semibold text-gray-800 mb-2">₹{item.price}</p>
+                  {item.description && (
+                    <p className="text-sm text-gray-500 line-clamp-2">{item.description}</p>
+                  )}
+                </div>
+
+                <div className="relative shrink-0 w-30 h-30">
+                  {item.image ? (
+                    <Image src={item.image} alt={item.name} fill className="object-cover rounded-xl" />
+                  ) : (
+                    <div className="w-full h-full bg-orange-50 rounded-xl flex items-center justify-center text-orange-200">
+                      <Star className="w-8 h-8 opacity-50" />
+                    </div>
+                  )}
+                  
+                  {/* Swiggy Style ADD Button */}
+                  <button type="button" className="absolute -bottom-4 left-1/2 -translate-x-1/2 w-[80%] bg-white text-green-600 font-bold border border-gray-200 shadow-md py-2 rounded-lg hover:bg-gray-50 transition-colors uppercase text-sm cursor-pointer">
+                    ADD
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}

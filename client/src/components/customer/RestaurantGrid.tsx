@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { publicService } from "@/services/public.service";
 import { Star, Clock } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 
 type Restaurant = {
   _id: string;
@@ -55,11 +56,10 @@ export default function RestaurantGrid() {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
       {restaurants.map((restaurant) => (
-        <div key={restaurant._id} className="group cursor-pointer flex flex-col gap-3">
+        <Link key={restaurant._id} href={`/restaurants/${restaurant._id}`} className="group cursor-pointer flex flex-col gap-3">
           <div className="relative h-48 w-full rounded-2xl overflow-hidden shadow-sm">
             {restaurant.image ? <Image src={restaurant.image} alt={restaurant.name} fill className="object-cover group-hover:scale-105 transition-transform duration-300" /> : <div className="w-full h-full bg-gray-100 flex items-center justify-center text-gray-400 group-hover:scale-105 transition-transform duration-300">No Image</div>}
 
-            {/* Optional overlay gradient for better text readability if we add text over images later */}
             <div className="absolute inset-0 bg-linear-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
           </div>
 
@@ -79,7 +79,7 @@ export default function RestaurantGrid() {
 
             <p className="text-gray-500 text-sm mt-1 truncate">{restaurant.address || "Local Area"}</p>
           </div>
-        </div>
+        </Link>
       ))}
     </div>
   );
