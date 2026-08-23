@@ -5,6 +5,7 @@ import { publicService } from "@/services/public.service";
 import { useParams } from "next/navigation";
 import Image from "next/image";
 import { Star, MapPin, Clock } from "lucide-react";
+import { useEffect } from "react";
 
 export default function RestaurantDetailsPage() {
   const params = useParams();
@@ -15,6 +16,11 @@ export default function RestaurantDetailsPage() {
     queryFn: () => publicService.getRestaurantById(id),
     enabled: !!id,
   });
+
+  useEffect(() => {
+    if (restaurant?.name) document.title = `${restaurant.name} | Cravon`;
+    else document.title = "Restaurant Menu | Cravon";
+  }, [restaurant?.name]);
 
   if (isLoading) {
     return (

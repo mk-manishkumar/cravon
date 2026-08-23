@@ -173,10 +173,10 @@ export default function PartnerRestaurantsPage() {
             <h3 className="text-2xl font-bold text-white mb-3">Upgrade Required</h3>
             <p className="text-[#888] mb-8">You&apos;ve reached the maximum number of restaurants for your current plan. Upgrade to a higher tier to add more locations!</p>
             <div className="flex gap-4">
-              <button type="button" onClick={() => setShowUpgradeModal(false)} className="flex-1 px-4 py-3 bg-[#222] text-white rounded-xl font-bold hover:bg-[#333] transition-colors">
+              <button type="button" onClick={() => setShowUpgradeModal(false)} className="flex-1 px-4 py-3 bg-[#222] text-white rounded-xl font-bold hover:bg-[#333] transition-colors cursor-pointer">
                 Cancel
               </button>
-              <button type="button" onClick={() => router.push("/partner/pricing")} className="flex-1 px-4 py-3 bg-[#FF7A30] text-white rounded-xl font-bold hover:bg-[#FF7A30]/90 transition-colors shadow-lg shadow-[#FF7A30]/20">
+              <button type="button" onClick={() => router.push("/partner/pricing")} className="flex-1 px-4 py-3 bg-[#FF7A30] text-white rounded-xl font-bold hover:bg-[#FF7A30]/90 transition-colors shadow-lg shadow-[#FF7A30]/20 cursor-pointer">
                 View Plans
               </button>
             </div>
