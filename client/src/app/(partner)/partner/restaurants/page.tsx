@@ -7,10 +7,12 @@ import { restaurantService } from "@/services/restaurant.service";
 import OnboardingWizard from "@/components/partner/OnboardingWizard";
 import toast from "react-hot-toast";
 import { Sparkles, Plus } from "lucide-react";
+import { useAuthStore } from "@/store/authStore";
 
 import RestaurantProfileCard from "./components/RestaurantProfileCard";
 
 export default function PartnerRestaurantsPage() {
+  const { user } = useAuthStore();
   const queryClient = useQueryClient();
   const router = useRouter();
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -25,6 +27,18 @@ export default function PartnerRestaurantsPage() {
       return response.data || [];
     },
   });
+
+  const handleCreateClick = () => {
+    const tier = user?.subscription?.tier?.toLowerCase() || "free";
+    const TIER_LIMITS: Record<string, number> = { ent: 100, pro: 50, free: 3 };
+    const limit = TIER_LIMITS[tier] || 3;
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const ownedRestaurants = restaurants.filter((r: any) => r.userRole === "Owner");
+
+    if (ownedRestaurants.length >= limit) setShowUpgradeModal(true);
+    else setIsCreateModalOpen(true);
+  };
 
   const createMutation = useMutation({
     mutationFn: (data: Record<string, unknown>) => restaurantService.createRestaurant(data),
@@ -112,7 +126,7 @@ export default function PartnerRestaurantsPage() {
                 Complete Onboarding
               </button>
             ) : (
-              <button type="button" onClick={() => setIsCreateModalOpen(true)} className="px-6 py-2.5 bg-[#e65c00] text-white font-bold rounded-xl hover:bg-[#cc5200] transition-all cursor-pointer shadow-lg shadow-[#e65c00]/20 flex items-center gap-2">
+              <button type="button" onClick={handleCreateClick} className="px-6 py-2.5 bg-[#e65c00] text-white font-bold rounded-xl hover:bg-[#cc5200] transition-all cursor-pointer shadow-lg shadow-[#e65c00]/20 flex items-center gap-2">
                 <Plus size={18} />
                 New Restaurant
               </button>
@@ -128,7 +142,7 @@ export default function PartnerRestaurantsPage() {
             {restaurants.length === 0 ? (
               <div className="col-span-full flex flex-col items-center justify-center p-12 bg-[#111] border border-[#222] rounded-3xl">
                 <p className="text-[#888] mb-4">You haven&apos;t onboarded any restaurants yet.</p>
-                <button type="button" onClick={() => setIsCreateModalOpen(true)} className="px-6 py-2.5 bg-white/5 border border-white/10 hover:bg-white/10 text-white font-bold rounded-xl transition-all cursor-pointer">
+                <button type="button" onClick={handleCreateClick} className="px-6 py-2.5 bg-white/5 border border-white/10 hover:bg-white/10 text-white font-bold rounded-xl transition-all cursor-pointer">
                   Create Your First Restaurant
                 </button>
               </div>

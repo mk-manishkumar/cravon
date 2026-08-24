@@ -129,7 +129,6 @@ export default function RestaurantDetailsPage() {
                     </div>
                   )}
                   
-                  {/* Swiggy Style ADD Button */}
                   <button type="button" className="absolute -bottom-4 left-1/2 -translate-x-1/2 w-[80%] bg-white text-green-600 font-bold border border-gray-200 shadow-md py-2 rounded-lg hover:bg-gray-50 transition-colors uppercase text-sm cursor-pointer">
                     ADD
                   </button>
