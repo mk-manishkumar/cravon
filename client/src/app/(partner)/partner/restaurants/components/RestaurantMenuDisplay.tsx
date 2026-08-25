@@ -96,7 +96,7 @@ export default function RestaurantMenuDisplay({ menu, restaurantId }: Props) {
                       {editingItem === item.name ? (
                         <div className="flex items-center gap-1 bg-[#222] rounded-md px-2 py-1">
                           <span className="text-white text-sm">₹</span>
-                          <input type="number" className="w-16 bg-transparent text-white text-sm outline-none font-bold" value={newPrice} onChange={(e) => setNewPrice(e.target.value)} autoFocus onKeyDown={(e) => e.key === "Enter" && handleSave(item.name)} />
+                          <input type="number" className="w-10 bg-transparent text-white text-sm outline-none font-bold [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" value={newPrice} onChange={(e) => setNewPrice(e.target.value)} autoFocus onKeyDown={(e) => e.key === "Enter" && handleSave(item.name)} />
                           <button type="button" onClick={() => handleSave(item.name)} disabled={updatePriceMutation.isPending} className="text-green-500 hover:text-green-400 p-1 cursor-pointer">
                             <Check size={16} />
                           </button>
