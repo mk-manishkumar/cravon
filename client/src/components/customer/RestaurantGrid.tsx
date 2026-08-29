@@ -3,6 +3,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { publicService } from "@/services/public.service";
 import { Star, Clock } from "lucide-react";
+import { useSearchParams } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -17,13 +18,16 @@ type Restaurant = {
 };
 
 export default function RestaurantGrid() {
+  const searchParams = useSearchParams();
+  const city = searchParams.get("city") || "Select City";
+
   const {
     data: restaurants,
     isLoading,
     isError,
   } = useQuery<Restaurant[]>({
-    queryKey: ["active-restaurants"],
-    queryFn: publicService.getActiveRestaurants,
+    queryKey: ["active-restaurants", city],
+    queryFn: () => publicService.getActiveRestaurants(city),
   });
 
   if (isLoading) {

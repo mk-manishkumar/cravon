@@ -2,13 +2,27 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useAuthStore } from "@/store/authStore";
+
+const CITIES = ["Delhi", "Gurgaon", "Noida", "Hyderabad", "Bangalore", "Patna", "Mumbai", "Pune", "Kolkata", "Jaipur", "Rishikesh", "Shimla"];
 
 export default function CustomerHeader() {
   const user = useAuthStore((state) => state.user);
   const logout = useAuthStore((state) => state.logout);
   const isLoading = useAuthStore((state) => state.isLoading);
   const [showDropdown, setShowDropdown] = useState(false);
+  const [showCityDropdown, setShowCityDropdown] = useState(false);
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const currentCity = searchParams.get("city") || "Select City";
+
+  const handleCitySelect = (city: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("city", city);
+    router.push(`/?${params.toString()}`);
+    setShowCityDropdown(false);
+  };
 
   const displayFont = "'Baloo 2', 'Poppins', 'Segoe UI', sans-serif";
 
@@ -37,7 +51,33 @@ export default function CustomerHeader() {
           </nav>
 
           {/* Right side (Auth / Profile) */}
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-6">
+            {/* Location Selector */}
+            <div className="relative" onMouseEnter={() => setShowCityDropdown(true)} onMouseLeave={() => setShowCityDropdown(false)}>
+              <button type="button" className="flex items-center gap-2 text-sm text-gray-700 hover:text-[#FF3D57] transition-colors cursor-pointer">
+                <span className="font-bold text-gray-500">Deliver to:</span>
+                <span className="font-semibold">{currentCity}</span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="m6 9 6 6 6-6" />
+                </svg>
+              </button>
+
+              {/* City Dropdown Menu */}
+              {showCityDropdown && (
+                <div className="absolute right-0 top-full pt-2 w-48 z-50">
+                  <div className="bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden animate-in fade-in slide-in-from-top-2">
+                    <div className="max-h-64 overflow-y-auto">
+                      {CITIES.map((city) => (
+                        <button type="button" key={city} onClick={() => handleCitySelect(city)} className={`w-full text-left px-4 py-2.5 text-sm transition-colors cursor-pointer ${currentCity === city ? "bg-[#FFF1F0] text-[#FF3D57] font-bold" : "text-gray-700 hover:bg-gray-50 hover:text-[#FF3D57]"}`}>
+                          {city}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
             {!isLoading &&
               (user ? (
                 <div className="relative" onMouseEnter={() => setShowDropdown(true)} onMouseLeave={() => setShowDropdown(false)}>
@@ -51,24 +91,32 @@ export default function CustomerHeader() {
                     <div className="absolute right-0 top-full pt-2 w-56 z-50">
                       <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden animate-in fade-in slide-in-from-top-2">
                         <div className="px-5 py-4 bg-[#FFFBF8] border-b border-gray-50">
-                          <p className="text-[15px] font-bold text-gray-800 capitalize">{user.firstName} {user.lastName}</p>
+                          <p className="text-[15px] font-bold text-gray-800 capitalize">
+                            {user.firstName} {user.lastName}
+                          </p>
                         </div>
                         <div className="py-2">
                           <Link href="/profile" className="flex items-center gap-3 px-5 py-2.5 text-[14px] text-gray-700 hover:bg-[#FFFBF8] hover:text-[#FF3D57] transition-colors">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                              <circle cx="12" cy="7" r="4" />
+                            </svg>
                             View Profile
                           </Link>
                           <Link href="/settings" className="flex items-center gap-3 px-5 py-2.5 text-[14px] text-gray-700 hover:bg-[#FFFBF8] hover:text-[#FF3D57] transition-colors">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                              <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" />
+                              <circle cx="12" cy="12" r="3" />
+                            </svg>
                             Account Settings
                           </Link>
                           <div className="w-full h-px bg-gray-50 my-2" />
-                          <button 
-                            type="button"
-                            onClick={() => logout()}
-                            className="flex items-center gap-3 w-full text-left px-5 py-2.5 text-[14px] text-[#FF3D57] hover:bg-[#FFF1F0] transition-colors cursor-pointer"
-                          >
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                          <button type="button" onClick={() => logout()} className="flex items-center gap-3 w-full text-left px-5 py-2.5 text-[14px] text-[#FF3D57] hover:bg-[#FFF1F0] transition-colors cursor-pointer">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                              <polyline points="16 17 21 12 16 7" />
+                              <line x1="21" y1="12" x2="9" y2="12" />
+                            </svg>
                             Log out
                           </button>
                         </div>

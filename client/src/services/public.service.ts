@@ -2,8 +2,11 @@ import api from "../lib/axios";
 
 export const publicService = {
   // Get all active restaurants for the customer landing page
-  getActiveRestaurants: async () => {
-    const response = await api.get("/public/restaurants");
+  getActiveRestaurants: async (city?: string) => {
+    const url = city && city !== "Select City" 
+      ? `/public/restaurants?city=${encodeURIComponent(city)}` 
+      : "/public/restaurants";
+    const response = await api.get(url);
     return response.data.data;
   },
 

@@ -4,12 +4,15 @@ import Restaurant from "../models/restaurant.model.js";
 
 // Get all active onboarded restaurants for public listing
 export const getActiveRestaurants = asyncHandler(async (req: Request, res: Response) => {
-  const restaurants = await Restaurant.find({
-    status: "active",
-    isOnboarded: true,
-  })
-    .select("-menu") 
-    .sort("-createdAt");
+  const { city } = req.query;
+
+  const filter: any = { status: "active", isOnboarded: true };
+
+  if (city && typeof city === "string" && city !== "Select City") {
+    filter.address = { $regex: new RegExp(city, "i") };
+  }
+
+  const restaurants = await Restaurant.find(filter).select("-menu").sort("-createdAt");
 
   res.status(200).json({
     status: "success",
@@ -24,7 +27,7 @@ export const getRestaurantById = asyncHandler(async (req: Request, res: Response
   const restaurant = await Restaurant.findOne({
     _id: id,
     status: "active",
-    isOnboarded: true
+    isOnboarded: true,
   });
 
   if (!restaurant) {
