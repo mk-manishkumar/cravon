@@ -1,5 +1,6 @@
 import { Metadata } from "next";
 import RestaurantGrid from "@/components/customer/RestaurantGrid";
+import { Suspense } from "react";
 
 export const metadata: Metadata = {
   title: "Cravon | Discover & Order Delicious Food",
@@ -29,7 +30,9 @@ export default function CustomerLandingPage() {
       <section className="px-6 py-8">
         <div className="max-w-7xl mx-auto">
           <h2 className="text-2xl font-bold text-gray-900 mb-8">Top Restaurants Near You</h2>
-          <RestaurantGrid />
+          <Suspense fallback={<div className="h-64 flex items-center justify-center">Loading restaurants...</div>}>
+            <RestaurantGrid />
+          </Suspense>
         </div>
       </section>
     </div>
