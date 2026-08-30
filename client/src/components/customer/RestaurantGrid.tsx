@@ -19,7 +19,7 @@ type Restaurant = {
 
 export default function RestaurantGrid() {
   const searchParams = useSearchParams();
-  const city = searchParams.get("city") || "Select City";
+  const city = searchParams.get("city") || "Delhi";
 
   const {
     data: restaurants,

@@ -57,6 +57,12 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 // Global Error Handler Middleware
 app.use(errorHandler);
 
-app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
-});
+// Only listen if not running in a serverless environment
+if (process.env.NODE_ENV !== 'production') {
+  app.listen(PORT, () => {
+    console.log(`Server is running on http://localhost:${PORT}`);
+  });
+}
+
+// Export for Vercel Serverless
+export default app;

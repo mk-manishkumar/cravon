@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuthStore } from "@/store/authStore";
+import { ShoppingCart } from "lucide-react";
 
 const CITIES = ["Delhi", "Gurgaon", "Noida", "Hyderabad", "Bangalore", "Patna", "Mumbai", "Pune", "Kolkata", "Jaipur", "Rishikesh", "Shimla"];
 
@@ -15,7 +16,7 @@ export default function CustomerHeader() {
   const [showCityDropdown, setShowCityDropdown] = useState(false);
   const router = useRouter();
   const searchParams = useSearchParams();
-  const currentCity = searchParams.get("city") || "Select City";
+  const currentCity = searchParams.get("city") || "Delhi";
 
   const handleCitySelect = (city: string) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -50,7 +51,7 @@ export default function CustomerHeader() {
             </Link>
           </nav>
 
-          {/* Right side (Auth / Profile) */}
+          {/* Right side */}
           <div className="flex items-center gap-6">
             {/* Location Selector */}
             <div className="relative" onMouseEnter={() => setShowCityDropdown(true)} onMouseLeave={() => setShowCityDropdown(false)}>
@@ -77,6 +78,12 @@ export default function CustomerHeader() {
                 </div>
               )}
             </div>
+
+            {/* Cart Icon */}
+            <Link href="/cart" className="relative flex items-center gap-2 text-gray-700 hover:text-[#FF3D57] transition-colors">
+              <ShoppingCart className="w-5 h-5" />
+              <span className="hidden sm:block font-bold text-[14px]">Cart</span>
+            </Link>
 
             {!isLoading &&
               (user ? (
@@ -126,11 +133,8 @@ export default function CustomerHeader() {
                 </div>
               ) : (
                 <div className="flex items-center gap-3">
-                  <Link href="/auth/login" className="hidden sm:block text-[14px] font-bold text-[#8A6F68] hover:text-[#FF3D57] transition-colors px-3 py-2">
+                  <Link href="/auth/login" className="text-[14px] font-bold text-white bg-linear-to-r from-[#FF3D57] to-[#FF7A30] hover:from-[#E22B45] hover:to-[#E06020] px-5 py-2.5 rounded-full shadow-md transition-all active:scale-95">
                     Sign In
-                  </Link>
-                  <Link href="/auth/register" className="text-[14px] font-bold text-white bg-linear-to-r from-[#FF3D57] to-[#FF7A30] hover:from-[#E22B45] hover:to-[#E06020] px-5 py-2.5 rounded-full shadow-md transition-all active:scale-95">
-                    Sign Up
                   </Link>
                 </div>
               ))}
