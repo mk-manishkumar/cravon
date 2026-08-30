@@ -64,7 +64,7 @@ export const setAuthCookies = (res: Response, accessToken: string, refreshToken:
   const cookieOptions = {
     httpOnly: true,
     secure: isProduction,
-    sameSite: "lax" as const,
+    sameSite: isProduction ? ("none" as const) : ("lax" as const),
   };
 
   res.cookie("accessToken", accessToken, {
