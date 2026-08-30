@@ -22,8 +22,10 @@ app.disable("x-powered-by");
 const PORT = process.env.PORT || 5000;
 
 // GLOBAL MIDDLEWARES
+const allowedOrigins = [process.env.CLIENT_URL || "http://localhost:3000", "http://localhost:3000"];
+
 const corsOptions = {
-  origin: process.env.CLIENT_URL || "http://localhost:3000",
+  origin: allowedOrigins,
   credentials: true,
   optionsSuccessStatus: 200,
 };
