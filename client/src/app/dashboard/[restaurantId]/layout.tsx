@@ -2,8 +2,8 @@ import { ReactNode } from "react";
 import Link from "next/link";
 import { Store, Settings, PieChart, Users, Menu, Package } from "lucide-react";
 
-export default function RestaurantDashboardLayout({ children, params }: Readonly<{ children: ReactNode; params: Readonly<{ restaurantId: string }> }>) {
-  const { restaurantId } = params;
+export default async function RestaurantDashboardLayout({ children, params }: Readonly<{ children: ReactNode; params: Promise<{ restaurantId: string }> }>) {
+  const { restaurantId } = await params;
 
   return (
     <div className="min-h-screen bg-black text-white flex">
