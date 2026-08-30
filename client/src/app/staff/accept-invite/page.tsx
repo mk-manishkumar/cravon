@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { CheckCircle2, XCircle, Loader2, User as UserIcon, Lock } from "lucide-react";
 import { staffService } from "@/services/staff.service";
@@ -8,7 +8,7 @@ import { useAuthStore } from "@/store/authStore";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 
-export default function AcceptInvitePage() {
+function AcceptInviteContent() {
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
   const router = useRouter();
@@ -217,5 +217,13 @@ export default function AcceptInvitePage() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function AcceptInvitePage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-black flex items-center justify-center text-white">Loading...</div>}>
+      <AcceptInviteContent />
+    </Suspense>
   );
 }

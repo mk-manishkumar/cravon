@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { authService } from "@/services/auth.service";
@@ -8,7 +8,7 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import { useAuthStore } from "@/store/authStore";
 
-export default function RestaurantLoginPage() {
+function RestaurantLoginContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirectPath = searchParams.get("redirect");
@@ -109,5 +109,13 @@ export default function RestaurantLoginPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function RestaurantLoginPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center text-white">Loading...</div>}>
+      <RestaurantLoginContent />
+    </Suspense>
   );
 }
