@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { authService } from "@/services/auth.service";
 import axios from "axios";
 import toast from "react-hot-toast";
+import { ArrowLeft } from "lucide-react";
 
 import { useAuthStore } from "@/store/authStore";
 
@@ -46,17 +47,24 @@ export default function LoginPage() {
         <div className="absolute -bottom-40 left-1/4 h-96 w-96 rounded-full bg-[#FF7A30] opacity-20 blur-[100px]" />
       </div>
 
-      <div className="relative w-full max-w-105 bg-white rounded-[28px] shadow-[0_20px_60px_-15px_rgba(255,61,87,0.25)] px-8 py-10 sm:px-10">
-        {/* Brand */}
-        <div className="text-center mb-4">
-          <span className="text-[32px] font-extrabold bg-clip-text text-transparent" style={{ fontFamily: displayFont, backgroundImage: "linear-gradient(135deg, #FF3D57 0%, #FF7A30 55%, #FFC93C 100%)" }}>
-            Cravon
-          </span>
-        </div>
+      <div className="relative z-10 w-full max-w-105 flex flex-col">
+        {/* Back to Home Button */}
+        <Link href="/" className="self-start flex items-center gap-2 text-[#8A6F68] hover:text-[#FF3D57] font-semibold text-[14px] transition-colors mb-4 group">
+          <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+          Back to home
+        </Link>
 
-        <h2 className="text-[26px] text-[#2B1210] text-center mb-6" style={{ fontFamily: displayFont, fontWeight: 700 }}>
-          Welcome back
-        </h2>
+        <div className="w-full bg-white rounded-[28px] shadow-[0_20px_60px_-15px_rgba(255,61,87,0.25)] px-8 py-10 sm:px-10">
+          {/* Brand */}
+          <div className="text-center mb-4">
+            <span className="text-[32px] font-extrabold bg-clip-text text-transparent" style={{ fontFamily: displayFont, backgroundImage: "linear-gradient(135deg, #FF3D57 0%, #FF7A30 55%, #FFC93C 100%)" }}>
+              Cravon
+            </span>
+          </div>
+
+          <h2 className="text-[26px] text-[#2B1210] text-center mb-6" style={{ fontFamily: displayFont, fontWeight: 700 }}>
+            Welcome back
+          </h2>
 
         <form onSubmit={handleSubmit} className="space-y-3" noValidate>
           <div>
@@ -112,11 +120,8 @@ export default function LoginPage() {
               Create an account
             </Link>
           </p>
-          <div className="w-full h-1px bg-linear-to-r from-transparent via-[#F1E1D6] to-transparent my-1" />
-          <Link href="/auth/restaurant/login" className="flex items-center justify-center w-full py-2.5 rounded-xl border-2 border-[#FFC93C]/30 text-[14px] font-bold text-[#FF7A30] hover:bg-[#FFFBF8] transition-colors">
-            Login as a Partner
-          </Link>
         </div>
+      </div>
       </div>
     </div>
   );

@@ -69,8 +69,16 @@ export default function RestaurantDetailsPage() {
         <div className="absolute bottom-0 left-0 w-full p-6 md:p-12">
           <div className="max-w-5xl mx-auto flex flex-col md:flex-row md:items-end justify-between gap-6">
             <div className="text-white">
-              <h1 className="text-4xl md:text-5xl font-black mb-3">{restaurant.name}</h1>
-              <div className="flex flex-wrap items-center gap-4 text-sm font-medium opacity-90">
+              <h1 className="text-4xl md:text-5xl font-black mb-1">{restaurant.name}</h1>
+              {restaurant.franchiseName && (
+                <div className="mb-4">
+                  <span className="inline-flex items-center px-3 py-1 rounded-full text-[13px] font-bold tracking-wide uppercase bg-[#FF3D57] text-white shadow-md">
+                    {restaurant.franchiseName}
+                  </span>
+                </div>
+              )}
+              {!restaurant.franchiseName && <div className="mb-3"></div>}
+              <div className="flex flex-wrap items-center gap-4 text-sm font-medium opacity-90 mb-4">
                 <div className="flex items-center gap-1">
                   <MapPin className="w-4 h-4" />
                   <span>{restaurant.address || "Local Area"}</span>
@@ -83,6 +91,40 @@ export default function RestaurantDetailsPage() {
                   <Clock className="w-4 h-4" />
                   <span>{restaurant.deliveryTime || "30-40"} mins</span>
                 </div>
+              </div>
+
+              <div className="flex flex-col gap-1.5 text-sm font-medium opacity-80 border-t border-white/20 pt-4 mt-2">
+                {restaurant.operatingDays && restaurant.operatingDays.length > 0 && (
+                  <div className="flex items-center gap-2">
+                    <span className="font-semibold text-white/90">Open Days:</span>
+                    <span>
+                      {restaurant.operatingDays.map((d: string) => d.substring(0, 3)).join(", ")}
+                    </span>
+                  </div>
+                )}
+                
+                {restaurant.mealTimings && (
+                  <div className="flex flex-wrap items-center gap-x-6 gap-y-2 mt-1">
+                    {restaurant.mealTimings.breakfast?.open && (
+                      <div className="flex items-center gap-1.5">
+                        <span className="font-semibold text-white/90">Breakfast:</span>
+                        <span>{restaurant.mealTimings.breakfast.open} - {restaurant.mealTimings.breakfast.close}</span>
+                      </div>
+                    )}
+                    {restaurant.mealTimings.lunch?.open && (
+                      <div className="flex items-center gap-1.5">
+                        <span className="font-semibold text-white/90">Lunch:</span>
+                        <span>{restaurant.mealTimings.lunch.open} - {restaurant.mealTimings.lunch.close}</span>
+                      </div>
+                    )}
+                    {restaurant.mealTimings.dinner?.open && (
+                      <div className="flex items-center gap-1.5">
+                        <span className="font-semibold text-white/90">Dinner:</span>
+                        <span>{restaurant.mealTimings.dinner.open} - {restaurant.mealTimings.dinner.close}</span>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
           </div>

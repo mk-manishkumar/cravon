@@ -45,14 +45,14 @@ export default function OnboardingWizard({ onComplete, onClose, isLoading = fals
     lat: initialData?.location?.coordinates?.[1] || undefined,
     lng: initialData?.location?.coordinates?.[0] || undefined,
     operatingDays: initialData?.operatingDays || ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
-    openTime: initialData?.operatingHours?.open || "09:00",
+    openTime: initialData?.operatingHours?.open || "07:00",
     closeTime: initialData?.operatingHours?.close || "22:00",
-    breakfastOpen: initialData?.mealTimings?.breakfast?.open || "",
-    breakfastClose: initialData?.mealTimings?.breakfast?.close || "",
-    lunchOpen: initialData?.mealTimings?.lunch?.open || "",
-    lunchClose: initialData?.mealTimings?.lunch?.close || "",
-    dinnerOpen: initialData?.mealTimings?.dinner?.open || "",
-    dinnerClose: initialData?.mealTimings?.dinner?.close || "",
+    breakfastOpen: initialData?.mealTimings?.breakfast?.open || (isEditMode ? "" : "07:00"),
+    breakfastClose: initialData?.mealTimings?.breakfast?.close || (isEditMode ? "" : "10:00"),
+    lunchOpen: initialData?.mealTimings?.lunch?.open || (isEditMode ? "" : "12:00"),
+    lunchClose: initialData?.mealTimings?.lunch?.close || (isEditMode ? "" : "16:00"),
+    dinnerOpen: initialData?.mealTimings?.dinner?.open || (isEditMode ? "" : "18:00"),
+    dinnerClose: initialData?.mealTimings?.dinner?.close || (isEditMode ? "" : "22:00"),
   };
 
   const form = useForm<OnboardingFormValues>({
