@@ -16,29 +16,39 @@ api.interceptors.request.use(
   (error) => Promise.reject(error),
 );
 
+const handleAuthRedirect = (wasLoggedIn: boolean) => {
+  if (typeof window === "undefined") return;
+
+  const currentPath = window.location.pathname;
+
+  // Don't redirect if already on an auth page or handling an invite
+  if (currentPath.includes("/login") || currentPath.includes("/accept-invite")) return;
+
+  if (currentPath.startsWith("/partner") || currentPath.startsWith("/staff")) {
+    window.location.href = "/auth/restaurant/login";
+    return;
+  }
+
+  if (currentPath.startsWith("/admin")) {
+    window.location.href = "/auth/admin/login";
+    return;
+  }
+
+  // Customer routes logic
+  const isPublicCustomerRoute = currentPath === "/" || currentPath.startsWith("/restaurants") || currentPath.startsWith("/offers") || currentPath.startsWith("/cart");
+
+  if (!isPublicCustomerRoute || wasLoggedIn) {
+    window.location.href = "/auth/login";
+  }
+};
+
 api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      // Clear user state on 401
+      const wasLoggedIn = !!useAuthStore.getState().user;
       useAuthStore.setState({ user: null });
-
-      // If we are on the client side, we can safely redirect
-      if (typeof window !== "undefined") {
-        const currentPath = window.location.pathname;
-
-        // Don't redirect if we are already on a login page to avoid loops
-        // Also don't redirect on accept-invite as it handles its own logic
-        if (!currentPath.includes("/login") && !currentPath.includes("/accept-invite")) {
-          if (currentPath.startsWith("/partner") || currentPath.startsWith("/staff")) {
-            window.location.href = "/auth/restaurant/login";
-          } else if (currentPath.startsWith("/admin")) {
-            window.location.href = "/auth/admin/login";
-          } else if (currentPath !== "/") {
-            window.location.href = "/auth/login";
-          }
-        }
-      }
+      handleAuthRedirect(wasLoggedIn);
     }
     return Promise.reject(error);
   },
