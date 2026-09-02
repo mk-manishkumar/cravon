@@ -13,6 +13,83 @@ const MapWidget = dynamic(() => import("@/components/partner/MapWidget"), {
   loading: () => <div className="w-full h-full bg-gray-800/50 animate-pulse flex items-center justify-center text-sm font-bold text-white">Loading Map...</div>,
 });
 
+interface TimeWindow {
+  open: string;
+  close: string;
+}
+
+interface RestaurantData {
+  operatingDays?: string[];
+  mealTimings?: {
+    breakfast?: TimeWindow;
+    lunch?: TimeWindow;
+    dinner?: TimeWindow;
+  };
+  operatingHours?: TimeWindow;
+  [key: string]: unknown; // Allow other properties
+}
+
+function parseTimeStr(timeStr: string | undefined): number | null {
+  if (!timeStr) return null;
+  const match = /^(\d{1,2}):(\d{2})\s*(AM|PM|am|pm)?$/.exec(timeStr.trim());
+  if (!match) return null;
+  let hours = Number.parseInt(match[1], 10);
+  const minutes = Number.parseInt(match[2], 10);
+  const period = match[3]?.toUpperCase();
+  if (period === "PM" && hours < 12) hours += 12;
+  if (period === "AM" && hours === 12) hours = 0;
+  return hours * 60 + minutes;
+}
+
+function checkTimeWindow(currentMinutes: number, window?: TimeWindow) {
+  if (!window?.open || !window?.close) return { isOpen: false, closingSoon: false };
+
+  const openMins = parseTimeStr(window.open);
+  const closeMins = parseTimeStr(window.close);
+
+  if (openMins === null || closeMins === null) return { isOpen: false, closingSoon: false };
+
+  if (currentMinutes >= openMins && currentMinutes < closeMins) {
+    return { isOpen: true, closingSoon: closeMins - currentMinutes <= 30 };
+  }
+  return { isOpen: false, closingSoon: false };
+}
+
+function getRestaurantStatus(restaurant?: RestaurantData | null) {
+  if (!restaurant) return { text: "Close", color: "bg-[#FF3D57]" };
+
+  const now = new Date();
+  const currentDay = now.toLocaleDateString("en-US", { weekday: "long" });
+
+  if (restaurant.operatingDays?.length && !restaurant.operatingDays.includes(currentDay)) {
+    return { text: "Close", color: "bg-[#FF3D57]" };
+  }
+
+  const currentMinutes = now.getHours() * 60 + now.getMinutes();
+  let isOpen = false;
+  let closingSoon = false;
+
+  if (restaurant.mealTimings) {
+    const meals = [restaurant.mealTimings.breakfast, restaurant.mealTimings.lunch, restaurant.mealTimings.dinner];
+    for (const meal of meals) {
+      const status = checkTimeWindow(currentMinutes, meal);
+      if (status.isOpen) {
+        isOpen = true;
+        closingSoon = status.closingSoon;
+        break;
+      }
+    }
+  } else if (restaurant.operatingHours) {
+    const status = checkTimeWindow(currentMinutes, restaurant.operatingHours);
+    isOpen = status.isOpen;
+    closingSoon = status.closingSoon;
+  }
+
+  if (isOpen && closingSoon) return { text: "Close in 30 minutes", color: "bg-[#FF3D57]" };
+  if (isOpen) return { text: "Open", color: "bg-green-600" };
+  return { text: "Close", color: "bg-[#FF3D57]" };
+}
+
 export default function RestaurantDetailsPage() {
   const params = useParams();
   const id = params.id as string;
@@ -58,6 +135,8 @@ export default function RestaurantDetailsPage() {
     return <div className="text-center py-20 text-red-500 font-medium">Restaurant not found or is currently inactive.</div>;
   }
 
+  const currentStatus = getRestaurantStatus(restaurant);
+
   return (
     <div className="bg-white text-gray-900 font-sans min-h-screen pb-24">
       {/* Header Banner */}
@@ -75,6 +154,7 @@ export default function RestaurantDetailsPage() {
                 </div>
               )}
               {!restaurant.franchiseName && <div className="mb-3"></div>}
+
               <div className="flex flex-wrap items-center gap-4 text-sm font-medium text-white/90 mb-4">
                 <div className="relative group flex items-center gap-1 cursor-pointer">
                   <MapPin className="w-4 h-4" />
@@ -86,14 +166,20 @@ export default function RestaurantDetailsPage() {
                     <div className="absolute bottom-3 left-3 right-3 bg-black/90 backdrop-blur-md text-[13px] font-bold text-white px-4 py-2.5 rounded-xl shadow-lg z-1000 truncate border border-white/10 text-center">{restaurant.address}</div>
                   </div>
                 </div>
+
                 <div className="flex items-center gap-1 bg-green-600 px-2 py-1 rounded-md text-white">
                   <Star className="w-4 h-4 fill-white" />
                   <span>{restaurant.rating && restaurant.rating > 0 ? restaurant.rating.toFixed(1) : "New"}</span>
                 </div>
+
                 <div className="flex items-center gap-1">
                   <Clock className="w-4 h-4" />
                   <span>{restaurant.deliveryTime || "30-40"} mins</span>
                 </div>
+
+                {/* Status Tag */}
+                <div className="flex-1 min-w-4 hidden sm:block"></div>
+                <span className={`inline-flex items-center px-3 py-1 rounded-full text-[13px] font-bold tracking-wide uppercase text-white shadow-md ${currentStatus.color}`}>{currentStatus.text}</span>
               </div>
 
               <div className="flex flex-col gap-1.5 text-sm font-medium opacity-80 border-t border-white/20 pt-4 mt-2">
