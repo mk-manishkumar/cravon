@@ -1,9 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/authStore";
+import { useLocationStore } from "@/store/locationStore";
 import { ShoppingCart } from "lucide-react";
 
 const CITIES = ["Delhi", "Gurgaon", "Noida", "Hyderabad", "Bangalore", "Patna", "Mumbai", "Pune", "Kolkata", "Jaipur", "Rishikesh", "Shimla"];
@@ -15,16 +16,27 @@ export default function CustomerHeader() {
   const [showDropdown, setShowDropdown] = useState(false);
   const [showCityDropdown, setShowCityDropdown] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  const currentCity = useLocationStore((state) => state.city);
+  const setCity = useLocationStore((state) => state.setCity);
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const currentCity = searchParams.get("city") || "Delhi";
+
+  // Prevent hydration mismatch for persisted state
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setMounted(true);
+  }, []);
 
   const handleCitySelect = (city: string) => {
-    const params = new URLSearchParams(searchParams.toString());
-    params.set("city", city);
-    router.push(`/?${params.toString()}`);
+    setCity(city);
     setShowCityDropdown(false);
     setShowMobileMenu(false);
+
+    // redirect to home page if user change city from a specific restaurant page
+    const currentPath = window.location.pathname;
+    if (currentPath !== "/" && currentPath !== "/restaurants") {
+      router.push("/");
+    }
   };
 
   const displayFont = "'Baloo 2', 'Poppins', 'Segoe UI', sans-serif";
@@ -63,7 +75,7 @@ export default function CustomerHeader() {
             <div className="relative hidden md:block" onMouseEnter={() => setShowCityDropdown(true)} onMouseLeave={() => setShowCityDropdown(false)}>
               <button type="button" className="flex items-center gap-2 text-sm text-gray-700 hover:text-[#FF3D57] transition-colors cursor-pointer">
                 <span className="font-bold text-gray-500">Deliver to:</span>
-                <span className="font-semibold">{currentCity}</span>
+                <span className="font-semibold">{mounted ? currentCity : "..."}</span>
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="m6 9 6 6 6-6" />
                 </svg>
@@ -185,10 +197,10 @@ export default function CustomerHeader() {
 
             {/* Mobile Location Selector */}
             <div className="px-5 py-3">
-              <label htmlFor="mobile-city" className="block text-[13px] font-bold text-gray-500 mb-2 uppercase tracking-wider">
-                Deliver to
+              <label htmlFor="mobile-city" className="block text-sm font-bold text-gray-500 mb-2">
+                Deliver to:
               </label>
-              <select id="mobile-city" value={currentCity} onChange={(e) => handleCitySelect(e.target.value)} className="w-full bg-gray-50 border border-gray-200 text-gray-800 text-[15px] font-semibold rounded-xl focus:ring-2 focus:ring-[#FF3D57] focus:border-[#FF3D57] outline-none block p-3">
+              <select id="mobile-city" value={mounted ? currentCity : ""} onChange={(e) => handleCitySelect(e.target.value)} className="w-full bg-gray-50 border border-gray-200 text-gray-800 text-[15px] font-semibold rounded-xl focus:ring-2 focus:ring-[#FF3D57] focus:border-[#FF3D57] outline-none block p-3">
                 {CITIES.map((city) => (
                   <option key={city} value={city}>
                     {city}

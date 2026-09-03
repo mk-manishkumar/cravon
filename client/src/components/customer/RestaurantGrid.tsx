@@ -3,7 +3,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { publicService } from "@/services/public.service";
 import { Star, Clock } from "lucide-react";
-import { useSearchParams } from "next/navigation";
+import { useLocationStore } from "@/store/locationStore";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -14,12 +14,10 @@ type Restaurant = {
   rating?: number;
   deliveryTime?: number;
   address?: string;
-  // you can add cuisines later
 };
 
 export default function RestaurantGrid() {
-  const searchParams = useSearchParams();
-  const city = searchParams.get("city") || "Delhi";
+  const city = useLocationStore((state) => state.city);
 
   const {
     data: restaurants,
@@ -62,7 +60,7 @@ export default function RestaurantGrid() {
       {restaurants.map((restaurant) => (
         <Link key={restaurant._id} href={`/restaurants/${restaurant._id}`} className="group cursor-pointer flex flex-col gap-3">
           <div className="relative h-48 w-full rounded-2xl overflow-hidden shadow-sm">
-            {restaurant.image ? <Image src={restaurant.image} alt={restaurant.name} fill className="object-cover group-hover:scale-105 transition-transform duration-300" /> : <div className="w-full h-full bg-gray-100 flex items-center justify-center text-gray-400 group-hover:scale-105 transition-transform duration-300">No Image</div>}
+            {restaurant.image ? <Image src={restaurant.image} alt={restaurant.name} fill sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw" className="object-cover group-hover:scale-105 transition-transform duration-300" /> : <div className="w-full h-full bg-gray-100 flex items-center justify-center text-gray-400 group-hover:scale-105 transition-transform duration-300">No Image</div>}
 
             <div className="absolute inset-0 bg-linear-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
           </div>
