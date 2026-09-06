@@ -2,15 +2,17 @@ export const checkTimeWindow = (window: { open?: string; close?: string }, curre
   if (!window.open || !window.close) return { isOpen: false, closingSoon: false };
 
   const parseTime = (timeStr: string) => {
-    const timeMatch = /(\d{1,2}):(\d{2})\s*(AM|PM)/i.exec(timeStr.trim());
+    const timeMatch = /(\d{1,2}):(\d{2})(?:\s*(AM|PM))?/i.exec(timeStr.trim());
     if (!timeMatch) return 0;
 
     let hours = Number.parseInt(timeMatch[1], 10);
     const mins = Number.parseInt(timeMatch[2], 10);
-    const period = timeMatch[3].toUpperCase();
+    const period = timeMatch[3]?.toUpperCase();
 
-    if (period === "PM" && hours < 12) hours += 12;
-    if (period === "AM" && hours === 12) hours = 0;
+    if (period) {
+      if (period === "PM" && hours < 12) hours += 12;
+      if (period === "AM" && hours === 12) hours = 0;
+    }
 
     return hours * 60 + mins;
   };

@@ -158,13 +158,14 @@ export const resendRestaurantOtp = async (data: { email: string }) => {
 
 // UPDATE PROFILE SERVICE
 export const updateProfile = async (userId: string, data: any) => {
-  const { firstName, lastName, phone } = data;
+  const { firstName, lastName, phone, addresses } = data;
   const user = await User.findById(userId);
   if (!user) throw new ApiError(404, "User not found");
 
   if (firstName) user.firstName = firstName;
   if (lastName) user.lastName = lastName;
   if (phone) user.phone = phone;
+  if (addresses) user.addresses = addresses;
   
   await user.save();
   return user;
