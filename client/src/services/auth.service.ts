@@ -46,7 +46,8 @@ export const authService = {
   },
 
   // Settings
-  updateProfile: async (data: Record<string, string>) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  updateProfile: async (data: Record<string, any>) => {
     const response = await api.put('/auth/profile', data);
     return response.data;
   },

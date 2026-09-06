@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
 import multer from "multer";
-import { UploadController } from "../controllers/upload.controller.js";
+import { getAuthParams, uploadImage } from "../controllers/upload.controller.js";
 
 const router = Router();
 
@@ -14,7 +14,7 @@ const upload = multer({
   } 
 });
 
-router.get("/auth", verifyJWT, UploadController.getAuthParams);
-router.post("/", verifyJWT, upload.single("file"), UploadController.uploadImage);
+router.get("/auth", verifyJWT, getAuthParams);
+router.post("/", verifyJWT, upload.single("file"), uploadImage);
 
 export default router;

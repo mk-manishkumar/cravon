@@ -27,6 +27,7 @@ export const verifyJWT = async (req: Request, res: Response, next: NextFunction)
       phone: user.phone,
       roles: roles,
       subscription: user.subscription,
+      addresses: user.addresses || [],
     };
 
     next();

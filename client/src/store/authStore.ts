@@ -2,19 +2,30 @@ import { create } from "zustand";
 import { authService } from "@/services/auth.service";
 import toast from "react-hot-toast";
 
-interface User {
+export interface Address {
+  _id?: string;
+  type: string;
+  street: string;
+  city: string;
+  state?: string;
+  zipCode?: string;
+  instructions?: string;
+}
+
+export interface User {
   id: string;
   firstName: string;
   lastName: string;
   email: string;
   phone?: string;
   roles: string[];
+  isPureStaff?: boolean;
+  addresses?: Address[];
   subscription?: {
     tier: string;
     status: string;
-    expiresAt: string;
+    expiresAt?: Date;
   };
-  isPureStaff?: boolean;
 }
 
 interface AuthState {
