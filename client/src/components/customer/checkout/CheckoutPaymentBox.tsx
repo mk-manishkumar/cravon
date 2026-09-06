@@ -46,7 +46,8 @@ export default function CheckoutPaymentBox({
           <CreditCard className="w-6 h-6" />
         </div>
         <div className="flex-1">
-          <h2 className="text-xl font-bold text-gray-900 mb-6">Choose Payment Method</h2>
+          <h2 className="text-xl font-bold text-gray-900 mb-2">Payment Details</h2>
+          <p className="text-sm text-gray-500 mb-6">Pay securely via Razorpay (UPI, Cards, NetBanking)</p>
           {paymentContent}
         </div>
       </div>
