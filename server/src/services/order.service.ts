@@ -6,14 +6,15 @@ import Restaurant from "../models/restaurant.model.js";
 interface CreateOrderDTO {
   userId: string;
   restaurantId: string;
-  items: { menuItemId: string; quantity: number }[];
+  items: { menuItemId?: string; name: string; quantity: number }[];
   deliveryAddress: { street: string; city: string; state?: string; zipCode?: string };
   deliveryInstructions?: string;
+  paymentMethod: 'online' | 'cod';
 }
 
-// Creates a new order and generates a Razorpay order for payment
+// Creates a new order — either initiates Razorpay flow or confirms COD directly
 export const createOrder = async (data: CreateOrderDTO) => {
-  const { userId, restaurantId, items, deliveryAddress, deliveryInstructions } = data;
+  const { userId, restaurantId, items, deliveryAddress, deliveryInstructions, paymentMethod = 'online' } = data;
 
   // Fetch Restaurant to validate and get menu item prices
   const restaurant = await Restaurant.findById(restaurantId);
@@ -24,13 +25,19 @@ export const createOrder = async (data: CreateOrderDTO) => {
   const orderItems = [];
 
   for (const item of items) {
-    // Find item in restaurant menu
-    const menuItem = (restaurant.menu ?? []).find(m => m._id?.toString() === item.menuItemId);
-    if (!menuItem) throw new Error(`Menu item ${item.menuItemId} not found`);
+    // Find item in restaurant menu - try _id first, fall back to name
+    const menuItem = (restaurant.menu ?? []).find(m => {
+      if (item.menuItemId) {
+        const menuId = m._id?.toString?.() ?? m._id;
+        if (menuId === item.menuItemId) return true;
+      }
+      return m.name === item.name;
+    });
+    if (!menuItem) throw new Error(`Menu item "${item.name}" not found in restaurant menu`);
 
     itemTotal += menuItem.price * item.quantity;
     orderItems.push({
-      menuItemId: menuItem._id,
+      menuItemId: menuItem._id || menuItem.name, // Use _id if available, name as fallback
       name: menuItem.name,
       price: menuItem.price,
       quantity: item.quantity
@@ -42,7 +49,31 @@ export const createOrder = async (data: CreateOrderDTO) => {
   const taxes = Math.round(itemTotal * 0.05);
   const grandTotal = itemTotal + deliveryFee + taxes;
 
-  // Create Razorpay Order
+  // ── COD Flow ──
+  if (paymentMethod === 'cod') {
+    const newOrder = await Order.create({
+      user: userId,
+      restaurant: restaurantId,
+      items: orderItems,
+      itemTotal,
+      deliveryFee,
+      taxes,
+      grandTotal,
+      deliveryAddress,
+      deliveryInstructions,
+      paymentMethod: 'cod',
+      orderStatus: 'preparing',
+      paymentStatus: 'pending', // Payment collected on delivery
+    });
+
+    return {
+      orderId: newOrder._id,
+      paymentMethod: 'cod',
+      grandTotal,
+    };
+  }
+
+  // ── Online (Razorpay) Flow ──
   const razorpayOptions = {
     amount: grandTotal * 100, 
     currency: "INR",
@@ -51,7 +82,6 @@ export const createOrder = async (data: CreateOrderDTO) => {
 
   const razorpayOrder = await razorpay.orders.create(razorpayOptions);
 
-  // Create Order in MongoDB
   const newOrder = await Order.create({
     user: userId,
     restaurant: restaurantId,
@@ -62,6 +92,7 @@ export const createOrder = async (data: CreateOrderDTO) => {
     grandTotal,
     deliveryAddress,
     deliveryInstructions,
+    paymentMethod: 'online',
     razorpayOrderId: razorpayOrder.id,
     orderStatus: 'pending',
     paymentStatus: 'pending'
@@ -69,6 +100,7 @@ export const createOrder = async (data: CreateOrderDTO) => {
 
   return {
     orderId: newOrder._id,
+    paymentMethod: 'online',
     razorpayOrderId: razorpayOrder.id,
     amount: razorpayOptions.amount,
     currency: razorpayOptions.currency,
@@ -111,4 +143,14 @@ export const verifyPayment = async (razorpayOrderId: string, razorpayPaymentId: 
   if (!order) throw new Error("Order not found for this Razorpay ID");
 
   return order;
+};
+
+// Fetches all orders for a given user, sorted newest first
+export const getMyOrders = async (userId: string) => {
+  const orders = await Order.find({ user: userId })
+    .populate("restaurant", "name image")
+    .sort({ createdAt: -1 })
+    .lean();
+
+  return orders;
 };

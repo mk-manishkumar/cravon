@@ -17,6 +17,8 @@ import CheckoutAddressBox from "@/components/customer/checkout/CheckoutAddressBo
 import CheckoutPaymentBox from "@/components/customer/checkout/CheckoutPaymentBox";
 import CheckoutCartSummary from "@/components/customer/checkout/CheckoutCartSummary";
 
+type PaymentMethod = "online" | "cod";
+
 export default function CheckoutPage() {
   const router = useRouter();
   const { user } = useAuthStore();
@@ -24,6 +26,7 @@ export default function CheckoutPage() {
   const [mounted, setMounted] = useState(false);
   const [selectedAddressIndex, setSelectedAddressIndex] = useState<number>(0);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("online");
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -74,16 +77,28 @@ export default function CheckoutPage() {
       // 1. Create Order on Backend
       const res = await axiosInstance.post("/orders/create", {
         restaurantId,
-        items: items.map((i) => ({ menuItemId: i.id, quantity: i.quantity })),
+        items: items.map((i) => ({ menuItemId: i.id, name: i.name, quantity: i.quantity })),
         deliveryAddress: {
           street: selectedAddress.street,
           city: selectedAddress.city,
           state: selectedAddress.state,
           zipCode: selectedAddress.zipCode,
         },
+        paymentMethod,
       });
 
-      const { razorpayOrderId, amount, currency } = res.data.data;
+      const orderData = res.data.data;
+
+      // ── COD Flow ──
+      if (paymentMethod === "cod") {
+        toast.success("Order placed successfully! Pay on delivery.");
+        clearCart();
+        router.push("/orders");
+        return;
+      }
+
+      // ── Online (Razorpay) Flow ──
+      const { razorpayOrderId, amount, currency } = orderData;
 
       // 2. Load Razorpay
       const isLoaded = await loadRazorpay();
@@ -110,7 +125,7 @@ export default function CheckoutPage() {
 
             toast.success("Payment successful! Order placed.");
             clearCart();
-            router.push("/orders"); // Assuming there will be an orders page
+            router.push("/orders");
           } catch (err) {
             console.error("Payment verification error:", err);
             toast.error("Payment verification failed.");
@@ -151,7 +166,7 @@ export default function CheckoutPage() {
         <div className="lg:col-span-8 flex flex-col gap-4">
           <CheckoutAccountBox user={user} />
           <CheckoutAddressBox user={user} selectedAddressIndex={selectedAddressIndex} setSelectedAddressIndex={setSelectedAddressIndex} />
-          <CheckoutPaymentBox isRestaurantLoading={isRestaurantLoading} isRestaurantOpen={isRestaurantOpen} isProcessing={isProcessing} user={user} grandTotal={grandTotal} handlePayment={handlePayment} />
+          <CheckoutPaymentBox isRestaurantLoading={isRestaurantLoading} isRestaurantOpen={isRestaurantOpen} isProcessing={isProcessing} user={user} grandTotal={grandTotal} paymentMethod={paymentMethod} setPaymentMethod={setPaymentMethod} handlePayment={handlePayment} />
         </div>
 
         {/* RIGHT COLUMN: Cart Summary */}

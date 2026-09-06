@@ -1,7 +1,7 @@
 "use client";
 
 import { useAuthStore } from "@/store/authStore";
-import { User, Settings, LogOut } from "lucide-react";
+import { User, Settings, LogOut, Package } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -40,6 +40,11 @@ export default function ProfileLayout({ children }: Readonly<{ children: React.R
               <Link href="/profile" className={`flex items-center gap-4 px-6 py-4 text-[15px] font-medium transition-colors ${pathname === "/profile" ? "text-gray-900 bg-gray-50 font-bold border-r-4 border-[#022A4E]" : "text-[#4b5563] hover:bg-gray-50"}`}>
                 <User size={20} className={pathname === "/profile" ? "text-[#022A4E]" : "text-[#4b5563]"} />
                 View Profile
+              </Link>
+
+              <Link href="/orders" className={`flex items-center gap-4 px-6 py-4 text-[15px] font-medium transition-colors ${pathname === "/orders" ? "text-gray-900 bg-gray-50 font-bold border-r-4 border-[#022A4E]" : "text-[#4b5563] hover:bg-gray-50"}`}>
+                <Package size={20} className={pathname === "/orders" ? "text-[#022A4E]" : "text-[#4b5563]"} />
+                My Orders
               </Link>
 
               <Link href="/account" className={`flex items-center gap-4 px-6 py-4 text-[15px] font-medium transition-colors ${pathname === "/account" ? "text-gray-900 bg-gray-50 font-bold border-r-4 border-[#022A4E]" : "text-[#4b5563] hover:bg-gray-50"}`}>

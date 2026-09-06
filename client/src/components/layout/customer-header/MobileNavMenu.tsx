@@ -84,6 +84,9 @@ export default function MobileNavMenu({ showMobileMenu, setShowMobileMenu }: Mob
               <Link href="/profile" className={getMobileNavClass()} onClick={() => setShowMobileMenu(false)}>
                 View Profile
               </Link>
+              <Link href="/orders" className={getMobileNavClass()} onClick={() => setShowMobileMenu(false)}>
+                My Orders
+              </Link>
               <Link href="/account" className={getMobileNavClass()} onClick={() => setShowMobileMenu(false)}>
                 Account Settings
               </Link>

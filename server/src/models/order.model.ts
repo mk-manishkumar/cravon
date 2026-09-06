@@ -30,6 +30,7 @@ export interface IOrder extends Document {
   // Statuses
   orderStatus: 'pending' | 'preparing' | 'out_for_delivery' | 'delivered' | 'cancelled';
   paymentStatus: 'pending' | 'paid' | 'failed' | 'refunded';
+  paymentMethod: 'online' | 'cod';
   
   // Razorpay Data
   razorpayOrderId?: string;
@@ -41,7 +42,7 @@ export interface IOrder extends Document {
 }
 
 const OrderItemSchema = new Schema({
-  menuItemId: { type: Schema.Types.ObjectId, ref: 'Restaurant.menu', required: true },
+  menuItemId: { type: Schema.Types.Mixed, required: true },
   name: { type: String, required: true },
   price: { type: Number, required: true },
   quantity: { type: Number, required: true, min: 1 }
@@ -74,6 +75,11 @@ const OrderSchema = new Schema({
     type: String, 
     enum: ['pending', 'paid', 'failed', 'refunded'], 
     default: 'pending' 
+  },
+  paymentMethod: {
+    type: String,
+    enum: ['online', 'cod'],
+    default: 'online'
   },
   
   razorpayOrderId: { type: String },

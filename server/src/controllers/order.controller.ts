@@ -1,11 +1,11 @@
 import { Request, Response } from "express";
-import { createOrder as createOrderService, verifyPayment as verifyPaymentService } from "../services/order.service.js";
+import { createOrder as createOrderService, verifyPayment as verifyPaymentService, getMyOrders as getMyOrdersService } from "../services/order.service.js";
 
 // Controller for creating a new order
 export const createOrder = async (req: Request, res: Response): Promise<any> => {
   try {
-    const { restaurantId, items, deliveryAddress, deliveryInstructions } = req.body;
-    const userId = (req as any).user._id;
+    const { restaurantId, items, deliveryAddress, deliveryInstructions, paymentMethod } = req.body;
+    const userId = (req as any).user.id;
 
     if (!restaurantId || !items?.length || !deliveryAddress) {
       return res.status(400).json({ status: "error", message: "Missing required order fields" });
@@ -16,7 +16,8 @@ export const createOrder = async (req: Request, res: Response): Promise<any> => 
       restaurantId,
       items,
       deliveryAddress,
-      deliveryInstructions
+      deliveryInstructions,
+      paymentMethod: paymentMethod || 'online',
     });
 
     res.status(201).json({
@@ -52,5 +53,21 @@ export const verifyPayment = async (req: Request, res: Response): Promise<any> =
   } catch (error: any) {
     console.error("Verify Payment Error:", error);
     res.status(400).json({ status: "error", message: error.message || "Payment verification failed" });
+  }
+};
+
+// Controller for fetching all orders for the logged-in user
+export const getMyOrders = async (req: Request, res: Response): Promise<any> => {
+  try {
+    const userId = (req as any).user.id;
+    const orders = await getMyOrdersService(userId);
+
+    res.status(200).json({
+      status: "success",
+      data: orders
+    });
+  } catch (error: any) {
+    console.error("Get Orders Error:", error);
+    res.status(500).json({ status: "error", message: error.message || "Failed to fetch orders" });
   }
 };
