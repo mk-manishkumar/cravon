@@ -32,9 +32,16 @@ const seedRestaurants = async () => {
 
     // Insert new mock data
     console.log('\nSeeding mock restaurants...');
-    const restaurantsWithOwner = MOCK_RESTAURANTS.map(rest => ({
+    const franchises = ["Cravon Originals", "Quick Bites", "Premium Dining", undefined, undefined];
+    const restaurantsWithOwner = MOCK_RESTAURANTS.map((rest, idx) => ({
       ...rest,
-      ownerId: owner._id
+      ownerId: owner._id,
+      franchiseName: franchises[idx % franchises.length],
+      mealTimings: {
+        breakfast: { open: "08:00", close: "11:00" },
+        lunch: { open: "12:00", close: "16:00" },
+        dinner: { open: "18:00", close: "23:30" }
+      }
     }));
 
     await Restaurant.insertMany(restaurantsWithOwner);

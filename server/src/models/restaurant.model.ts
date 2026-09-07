@@ -1,5 +1,14 @@
 import mongoose, { Document, Schema } from 'mongoose';
 
+export interface IMenuItem {
+  _id?: mongoose.Types.ObjectId;
+  name: string;
+  price: number;
+  description?: string;
+  isVeg?: boolean;
+  image?: string;
+}
+
 export interface IRestaurant extends Document {
   ownerId: mongoose.Types.ObjectId;
   name: string;
@@ -23,12 +32,20 @@ export interface IRestaurant extends Document {
   rating: number;
   deliveryTime?: number;
   image?: string;
-  menu?: any[];
+  menu?: IMenuItem[];
   status: 'active' | 'inactive' | 'pending';
   isOnboarded: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
+
+const menuItemSchema = new Schema<IMenuItem>({
+  name: { type: String, required: true },
+  price: { type: Number, required: true },
+  description: { type: String },
+  isVeg: { type: Boolean },
+  image: { type: String }
+});
 
 const restaurantSchema = new Schema<IRestaurant>({
   ownerId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
@@ -53,7 +70,7 @@ const restaurantSchema = new Schema<IRestaurant>({
   rating: { type: Number, default: 0 },
   deliveryTime: { type: Number },
   image: { type: String },
-  menu: { type: [Schema.Types.Mixed], default: [] },
+  menu: { type: [menuItemSchema], default: [] },
   status: { type: String, enum: ['active', 'inactive', 'pending'], default: 'pending' },
   isOnboarded: { type: Boolean, default: false },
 }, { timestamps: true });

@@ -26,6 +26,7 @@ export const updateProfileSchema = z.object({
   lastName: z.string().min(2, "Last name must be at least 2 characters").optional(),
   phone: z.string().min(10, "Phone number must be at least 10 digits").optional(),
   addresses: z.array(z.object({
+    _id: z.string().optional(),
     street: z.string(),
     city: z.string(),
     state: z.string().optional(),

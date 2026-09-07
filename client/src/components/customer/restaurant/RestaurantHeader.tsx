@@ -1,7 +1,9 @@
+"use client";
 import Image from "next/image";
 import { Star, MapPin, Clock } from "lucide-react";
 import dynamic from "next/dynamic";
 import { getRestaurantStatus } from "@/utils/restaurantUtils";
+import { useAuthStore } from "@/store/authStore";
 
 const MapWidget = dynamic(() => import("@/components/partner/MapWidget"), {
   ssr: false,
@@ -11,6 +13,7 @@ const MapWidget = dynamic(() => import("@/components/partner/MapWidget"), {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default function RestaurantHeader({ restaurant }: { readonly restaurant: any }) {
   const currentStatus = getRestaurantStatus(restaurant);
+  const user = useAuthStore((state) => state.user);
 
   return (
     <div className="relative w-full h-75 md:h-100 bg-gray-900">
@@ -29,15 +32,17 @@ export default function RestaurantHeader({ restaurant }: { readonly restaurant: 
             {!restaurant.franchiseName && <div className="mb-3"></div>}
 
             <div className="flex flex-wrap items-center gap-4 text-sm font-medium text-white/90 mb-4">
-              <div className="relative group flex items-center gap-1 cursor-pointer">
+              <div className={`relative flex items-center gap-1 ${user ? 'group cursor-pointer' : ''}`}>
                 <MapPin className="w-4 h-4" />
-                <span className="border-b border-dashed border-white/50 pb-0.5 hover:text-[#FF3D57] hover:border-[#FF3D57] transition-colors">{restaurant.address || "Local Area"}</span>
+                <span className={user ? "border-b border-dashed border-white/50 pb-0.5 hover:text-[#FF3D57] hover:border-[#FF3D57] transition-colors" : ""}>{restaurant.address || "Local Area"}</span>
 
-                {/* Hover Map Tooltip */}
-                <div className="absolute top-full left-0 mt-3 w-90 h-60 bg-[#1A1A1A] rounded-2xl shadow-[0_20px_50px_-12px_rgba(0,0,0,0.8)] z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 border border-white/20 overflow-hidden pointer-events-none origin-top-left transform scale-95 group-hover:scale-100">
-                  <MapWidget lat={restaurant.location?.coordinates?.[1] || 28.6139} lng={restaurant.location?.coordinates?.[0] || 77.209} readOnly={true} />
-                  <div className="absolute bottom-3 left-3 right-3 bg-black/90 backdrop-blur-md text-[13px] font-bold text-white px-4 py-2.5 rounded-xl shadow-lg z-1000 truncate border border-white/10 text-center">{restaurant.address}</div>
-                </div>
+                {/* Hover Map Tooltip (Only for logged in users) */}
+                {user && (
+                  <div className="absolute top-full left-0 mt-3 w-90 h-60 bg-[#1A1A1A] rounded-2xl shadow-[0_20px_50px_-12px_rgba(0,0,0,0.8)] z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 border border-white/20 overflow-hidden pointer-events-none origin-top-left transform scale-95 group-hover:scale-100">
+                    <MapWidget lat={restaurant.location?.coordinates?.[1] || 28.6139} lng={restaurant.location?.coordinates?.[0] || 77.209} readOnly={true} />
+                    <div className="absolute bottom-3 left-3 right-3 bg-black/90 backdrop-blur-md text-[13px] font-bold text-white px-4 py-2.5 rounded-xl shadow-lg z-1000 truncate border border-white/10 text-center">{restaurant.address}</div>
+                  </div>
+                )}
               </div>
 
               <div className="flex items-center gap-1 bg-green-600 px-2 py-1 rounded-md text-white">

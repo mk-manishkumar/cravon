@@ -42,7 +42,7 @@ export interface IOrder extends Document {
 }
 
 const OrderItemSchema = new Schema({
-  menuItemId: { type: Schema.Types.Mixed, required: true },
+  menuItemId: { type: Schema.Types.ObjectId, ref: 'Restaurant.menu', required: true },
   name: { type: String, required: true },
   price: { type: Number, required: true },
   quantity: { type: Number, required: true, min: 1 }

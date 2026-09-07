@@ -6,7 +6,7 @@ import Restaurant from "../models/restaurant.model.js";
 interface CreateOrderDTO {
   userId: string;
   restaurantId: string;
-  items: { menuItemId?: string; name: string; quantity: number }[];
+  items: { menuItemId: string; name: string; quantity: number }[];
   deliveryAddress: { street: string; city: string; state?: string; zipCode?: string };
   deliveryInstructions?: string;
   paymentMethod: 'online' | 'cod';
@@ -25,19 +25,18 @@ export const createOrder = async (data: CreateOrderDTO) => {
   const orderItems = [];
 
   for (const item of items) {
-    // Find item in restaurant menu - try _id first, fall back to name
+    if (!item.menuItemId) throw new Error("Menu item ID is required");
+
     const menuItem = (restaurant.menu ?? []).find(m => {
-      if (item.menuItemId) {
-        const menuId = m._id?.toString?.() ?? m._id;
-        if (menuId === item.menuItemId) return true;
-      }
-      return m.name === item.name;
+      const menuId = m._id?.toString?.() ?? m._id;
+      return menuId === item.menuItemId;
     });
+
     if (!menuItem) throw new Error(`Menu item "${item.name}" not found in restaurant menu`);
 
     itemTotal += menuItem.price * item.quantity;
     orderItems.push({
-      menuItemId: menuItem._id || menuItem.name, // Use _id if available, name as fallback
+      menuItemId: menuItem._id,
       name: menuItem.name,
       price: menuItem.price,
       quantity: item.quantity
