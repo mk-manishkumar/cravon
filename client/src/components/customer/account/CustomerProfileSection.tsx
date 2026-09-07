@@ -1,8 +1,10 @@
 import { useState } from "react";
+import Image from "next/image";
 import { useAuthStore } from "@/store/authStore";
 import { authService } from "@/services/auth.service";
 import toast from "react-hot-toast";
 import { Edit2, Save, X, User } from "lucide-react";
+import { IKContext, IKUpload } from "imagekitio-react";
 
 export default function CustomerProfileSection() {
   const user = useAuthStore((state) => state.user);
@@ -77,6 +79,56 @@ export default function CustomerProfileSection() {
       </h2>
 
       <div className="space-y-6 relative z-10">
+        {/* Profile Picture */}
+        <div className="flex items-center gap-6 mb-8">
+          <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center overflow-hidden border border-gray-200 shrink-0">{user.profilePicture ? <Image src={user.profilePicture} alt="Profile" width={80} height={80} className="w-full h-full object-cover" /> : <User className="text-gray-400 w-10 h-10" />}</div>
+          <IKContext
+            publicKey={process.env.NEXT_PUBLIC_IMAGE_PUBLIC_KEY}
+            urlEndpoint={process.env.NEXT_PUBLIC_IMAGE_URL_ENDPOINT}
+            authenticator={async () => {
+              try {
+                const api = (await import("@/lib/axios")).default;
+                const res = await api.get("/upload/auth");
+                return res.data;
+              } catch (err) {
+                console.error("Auth failed:", err);
+                throw new Error("Auth failed");
+              }
+            }}
+          >
+            <label className="px-4 py-2 bg-orange-50 text-orange-600 font-bold rounded-xl hover:bg-orange-100 transition-colors cursor-pointer text-sm">
+              {isLoading && editingField === "picture" ? "Uploading..." : "Change Picture"}
+              <IKUpload
+                fileName="profile_picture"
+                className="hidden"
+                onUploadStart={() => {
+                  setEditingField("picture");
+                  setIsLoading(true);
+                }}
+                onSuccess={async (res: { url: string }) => {
+                  try {
+                    await authService.updateProfile({ profilePicture: res.url });
+                    updateUser({ profilePicture: res.url });
+                    toast.success("Profile picture updated");
+                  } catch (error: unknown) {
+                    console.error("Profile picture update failed:", error);
+                    toast.error("Failed to update profile picture");
+                  } finally {
+                    setIsLoading(false);
+                    setEditingField(null);
+                  }
+                }}
+                onError={(error: unknown) => {
+                  console.error("Image upload failed:", error);
+                  setIsLoading(false);
+                  setEditingField(null);
+                  toast.error("Failed to upload image");
+                }}
+              />
+            </label>
+          </IKContext>
+        </div>
+
         {/* Name Field */}
         <div className="flex items-center justify-between p-4 bg-gray-50 border border-gray-100 rounded-2xl hover:border-gray-200 transition-colors group">
           <div className="flex-1">

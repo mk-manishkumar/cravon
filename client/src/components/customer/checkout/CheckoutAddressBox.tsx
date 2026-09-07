@@ -79,20 +79,20 @@ export default function CheckoutAddressBox({ user, selectedAddressIndex, setSele
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
               <div>
-                <label className="block text-[11px] font-semibold uppercase text-gray-500 mb-1.5">Street Address</label>
-                <input value={addressForm.street} onChange={(e) => setAddressForm({ ...addressForm, street: e.target.value })} className="w-full bg-white border border-gray-300 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-orange-500 text-gray-900" placeholder="e.g. 123 Main St, Apt 4B" />
+                <label htmlFor="street-address" className="block text-[11px] font-semibold uppercase text-gray-500 mb-1.5">Street Address</label>
+                <input id="street-address" value={addressForm.street} onChange={(e) => setAddressForm({ ...addressForm, street: e.target.value })} className="w-full bg-white border border-gray-300 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-orange-500 text-gray-900" placeholder="e.g. 123 Main St, Apt 4B" />
               </div>
               <div>
-                <label className="block text-[11px] font-semibold uppercase text-gray-500 mb-1.5">City</label>
-                <input value={addressForm.city} onChange={(e) => setAddressForm({ ...addressForm, city: e.target.value })} className="w-full bg-white border border-gray-300 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-orange-500 text-gray-900" placeholder="e.g. Mumbai" />
+                <label htmlFor="city" className="block text-[11px] font-semibold uppercase text-gray-500 mb-1.5">City</label>
+                <input id="city" value={addressForm.city} onChange={(e) => setAddressForm({ ...addressForm, city: e.target.value })} className="w-full bg-white border border-gray-300 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-orange-500 text-gray-900" placeholder="e.g. Mumbai" />
               </div>
               <div>
-                <label className="block text-[11px] font-semibold uppercase text-gray-500 mb-1.5">State</label>
-                <input value={addressForm.state} onChange={(e) => setAddressForm({ ...addressForm, state: e.target.value })} className="w-full bg-white border border-gray-300 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-orange-500 text-gray-900" placeholder="e.g. Maharashtra" />
+                <label htmlFor="state" className="block text-[11px] font-semibold uppercase text-gray-500 mb-1.5">State</label>
+                <input id="state" value={addressForm.state} onChange={(e) => setAddressForm({ ...addressForm, state: e.target.value })} className="w-full bg-white border border-gray-300 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-orange-500 text-gray-900" placeholder="e.g. Maharashtra" />
               </div>
               <div>
-                <label className="block text-[11px] font-semibold uppercase text-gray-500 mb-1.5">Zip Code</label>
-                <input value={addressForm.zipCode} onChange={(e) => setAddressForm({ ...addressForm, zipCode: e.target.value })} className="w-full bg-white border border-gray-300 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-orange-500 text-gray-900" placeholder="e.g. 400001" />
+                <label htmlFor="zip-code" className="block text-[11px] font-semibold uppercase text-gray-500 mb-1.5">Zip Code</label>
+                <input id="zip-code" value={addressForm.zipCode} onChange={(e) => setAddressForm({ ...addressForm, zipCode: e.target.value })} className="w-full bg-white border border-gray-300 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-orange-500 text-gray-900" placeholder="e.g. 400001" />
               </div>
               <fieldset className="md:col-span-2">
                 <legend className="block text-[11px] font-semibold uppercase text-gray-500 mb-2">Address Type</legend>

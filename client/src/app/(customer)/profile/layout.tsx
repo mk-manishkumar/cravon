@@ -2,6 +2,7 @@
 
 import { useAuthStore } from "@/store/authStore";
 import { User, Settings, LogOut, Package } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -29,7 +30,17 @@ export default function ProfileLayout({ children }: Readonly<{ children: React.R
         <div className="md:col-span-4 lg:col-span-3">
           <div className="bg-white shadow-sm border border-gray-100 flex flex-col">
             {/* Header / Name */}
-            <div className="p-6 bg-[#fffaf5] border-b border-gray-50">
+            <div className="p-6 bg-[#fffaf5] border-b border-gray-50 flex items-center gap-4">
+              <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center overflow-hidden border border-gray-200 shrink-0 text-[#022A4E] font-bold">
+                {user.profilePicture ? (
+                  <Image src={user.profilePicture} alt="Profile" width={48} height={48} className="w-full h-full object-cover" />
+                ) : (
+                  <>
+                    {user.firstName[0]}
+                    {user.lastName[0]}
+                  </>
+                )}
+              </div>
               <h1 className="text-[#022A4E] text-lg font-bold uppercase tracking-wide">
                 {user.firstName} {user.lastName}
               </h1>

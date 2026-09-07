@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useState } from "react";
 import { useAuthStore } from "@/store/authStore";
 
@@ -24,9 +25,15 @@ export default function DesktopAuthDropdown() {
 
   return (
     <div className="hidden md:block relative" onMouseEnter={() => setShowDropdown(true)} onMouseLeave={() => setShowDropdown(false)}>
-      <button type="button" className="flex items-center justify-center w-10 h-10 rounded-full bg-linear-to-br from-[#FF3D57] to-[#FF7A30] text-white font-bold text-lg shadow-md cursor-pointer outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#FF3D57]">
-        {user.firstName[0]}
-        {user.lastName[0]}
+      <button type="button" className="flex items-center justify-center w-10 h-10 rounded-full bg-linear-to-br from-[#FF3D57] to-[#FF7A30] text-white font-bold text-lg shadow-md cursor-pointer outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#FF3D57] overflow-hidden">
+        {user.profilePicture ? (
+          <Image src={user.profilePicture} alt="Profile" width={40} height={40} className="w-full h-full object-cover" />
+        ) : (
+          <>
+            {user.firstName[0]}
+            {user.lastName[0]}
+          </>
+        )}
       </button>
 
       {/* Dropdown Menu */}

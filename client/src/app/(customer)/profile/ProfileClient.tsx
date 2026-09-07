@@ -3,6 +3,7 @@
 import { useAuthStore } from "@/store/authStore";
 import { User, Phone, Mail, Edit3 } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 
 export default function ProfilePage() {
   const { user } = useAuthStore();
@@ -12,9 +13,18 @@ export default function ProfilePage() {
   return (
     <div className="bg-white p-6 sm:p-10 rounded-none sm:rounded-xl shadow-sm border border-gray-100 min-h-125">
       <div className="flex justify-between items-start mb-10">
-        <div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">My Profile</h2>
-          <p className="text-gray-500 text-sm">Personal Information</p>
+        <div className="flex items-center gap-6">
+          <div className="w-20 h-20 bg-gray-200 rounded-full flex items-center justify-center overflow-hidden border border-gray-200 shrink-0">
+            {user.profilePicture ? (
+              <Image src={user.profilePicture} alt="Profile" width={80} height={80} className="w-full h-full object-cover" />
+            ) : (
+              <User className="text-gray-400 w-10 h-10" />
+            )}
+          </div>
+          <div>
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">My Profile</h2>
+            <p className="text-gray-500 text-sm">Personal Information</p>
+          </div>
         </div>
         <Link href="/account" className="flex items-center gap-2 text-sm font-bold text-orange-500 hover:text-orange-600 bg-orange-50 hover:bg-orange-100 px-4 py-2 rounded-lg transition-colors">
           <Edit3 size={16} /> Edit Profile

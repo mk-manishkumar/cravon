@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/authStore";
@@ -78,7 +79,17 @@ export default function MobileNavMenu({ showMobileMenu, setShowMobileMenu }: Mob
         {!isLoading &&
           (user ? (
             <div className="py-2">
-              <div className="px-5 py-2">
+              <div className="px-5 py-2 flex items-center gap-3">
+                <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center overflow-hidden border border-gray-200 shrink-0 text-[#FF3D57] font-bold">
+                  {user.profilePicture ? (
+                    <Image src={user.profilePicture} alt="Profile" width={40} height={40} className="w-full h-full object-cover" />
+                  ) : (
+                    <>
+                      {user.firstName[0]}
+                      {user.lastName[0]}
+                    </>
+                  )}
+                </div>
                 <p className="text-[15px] font-bold text-gray-800 capitalize">Hi, {user.firstName}</p>
               </div>
               <Link href="/profile" className={getMobileNavClass()} onClick={() => setShowMobileMenu(false)}>

@@ -18,6 +18,7 @@ export interface User {
   lastName: string;
   email: string;
   phone?: string;
+  profilePicture?: string;
   roles: string[];
   isPureStaff?: boolean;
   addresses?: Address[];
