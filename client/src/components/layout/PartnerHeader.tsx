@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { useAuthStore } from "@/store/authStore";
+import PartnerNotifications from "./PartnerNotifications";
 
 export default function PartnerHeader() {
   const user = useAuthStore((state) => state.user);
@@ -62,6 +63,7 @@ export default function PartnerHeader() {
           <div className="flex items-center gap-2 sm:gap-4">
             {!isLoading && user && (
               <>
+                <PartnerNotifications />
                 {!user.isPureStaff && <span className="px-2 py-0.5 sm:px-3 sm:py-1 rounded-full text-[10px] sm:text-[11px] font-bold uppercase tracking-wider bg-[#FF7A30]/10 text-[#FF7A30] border border-[#FF7A30]/20">{getDisplayTier(user.subscription?.tier)}</span>}
                 <div className="relative" onMouseEnter={() => setShowDropdown(true)} onMouseLeave={() => setShowDropdown(false)}>
                   <div className="flex items-center cursor-pointer">
