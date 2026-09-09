@@ -70,3 +70,37 @@ export const sendInviteEmail = async (email: string, inviteUrl: string, restaura
   }
 };
 
+export const sendRefundEmail = async (email: string, amount: number, paymentMethod: string, orderId: string) => {
+  if (!process.env.MAIL_HOST || !process.env.MAIL_USERNAME || !process.env.MAIL_PASSWORD) {
+    console.error("Mailer is not configured.");
+    return;
+  }
+  try {
+    const transporter = nodemailer.createTransport({
+      host: process.env.MAIL_HOST,
+      port: Number(process.env.MAIL_PORT) || 587,
+      secure: false,
+      auth: {
+        user: process.env.MAIL_USERNAME,
+        pass: process.env.MAIL_PASSWORD,
+      },
+    });
+
+    await transporter.sendMail({
+      from: `"Cravon Food Delivery" <${process.env.MAIL_FROM || "no-reply@cravon.com"}>`,
+      to: email,
+      subject: `Order Cancelled - Refund Initiated (Order #${orderId.toString().slice(-6)})`,
+      text: `Your order #${orderId.toString().slice(-6)} was cancelled by the restaurant. A refund of ₹${amount} will be processed to your original ${paymentMethod} payment method.`,
+      html: `
+        <div style="font-family: Arial, sans-serif; padding: 20px; color: #333;">
+          <h2 style="color: #FF3D57;">Order Cancelled</h2>
+          <p>We are sorry, but your order <strong>#${orderId.toString().slice(-6)}</strong> was cancelled by the restaurant.</p>
+          <p>Since you paid via <strong>${paymentMethod.toUpperCase()}</strong>, a refund of <strong>₹${amount}</strong> has been initiated and will reflect in your account within 5-7 business days.</p>
+          <p>We apologize for the inconvenience.</p>
+        </div>
+      `,
+    });
+  } catch (error) {
+    console.error("Error sending refund email: ", error);
+  }
+};

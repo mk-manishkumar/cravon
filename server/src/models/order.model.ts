@@ -36,6 +36,8 @@ export interface IOrder extends Document {
   razorpayOrderId?: string;
   razorpayPaymentId?: string;
   razorpaySignature?: string;
+  
+  acceptedAt?: Date;
 
   createdAt: Date;
   updatedAt: Date;
@@ -84,7 +86,9 @@ const OrderSchema = new Schema({
   
   razorpayOrderId: { type: String },
   razorpayPaymentId: { type: String },
-  razorpaySignature: { type: String }
+  razorpaySignature: { type: String },
+  
+  acceptedAt: { type: Date }
 
 }, { timestamps: true });
 
