@@ -38,6 +38,11 @@ export default function RestaurantProfileCard({ restaurant, isOnboarded, onEdit,
               {restaurant?.franchiseName && <p className="text-[13px] font-semibold text-[#FF7A30]">{restaurant.franchiseName}</p>}
               <div className="flex items-center gap-2 mt-1">
                 <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${isActive ? "bg-[#00C853]/10 text-[#00C853] border border-[#00C853]/20" : "bg-red-500/10 text-red-500 border border-red-500/20"}`}>{restaurant?.status || "PENDING"}</span>
+                {isOnboarded && (
+                  <Link href={`/dashboard/${restaurant._id}/orders`} className="text-[11px] font-bold text-[#FF7A30] hover:text-[#FF8A4D] hover:underline underline-offset-2 transition-all flex items-center gap-1">
+                    View Orders
+                  </Link>
+                )}
                 {!isOnboarded && <span className="text-[10px] text-[#888]">(Pending Onboarding)</span>}
               </div>
             </div>
