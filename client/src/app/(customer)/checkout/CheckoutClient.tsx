@@ -166,7 +166,7 @@ export default function CheckoutPage() {
   return (
     <div className="min-h-screen bg-[#e9ecee] py-8">
       <div className="max-w-6xl mx-auto px-4 grid grid-cols-1 lg:grid-cols-12 gap-8">
-        {/* LEFT COLUMN: Account, Address, Payment */}
+        {/* Account, Address, Payment */}
         <div className="lg:col-span-8 flex flex-col gap-4">
           <CheckoutAccountBox user={user} />
           <CheckoutAddressBox user={user} selectedAddressIndex={selectedAddressIndex} setSelectedAddressIndex={setSelectedAddressIndex} />

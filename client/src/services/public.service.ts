@@ -14,5 +14,12 @@ export const publicService = {
   getRestaurantById: async (id: string) => {
     const response = await api.get(`/public/restaurants/${id}`);
     return response.data.data;
+  },
+
+  // Explore food items across all active restaurants
+  exploreFoods: async (filter?: string) => {
+    const url = filter ? `/public/explore-foods?filter=${filter}` : `/public/explore-foods`;
+    const response = await api.get(url);
+    return response.data.data;
   }
 };

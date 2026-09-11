@@ -1,18 +1,11 @@
 import { Request, Response } from "express";
 import asyncHandler from "../utils/asyncHandler.js";
-import Restaurant from "../models/restaurant.model.js";
+import { getActiveRestaurantsService, getRestaurantByIdService, exploreFoodsService } from "../services/public.service.js";
 
 // Get all active onboarded restaurants for public listing
 export const getActiveRestaurants = asyncHandler(async (req: Request, res: Response) => {
   const { city } = req.query;
-
-  const filter: any = { status: "active", isOnboarded: true };
-
-  if (city && typeof city === "string" && city !== "Select City") {
-    filter.address = { $regex: new RegExp(city, "i") };
-  }
-
-  const restaurants = await Restaurant.find(filter).select("-menu").sort("-createdAt");
+  const restaurants = await getActiveRestaurantsService(city as string);
 
   res.status(200).json({
     status: "success",
@@ -23,20 +16,26 @@ export const getActiveRestaurants = asyncHandler(async (req: Request, res: Respo
 // Get a single restaurant by ID with its full menu
 export const getRestaurantById = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
-
-  const restaurant = await Restaurant.findOne({
-    _id: id,
-    status: "active",
-    isOnboarded: true,
-  });
-
-  if (!restaurant) {
+  
+  try {
+    const restaurant = await getRestaurantByIdService(id);
+    res.status(200).json({
+      status: "success",
+      data: restaurant,
+    });
+  } catch (error: any) {
     res.status(404);
-    throw new Error("Restaurant not found or is currently inactive");
+    throw new Error(error.message);
   }
+});
+
+// Explore food items across all active restaurants
+export const exploreFoods = asyncHandler(async (req: Request, res: Response) => {
+  const { filter } = req.query;
+  const foods = await exploreFoodsService(filter as string);
 
   res.status(200).json({
     status: "success",
-    data: restaurant,
+    data: foods,
   });
 });

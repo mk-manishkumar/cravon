@@ -1,5 +1,6 @@
 import { Metadata } from "next";
 import RestaurantGrid from "@/components/customer/RestaurantGrid";
+import FoodCarousel from "@/components/customer/FoodCarousel";
 import { Suspense } from "react";
 
 export const metadata: Metadata = {
@@ -34,6 +35,13 @@ export default function CustomerLandingPage() {
             <RestaurantGrid />
           </Suspense>
         </div>
+      </section>
+
+      {/* Explore Foods Sections */}
+      <section className="py-8">
+        <FoodCarousel title="Foods based on Franchise" filter="franchise" />
+        <FoodCarousel title="Pure Veg Delights" filter="veg" />
+        <FoodCarousel title="Non-Veg Cravings" filter="nonveg" />
       </section>
     </div>
   );
