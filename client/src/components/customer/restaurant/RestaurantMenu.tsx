@@ -35,27 +35,29 @@ export default function RestaurantMenu({ restaurant, getQuantity, updateQuantity
                 {item.description && <p className="text-sm text-gray-500 line-clamp-2">{item.description}</p>}
               </div>
 
-              <div className="relative shrink-0 w-30 h-30">
-                {item.image ? (
-                  <Image src={item.image} alt={item.name} fill className="object-cover rounded-xl" />
-                ) : (
-                  <div className="w-full h-full bg-orange-50 rounded-xl flex items-center justify-center text-orange-200">
-                    <Star className="w-8 h-8 opacity-50" />
-                  </div>
-                )}
+              <div className="shrink-0 w-32 flex flex-col items-center">
+                <div className="relative w-32 h-32 mb-3">
+                  {item.image ? (
+                    <Image src={item.image} alt={item.name} fill className="object-cover rounded-xl shadow-sm" />
+                  ) : (
+                    <div className="w-full h-full bg-orange-50 rounded-xl shadow-sm flex items-center justify-center text-orange-200">
+                      <Star className="w-8 h-8 opacity-50" />
+                    </div>
+                  )}
+                </div>
 
                 {getQuantity(item._id) > 0 ? (
-                  <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 w-[80%] bg-white text-green-600 font-bold border border-gray-200 shadow-md rounded-lg flex items-center justify-between overflow-hidden">
-                    <button type="button" onClick={() => updateQuantity(item._id, -1)} className="px-3 py-2 hover:bg-gray-100 cursor-pointer text-lg leading-none">
+                  <div className="w-[85%] bg-[#FF7A30] text-white font-bold rounded-xl shadow-[0_4px_12px_rgba(255,122,48,0.3)] flex items-center justify-between overflow-hidden">
+                    <button type="button" onClick={() => updateQuantity(item._id, -1)} className="px-3 py-1.5 hover:bg-black/10 cursor-pointer text-lg leading-none transition-colors">
                       -
                     </button>
-                    <span className="text-sm">{getQuantity(item._id)}</span>
-                    <button type="button" onClick={() => updateQuantity(item._id, 1)} className="px-3 py-2 hover:bg-gray-100 cursor-pointer text-lg leading-none">
+                    <span className="text-sm font-bold">{getQuantity(item._id)}</span>
+                    <button type="button" onClick={() => updateQuantity(item._id, 1)} className="px-3 py-1.5 hover:bg-black/10 cursor-pointer text-lg leading-none transition-colors">
                       +
                     </button>
                   </div>
                 ) : (
-                  <button type="button" onClick={() => handleAddToCart(item)} className="absolute -bottom-4 left-1/2 -translate-x-1/2 w-[80%] bg-white text-green-600 font-bold border border-gray-200 shadow-md py-2 rounded-lg hover:bg-gray-50 transition-colors uppercase text-sm cursor-pointer">
+                  <button type="button" onClick={() => handleAddToCart(item)} className="w-[85%] cursor-pointer bg-[#FF7A30] hover:bg-[#FF8E4D] text-white font-bold rounded-xl shadow-[0_4px_12px_rgba(255,122,48,0.3)] transition-transform active:scale-[0.98] py-1.5 uppercase text-sm">
                     ADD
                   </button>
                 )}

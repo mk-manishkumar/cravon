@@ -21,7 +21,7 @@ type PaymentMethod = "online" | "cod";
 
 export default function CheckoutPage() {
   const router = useRouter();
-  const { user } = useAuthStore();
+  const { user, isLoading: isAuthLoading } = useAuthStore();
   const { items, restaurantId, restaurantName, updateQuantity, clearCart, getSubtotal } = useCartStore();
   const [mounted, setMounted] = useState(false);
   const [selectedAddressIndex, setSelectedAddressIndex] = useState<number>(0);
@@ -31,10 +31,8 @@ export default function CheckoutPage() {
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
-    if (!user) {
-      router.push("/auth/login?redirect=/checkout");
-    }
-  }, [user, router]);
+    if (!isAuthLoading && !user) router.push("/auth/login?redirect=/checkout");
+  }, [user, isAuthLoading, router]);
 
   const { data: restaurant, isLoading: isRestaurantLoading } = useQuery({
     queryKey: ["restaurant", restaurantId],
@@ -42,7 +40,7 @@ export default function CheckoutPage() {
     enabled: !!restaurantId,
   });
 
-  if (!mounted) return null;
+  if (!mounted || isAuthLoading || !user) return null;
 
   if (items.length === 0) {
     return (
@@ -100,13 +98,13 @@ export default function CheckoutPage() {
       // ── Online (Razorpay) Flow ──
       const { razorpayOrderId, amount, currency } = orderData;
 
-      // 2. Load Razorpay
+      // Load Razorpay
       const isLoaded = await loadRazorpay();
       if (!isLoaded) {
         throw new Error("Razorpay SDK failed to load. Are you online?");
       }
 
-      // 3. Open Razorpay Modal
+      //  Open Razorpay Modal
       const options = {
         key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
         amount,
@@ -116,7 +114,7 @@ export default function CheckoutPage() {
         order_id: razorpayOrderId,
         handler: async function (response: { razorpay_order_id: string; razorpay_payment_id: string; razorpay_signature: string }) {
           try {
-            // 4. Verify Payment on Backend
+            // Verify Payment on Backend
             await axiosInstance.post("/orders/verify", {
               razorpay_order_id: response.razorpay_order_id,
               razorpay_payment_id: response.razorpay_payment_id,
@@ -138,7 +136,13 @@ export default function CheckoutPage() {
           contact: user.phone || "",
         },
         theme: {
-          color: "#f97316", // Orange-500
+          color: "#FF7A30", // Cravon brand orange
+        },
+        modal: {
+          ondismiss: function () {
+            setIsProcessing(false);
+            toast.error("Payment cancelled");
+          },
         },
       };
 
@@ -169,7 +173,7 @@ export default function CheckoutPage() {
           <CheckoutPaymentBox isRestaurantLoading={isRestaurantLoading} isRestaurantOpen={isRestaurantOpen} isProcessing={isProcessing} user={user} grandTotal={grandTotal} paymentMethod={paymentMethod} setPaymentMethod={setPaymentMethod} handlePayment={handlePayment} />
         </div>
 
-        {/* RIGHT COLUMN: Cart Summary */}
+        {/* Cart Summary */}
         <div className="lg:col-span-4">
           <CheckoutCartSummary restaurant={restaurant} restaurantName={restaurantName} items={items} subtotal={subtotal} deliveryFee={deliveryFee} taxes={taxes} grandTotal={grandTotal} updateQuantity={updateQuantity} />
         </div>
