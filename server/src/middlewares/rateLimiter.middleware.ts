@@ -13,7 +13,7 @@ const baseConfig: Partial<Options> = {
 // Global Rate Limiter
 export const globalLimiter = rateLimit({
   ...baseConfig,
-  max: Number.parseInt(process.env.RATE_LIMIT_GLOBAL || "100", 10),
+  max: Number.parseInt(process.env.RATE_LIMIT_GLOBAL || "2000", 10),
   message: {
     status: "error",
     message: `Too many requests from this IP, please try again after ${windowMsg}`,
@@ -23,7 +23,7 @@ export const globalLimiter = rateLimit({
 // Rate Limiter for Authentication
 export const authLimiter = rateLimit({
   ...baseConfig,
-  max: Number.parseInt(process.env.RATE_LIMIT_AUTH || "5", 10),
+  max: Number.parseInt(process.env.RATE_LIMIT_AUTH || "50", 10),
   message: {
     status: "error",
     message: `Too many login/register attempts from this IP, please try again after ${windowMsg}`,

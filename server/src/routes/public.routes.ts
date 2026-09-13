@@ -3,8 +3,8 @@ import { getActiveRestaurants, getRestaurantById, exploreFoods } from "../contro
 
 const router = Router();
 
-router.get("/restaurants", getActiveRestaurants);
 router.get("/explore-foods", exploreFoods);
+router.get("/restaurants", getActiveRestaurants);
 router.get("/restaurants/:id", getRestaurantById);
 
 export default router;
