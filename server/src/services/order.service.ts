@@ -145,6 +145,9 @@ export const verifyPayment = async (razorpayOrderId: string, razorpayPaymentId: 
 
 // Fetches all orders for a given user, sorted newest first
 export const getMyOrders = async (userId: string) => {
+  // Lazy evaluation: sweep stale orders before returning
+  await autoDeliverOrdersService();
+
   return await Order.find({ user: userId }).sort({ createdAt: -1 }).populate("restaurant", "name image address deliveryTime status");
 };
 
@@ -162,11 +165,17 @@ export const getRestaurantOrdersService = async (restaurantId: string, userId: s
     throw new Error("Forbidden");
   }
 
+  // sweep stale orders before returning
+  await autoDeliverOrdersService();
+
   return await Order.find({ restaurant: restaurantId }).sort({ createdAt: -1 }).populate("user", "firstName lastName email phone");
 };
 
 // Fetches recent orders across all restaurants where the user has access
 export const getPartnerNotificationsService = async (userId: string) => {
+  // sweep stale orders before returning
+  await autoDeliverOrdersService();
+
   const sevenDaysAgo = new Date();
   sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
