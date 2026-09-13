@@ -1,18 +1,31 @@
 "use client";
 
 import Image from "next/image";
-import { Star } from "lucide-react";
+import { Star, ChevronLeft, ChevronRight } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { publicService } from "@/services/public.service";
 import { useCartStore } from "@/store/cartStore";
 import toast from "react-hot-toast";
+import { useRef } from "react";
 
 interface FoodCarouselProps {
   readonly title: string;
   readonly filter: "veg" | "nonveg" | "franchise";
 }
 
-export default function FoodCarousel({ title, filter }: Readonly<FoodCarouselProps>) {
+export default function FoodCarousel({ title, filter }: FoodCarouselProps) {
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  const scroll = (direction: 'left' | 'right') => {
+    if (scrollContainerRef.current) {
+      const scrollAmount = 800; // Scroll by roughly 3 cards
+      scrollContainerRef.current.scrollBy({
+        left: direction === 'left' ? -scrollAmount : scrollAmount,
+        behavior: 'smooth'
+      });
+    }
+  };
+
   const { data: foods, isLoading } = useQuery({
     queryKey: ["exploreFoods", filter],
     queryFn: () => publicService.exploreFoods(filter),
@@ -56,11 +69,23 @@ export default function FoodCarousel({ title, filter }: Readonly<FoodCarouselPro
   if (!foods || foods.length === 0) return null;
 
   return (
-    <div className="mb-12">
-      <h2 className="text-2xl font-bold text-gray-900 mb-6 px-6 max-w-7xl mx-auto">{title}</h2>
+    <div className="mb-12 relative group">
+      <div className="flex justify-between items-center mb-6 px-6 max-w-7xl mx-auto">
+        <h2 className="text-2xl font-bold text-gray-900">{title}</h2>
+        
+        {/* Desktop Scroll Buttons */}
+        <div className="hidden md:flex gap-2">
+          <button onClick={() => scroll('left')} className="w-10 h-10 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-600 transition-colors cursor-pointer">
+            <ChevronLeft className="w-6 h-6" />
+          </button>
+          <button onClick={() => scroll('right')} className="w-10 h-10 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-600 transition-colors cursor-pointer">
+            <ChevronRight className="w-6 h-6" />
+          </button>
+        </div>
+      </div>
       
       {/* Horizontal carousel */}
-      <div className="flex overflow-x-auto gap-6 px-6 pb-6 snap-x hide-scrollbar max-w-7xl mx-auto" style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}>
+      <div ref={scrollContainerRef} className="flex overflow-x-auto gap-6 px-6 pb-6 snap-x hide-scrollbar max-w-7xl mx-auto" style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}>
         {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
         {foods.map((food: any) => (
           <div key={food._id} className="snap-start shrink-0 w-65 bg-white border border-gray-100 rounded-2xl shadow-sm hover:shadow-md transition-shadow flex flex-col overflow-hidden">
