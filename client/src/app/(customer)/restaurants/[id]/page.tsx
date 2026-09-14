@@ -59,12 +59,12 @@ export default function RestaurantPage() {
   }, [user, restaurant, addItem]);
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const handleAddToCart = (menuItem: any) => {
+  const handleAddToCart = (menuItem: any, quantity: number = 1) => {
     const item = {
       id: menuItem._id,
       name: menuItem.name,
       price: menuItem.price,
-      quantity: 1,
+      quantity: quantity,
       isVeg: menuItem.isVeg,
     };
 
