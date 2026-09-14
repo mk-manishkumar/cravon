@@ -14,7 +14,7 @@ interface FoodCarouselProps {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-function FoodCarouselCard({ food, handleAddToCart }: { food: any; handleAddToCart: (food: any, quantity?: number) => void }) {
+function FoodCarouselCard({ food, handleAddToCart }: Readonly<{ food: any; handleAddToCart: (food: any, quantity?: number) => void }>) {
   const [count, setCount] = useState(0);
 
   const increment = () => setCount((c) => c + 1);
@@ -36,7 +36,7 @@ function FoodCarouselCard({ food, handleAddToCart }: { food: any; handleAddToCar
             <Star className="w-8 h-8 opacity-50" />
           </div>
         )}
-        
+
         {/* Veg/Non-Veg Icon overlay */}
         <div className="absolute top-3 left-3 bg-white p-1 rounded shadow-sm">
           <div className={`w-3 h-3 flex items-center justify-center border rounded-sm ${food.isVeg !== false ? "border-green-600" : "border-red-600"}`}>
@@ -46,22 +46,22 @@ function FoodCarouselCard({ food, handleAddToCart }: { food: any; handleAddToCar
       </div>
 
       <div className="p-4 flex flex-col grow">
-        <h3 className="font-bold text-gray-900 line-clamp-1 mb-1" title={food.name}>{food.name}</h3>
+        <h3 className="font-bold text-gray-900 line-clamp-1 mb-1" title={food.name}>
+          {food.name}
+        </h3>
         <p className="font-semibold text-gray-800 mb-2">₹{food.price}</p>
-        
+
         {/* Restaurant Name */}
-        <p className="text-xs text-gray-500 line-clamp-1 mb-4 mt-auto">
-          By {food.restaurantName}
-        </p>
+        <p className="text-xs text-gray-500 line-clamp-1 mb-4 mt-auto">By {food.restaurantName}</p>
 
         {/* Add Button & Counter */}
         <div className="mt-auto flex items-center justify-between gap-2">
-          <div className="flex items-center border border-[#FF7A30] rounded-xl overflow-hidden h-9 w-[110px] shrink-0">
-            <button type="button" onClick={decrement} className="cursor-pointer h-full flex-1 flex items-center justify-center text-[#FF7A30] hover:bg-orange-50 font-bold text-lg transition-colors">
+          <div className="flex items-center border border-[#FF7A30] rounded-xl overflow-hidden h-9 w-27.5 shrink-0">
+            <button type="button" onClick={decrement} className="cursor-pointer px-2 h-full flex-1 flex justify-center text-[#FF7A30] hover:bg-orange-50 font-bold transition-colors">
               -
             </button>
-            <span className="text-sm font-bold w-6 text-center flex items-center justify-center h-full">{count}</span>
-            <button type="button" onClick={increment} className="cursor-pointer h-full flex-1 flex items-center justify-center text-[#FF7A30] hover:bg-orange-50 font-bold text-lg transition-colors">
+            <span className="text-sm font-bold w-6 text-center">{count}</span>
+            <button type="button" onClick={increment} className="cursor-pointer px-2 h-full flex-1 flex justify-center text-[#FF7A30] hover:bg-orange-50 font-bold transition-colors">
               +
             </button>
           </div>
@@ -77,12 +77,12 @@ function FoodCarouselCard({ food, handleAddToCart }: { food: any; handleAddToCar
 export default function FoodCarousel({ title, filter }: FoodCarouselProps) {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
-  const scroll = (direction: 'left' | 'right') => {
+  const scroll = (direction: "left" | "right") => {
     if (scrollContainerRef.current) {
       const scrollAmount = 800; // Scroll by roughly 3 cards
       scrollContainerRef.current.scrollBy({
-        left: direction === 'left' ? -scrollAmount : scrollAmount,
-        behavior: 'smooth'
+        left: direction === "left" ? -scrollAmount : scrollAmount,
+        behavior: "smooth",
       });
     }
   };
@@ -129,18 +129,18 @@ export default function FoodCarousel({ title, filter }: FoodCarouselProps) {
     <div className="mb-12 relative group">
       <div className="flex justify-between items-center mb-6 px-6 max-w-7xl mx-auto">
         <h2 className="text-2xl font-bold text-gray-900">{title}</h2>
-        
+
         {/* Desktop Scroll Buttons */}
         <div className="hidden md:flex gap-2">
-          <button onClick={() => scroll('left')} className="w-10 h-10 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-600 transition-colors cursor-pointer">
+          <button onClick={() => scroll("left")} className="w-10 h-10 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-600 transition-colors cursor-pointer">
             <ChevronLeft className="w-6 h-6" />
           </button>
-          <button onClick={() => scroll('right')} className="w-10 h-10 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-600 transition-colors cursor-pointer">
+          <button onClick={() => scroll("right")} className="w-10 h-10 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-600 transition-colors cursor-pointer">
             <ChevronRight className="w-6 h-6" />
           </button>
         </div>
       </div>
-      
+
       {/* Horizontal carousel */}
       <div ref={scrollContainerRef} className="flex overflow-x-auto gap-6 px-6 pb-6 snap-x hide-scrollbar max-w-7xl mx-auto" style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}>
         {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
