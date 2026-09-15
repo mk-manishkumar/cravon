@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { authService } from "@/services/auth.service";
 import toast from "react-hot-toast";
+import { useCartStore } from "./cartStore";
 
 export interface Address {
   _id?: string;
@@ -49,9 +50,16 @@ export const useAuthStore = create<AuthState>((set) => ({
     set({ isLoading: true });
     try {
       const response = await authService.getMe();
-      set({ user: response?.user || null, isLoading: false });
+      const user = response?.user || null;
+      
+      if (!user) {
+        useCartStore.getState().clearCart();
+      }
+      
+      set({ user, isLoading: false });
     } catch (error) {
       console.error("Failed to fetch user session:", error);
+      useCartStore.getState().clearCart();
       set({ user: null, isLoading: false });
     }
   },
@@ -67,6 +75,11 @@ export const useAuthStore = create<AuthState>((set) => ({
     } finally {
       // Regardless of success/fail, clear local state
       set({ user: null, isLoggingOut: false });
+      // Clear the cart
+      useCartStore.getState().clearCart();
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('pendingCartItem');
+      }
     }
   },
 

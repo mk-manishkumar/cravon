@@ -25,7 +25,10 @@ export default function LoginPage() {
       await authService.login({ email, password });
       await useAuthStore.getState().checkAuth();
       toast.success("Welcome back!");
-      router.push("/");
+      
+      const params = new URLSearchParams(window.location.search);
+      const redirectUrl = params.get("redirect") || "/";
+      router.push(redirectUrl);
     } catch (err) {
       if (axios.isAxiosError(err)) {
         toast.error(err.response?.data?.message || err.response?.data?.error || "We couldn't sign you in.");

@@ -1,10 +1,12 @@
 "use client";
 
 import Image from "next/image";
-import { Star, ChevronLeft, ChevronRight } from "lucide-react";
+import { Star, ChevronLeft, ChevronRight, Plus, Minus } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { publicService } from "@/services/public.service";
 import { useCartStore } from "@/store/cartStore";
+import { useAuthStore } from "@/store/authStore";
+import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { useRef, useState } from "react";
 
@@ -15,15 +17,14 @@ interface FoodCarouselProps {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function FoodCarouselCard({ food, handleAddToCart }: Readonly<{ food: any; handleAddToCart: (food: any, quantity?: number) => void }>) {
-  const [count, setCount] = useState(0);
+  const [count, setCount] = useState(1);
 
   const increment = () => setCount((c) => c + 1);
-  const decrement = () => setCount((c) => Math.max(0, c - 1));
+  const decrement = () => setCount((c) => Math.max(1, c - 1));
 
   const onAdd = () => {
-    const qtyToAdd = count > 0 ? count : 1;
-    handleAddToCart(food, qtyToAdd);
-    setCount(0);
+    handleAddToCart(food, count);
+    setCount(1);
   };
 
   return (
@@ -57,15 +58,15 @@ function FoodCarouselCard({ food, handleAddToCart }: Readonly<{ food: any; handl
         {/* Add Button & Counter */}
         <div className="mt-auto flex items-center justify-between gap-2">
           <div className="flex items-center border border-[#FF7A30] rounded-xl overflow-hidden h-9 w-27.5 shrink-0">
-            <button type="button" onClick={decrement} className="cursor-pointer px-2 h-full flex-1 flex justify-center text-[#FF7A30] hover:bg-orange-50 font-bold transition-colors">
-              -
+            <button type="button" onClick={decrement} className="cursor-pointer h-full flex-1 flex items-center justify-center text-[#FF7A30] hover:bg-orange-50 transition-colors">
+              <Minus size={16} strokeWidth={3} />
             </button>
-            <span className="text-sm font-bold w-6 text-center">{count}</span>
-            <button type="button" onClick={increment} className="cursor-pointer px-2 h-full flex-1 flex justify-center text-[#FF7A30] hover:bg-orange-50 font-bold transition-colors">
-              +
+            <span className="text-sm font-bold w-6 text-center flex items-center justify-center h-full leading-none">{count}</span>
+            <button type="button" onClick={increment} className="cursor-pointer h-full flex-1 flex items-center justify-center text-[#FF7A30] hover:bg-orange-50 transition-colors">
+              <Plus size={16} strokeWidth={3} />
             </button>
           </div>
-          <button type="button" onClick={onAdd} className="cursor-pointer h-9 flex-1 bg-[#FF7A30] hover:bg-[#FF8E4D] text-white font-bold rounded-xl shadow-[0_4px_12px_rgba(255,122,48,0.3)] transition-transform active:scale-[0.98] text-sm uppercase">
+          <button type="button" onClick={onAdd} className="cursor-pointer h-9 flex-1 bg-[#FF7A30] hover:bg-[#FF8E4D] text-white font-bold rounded-xl shadow-[0_4px_12px_rgba(255,122,48,0.3)] transition-transform active:scale-[0.98] text-sm uppercase flex items-center justify-center">
             ADD
           </button>
         </div>
@@ -76,6 +77,8 @@ function FoodCarouselCard({ food, handleAddToCart }: Readonly<{ food: any; handl
 
 export default function FoodCarousel({ title, filter }: FoodCarouselProps) {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
+  const { user } = useAuthStore();
 
   const scroll = (direction: "left" | "right") => {
     if (scrollContainerRef.current) {
@@ -103,6 +106,14 @@ export default function FoodCarousel({ title, filter }: FoodCarouselProps) {
       quantity: quantity,
       isVeg: food.isVeg,
     };
+
+    if (!user) {
+      if (typeof window !== 'undefined') {
+        localStorage.setItem("pendingCartItem", JSON.stringify({ item, restaurantId: food.restaurantId }));
+      }
+      router.push(`/auth/login?redirect=/restaurants/${food.restaurantId}`);
+      return;
+    }
 
     const added = addItem(item, food.restaurantId, food.restaurantName);
     if (!added) {

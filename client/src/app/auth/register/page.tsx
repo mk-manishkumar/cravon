@@ -30,7 +30,13 @@ export default function RegisterPage() {
     try {
       await authService.register(formData);
       toast.success("Account created successfully!");
-      router.push("/auth/login");
+      const params = new URLSearchParams(window.location.search);
+      const redirectUrl = params.get("redirect");
+      if (redirectUrl) {
+        router.push(`/auth/login?redirect=${encodeURIComponent(redirectUrl)}`);
+      } else {
+        router.push("/auth/login");
+      }
     } catch (err) {
       if (axios.isAxiosError(err)) {
         toast.error(err.response?.data?.message || err.response?.data?.error || "We couldn't create your account.");
