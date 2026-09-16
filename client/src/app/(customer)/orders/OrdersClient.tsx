@@ -70,6 +70,7 @@ export default function OrdersClient() {
     queryKey: ["my-orders"],
     queryFn: fetchMyOrders,
     enabled: !!user,
+    refetchInterval: 15000, // Poll every 15 seconds to auto-update order status
   });
 
   const orderCount = orders?.length ?? 0;
