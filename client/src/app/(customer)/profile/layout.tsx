@@ -8,7 +8,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function ProfileLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  const { user, logout } = useAuthStore();
+  const { user, logout, isLoading: isAuthLoading } = useAuthStore();
   const pathname = usePathname();
   const router = useRouter();
   const [mounted, setMounted] = useState(false);
@@ -16,10 +16,10 @@ export default function ProfileLayout({ children }: Readonly<{ children: React.R
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
-    if (!user) {
+    if (!isAuthLoading && !user) {
       router.push("/auth/login?redirect=/profile");
     }
-  }, [user, router]);
+  }, [user, isAuthLoading, router]);
 
   if (!mounted || !user) return null;
 

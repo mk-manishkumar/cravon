@@ -17,7 +17,7 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
   useEffect(() => {
     if (!isLoading) {
       if (!user) {
-        if (pathname.startsWith("/partner") || pathname.startsWith("/auth/restaurant")) {
+        if (pathname.startsWith("/partner") || pathname.startsWith("/dashboard") || pathname.startsWith("/auth/restaurant")) {
           router.push("/auth/restaurant/login");
         } else {
           router.push("/auth/login");

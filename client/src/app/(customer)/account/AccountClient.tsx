@@ -9,17 +9,17 @@ import CustomerSecuritySection from "@/components/customer/account/CustomerSecur
 import CustomerDeleteAccountSection from "@/components/customer/account/CustomerDeleteAccountSection";
 
 export default function CustomerAccountSettingsPage() {
-  const { user } = useAuthStore();
+  const { user, isLoading: isAuthLoading } = useAuthStore();
   const router = useRouter();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
-    if (!user) {
+    if (!isAuthLoading && !user) {
       router.push("/auth/login?redirect=/account");
     }
-  }, [user, router]);
+  }, [user, isAuthLoading, router]);
 
   if (!mounted || !user) return null;
 

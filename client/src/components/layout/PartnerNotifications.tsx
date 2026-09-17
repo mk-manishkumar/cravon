@@ -64,7 +64,7 @@ export default function PartnerNotifications() {
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 notifications.map((order: any) => (
                   <div key={order._id} className="border-b border-[#222222] last:border-0">
-                    <Link href={`/dashboard/${order.restaurant._id || order.restaurant}/orders`} className="block px-5 py-4 hover:bg-[#2A2A2A] transition-colors">
+                    <Link href="/partner/notifications" onClick={() => setShowDropdown(false)} className="block px-5 py-4 hover:bg-[#2A2A2A] transition-colors">
                       <div className="flex justify-between items-start mb-1">
                         <p className="text-[13px] font-bold text-white">New Order from {order.user?.firstName || "Customer"}</p>
                         <span className="text-[10px] text-[#888888] whitespace-nowrap ml-2">
@@ -83,6 +83,10 @@ export default function PartnerNotifications() {
                 ))
               )}
             </div>
+            
+            <Link href="/partner/notifications" className="block px-5 py-3 text-center text-[13px] font-bold text-[#FF7A30] hover:bg-[#222222] border-t border-[#333333] transition-colors" onClick={() => setShowDropdown(false)}>
+              View All Notifications
+            </Link>
           </div>
         </div>
       )}

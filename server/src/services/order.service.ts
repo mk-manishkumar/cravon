@@ -146,6 +146,7 @@ export const verifyPayment = async (razorpayOrderId: string, razorpayPaymentId: 
 // Fetches all orders for a given user, sorted newest first
 export const getMyOrders = async (userId: string) => {
   // Lazy evaluation: sweep stale orders before returning
+  await autoCancelOrdersService();
   await autoDeliverOrdersService();
 
   return await Order.find({ user: userId }).sort({ createdAt: -1 }).populate("restaurant", "name image address deliveryTime status");
@@ -166,6 +167,7 @@ export const getRestaurantOrdersService = async (restaurantId: string, userId: s
   }
 
   // sweep stale orders before returning
+  await autoCancelOrdersService();
   await autoDeliverOrdersService();
 
   return await Order.find({ restaurant: restaurantId }).sort({ createdAt: -1 }).populate("user", "firstName lastName email phone");
@@ -174,6 +176,7 @@ export const getRestaurantOrdersService = async (restaurantId: string, userId: s
 // Fetches recent orders across all restaurants where the user has access
 export const getPartnerNotificationsService = async (userId: string) => {
   // sweep stale orders before returning
+  await autoCancelOrdersService();
   await autoDeliverOrdersService();
 
   const sevenDaysAgo = new Date();
@@ -243,4 +246,29 @@ export const autoDeliverOrdersService = async () => {
   );
 
   return result.modifiedCount;
+};
+
+// Cron/lazy endpoint to automatically cancel unaccepted orders
+export const autoCancelOrdersService = async () => {
+  const timeoutMinutes = Number(process.env.ORDER_ACCEPT_TIMEOUT_MINUTES) || 2;
+  const cutoffTime = new Date(Date.now() - timeoutMinutes * 60 * 1000);
+
+  // Find orders that are still pending and past the timeout
+  const stalePendingOrders = await Order.find({
+    orderStatus: "pending",
+    createdAt: { $lt: cutoffTime },
+  }).populate("user", "email");
+
+  for (const order of stalePendingOrders) {
+    order.orderStatus = "cancelled";
+    await order.save();
+
+    if (order.paymentMethod === "online") {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const userEmail = (order.user as any)?.email;
+      if (userEmail) {
+        await sendRefundEmail(userEmail, order.grandTotal, order.paymentMethod, order._id.toString());
+      }
+    }
+  }
 };

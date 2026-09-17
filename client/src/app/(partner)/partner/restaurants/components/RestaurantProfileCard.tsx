@@ -28,28 +28,28 @@ export default function RestaurantProfileCard({ restaurant, isOnboarded, onEdit,
 
       <div className="relative z-10 flex-1">
         <div className="flex items-start justify-between mb-6">
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-4 flex-1">
             <div className="w-14 h-14 bg-[#1A1A1A] rounded-2xl border border-[#333] flex items-center justify-center text-[#FF7A30] overflow-hidden relative shrink-0">{restaurant?.image ? <Image src={restaurant.image} alt={restaurant?.name || "Logo"} fill className="object-cover" sizes="56px" /> : <Store size={24} />}</div>
-            <div>
+            <div className="flex-1 min-w-0">
               <h2 className="text-xl font-bold flex items-center gap-2">
-                {restaurant?.name || "Your Restaurant"}
-                {restaurant?.userRole && <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${getRoleBadgeClasses(restaurant.userRole)}`}>{restaurant.userRole}</span>}
+                <span className="truncate">{restaurant?.name || "Your Restaurant"}</span>
+                {restaurant?.userRole && <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider shrink-0 ${getRoleBadgeClasses(restaurant.userRole)}`}>{restaurant.userRole}</span>}
               </h2>
-              {restaurant?.franchiseName && <p className="text-[13px] font-semibold text-[#FF7A30]">{restaurant.franchiseName}</p>}
-              <div className="flex items-center gap-2 mt-1">
-                <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${isActive ? "bg-[#00C853]/10 text-[#00C853] border border-[#00C853]/20" : "bg-red-500/10 text-red-500 border border-red-500/20"}`}>{restaurant?.status || "PENDING"}</span>
+              {restaurant?.franchiseName && <p className="text-[13px] font-semibold text-[#FF7A30] truncate">{restaurant.franchiseName}</p>}
+              <div className="flex items-center gap-2 mt-1 w-full pr-1">
+                <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider shrink-0 ${isActive ? "bg-[#00C853]/10 text-[#00C853] border border-[#00C853]/20" : "bg-red-500/10 text-red-500 border border-red-500/20"}`}>{restaurant?.status || "PENDING"}</span>
+                {!isOnboarded && <span className="text-[10px] text-[#888] shrink-0">(Pending Onboarding)</span>}
                 {isOnboarded && (
-                  <Link href={`/dashboard/${restaurant._id}/orders`} className="text-[11px] font-bold text-[#FF7A30] hover:text-[#FF8A4D] hover:underline underline-offset-2 transition-all flex items-center gap-1">
+                  <Link href={`/dashboard/${restaurant._id}/orders`} className="text-[11px] font-bold text-[#FF7A30] hover:text-[#FF8A4D] hover:underline underline-offset-2 transition-all ml-auto shrink-0">
                     View Orders
                   </Link>
                 )}
-                {!isOnboarded && <span className="text-[10px] text-[#888]">(Pending Onboarding)</span>}
               </div>
             </div>
           </div>
 
           {/* Actions */}
-          <div className="flex items-center gap-2 shrink-0">
+          <div className="flex items-center gap-2 shrink-0 ml-4">
             {restaurant?.userRole === "Owner" &&
               (!isOnboarded ? (
                 <button type="button" onClick={onEdit} className="cursor-pointer px-4 py-2 bg-[#FF7A30]/10 text-[#FF7A30] hover:bg-[#FF7A30]/20 rounded-xl text-xs font-bold transition-all border border-[#FF7A30]/20 flex items-center gap-1.5">

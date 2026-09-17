@@ -55,16 +55,16 @@ const fetchMyOrders = async (): Promise<Order[]> => {
 
 export default function OrdersClient() {
   const router = useRouter();
-  const { user } = useAuthStore();
+  const { user, isLoading: isAuthLoading } = useAuthStore();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
-    if (!user) {
+    if (!isAuthLoading && !user) {
       router.push("/auth/login?redirect=/orders");
     }
-  }, [user, router]);
+  }, [user, isAuthLoading, router]);
 
   const { data: orders, isLoading } = useQuery({
     queryKey: ["my-orders"],

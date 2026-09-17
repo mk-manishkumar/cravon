@@ -24,7 +24,7 @@ const handleAuthRedirect = (wasLoggedIn: boolean) => {
   // Don't redirect if already on an auth page or handling an invite
   if (currentPath.includes("/login") || currentPath.includes("/accept-invite")) return;
 
-  if (currentPath.startsWith("/partner") || currentPath.startsWith("/staff")) {
+  if (currentPath.startsWith("/partner") || currentPath.startsWith("/dashboard") || currentPath.startsWith("/staff")) {
     window.location.href = "/auth/restaurant/login";
     return;
   }
