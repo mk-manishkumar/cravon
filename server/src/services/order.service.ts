@@ -74,7 +74,7 @@ export const createOrder = async (data: CreateOrderDTO) => {
     };
   }
 
-  // ── Online (Razorpay) Flow ──
+  // ── Online Flow ──
   const razorpayOptions = {
     amount: grandTotal * 100,
     currency: "INR",
@@ -215,11 +215,9 @@ export const updateOrderStatusService = async (orderId: string, status: string, 
     order.orderStatus = "cancelled";
     await order.save();
 
-    if (order.paymentMethod === "online") {
-      const userEmail = (order.user as any).email;
-      if (userEmail) {
-        await sendRefundEmail(userEmail, order.grandTotal, order.paymentMethod, order._id.toString());
-      }
+    const userEmail = (order.user as any).email;
+    if (userEmail) {
+      await sendRefundEmail(userEmail, order.grandTotal, order.paymentMethod, order._id.toString());
     }
   } else {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

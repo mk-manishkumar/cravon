@@ -86,16 +86,30 @@ export const sendRefundEmail = async (email: string, amount: number, paymentMeth
       },
     });
 
+    const isOnline = paymentMethod.toLowerCase() === "online";
+    
+    const subject = isOnline 
+      ? `Order Cancelled - Refund Initiated (Order #${orderId.toString().slice(-6)})`
+      : `Order Cancelled (Order #${orderId.toString().slice(-6)})`;
+
+    const textMsg = isOnline 
+      ? `Your order #${orderId.toString().slice(-6)} was cancelled by the restaurant. A refund of ₹${amount} will be processed to your original payment method.`
+      : `Your order #${orderId.toString().slice(-6)} was cancelled by the restaurant. Since you chose Cash on Delivery, no payment was collected.`;
+
+    const htmlMsg = isOnline
+      ? `<p>Since you paid via <strong>ONLINE</strong>, a refund of <strong>₹${amount}</strong> has been initiated and will reflect in your account within 5-7 business days.</p>`
+      : `<p>Since you chose <strong>Cash on Delivery (COD)</strong>, no payment was collected and you have not been charged.</p>`;
+
     await transporter.sendMail({
       from: `"Cravon Food Delivery" <${process.env.MAIL_FROM || "no-reply@cravon.com"}>`,
       to: email,
-      subject: `Order Cancelled - Refund Initiated (Order #${orderId.toString().slice(-6)})`,
-      text: `Your order #${orderId.toString().slice(-6)} was cancelled by the restaurant. A refund of ₹${amount} will be processed to your original ${paymentMethod} payment method.`,
+      subject: subject,
+      text: textMsg,
       html: `
         <div style="font-family: Arial, sans-serif; padding: 20px; color: #333;">
           <h2 style="color: #FF3D57;">Order Cancelled</h2>
           <p>We are sorry, but your order <strong>#${orderId.toString().slice(-6)}</strong> was cancelled by the restaurant.</p>
-          <p>Since you paid via <strong>${paymentMethod.toUpperCase()}</strong>, a refund of <strong>₹${amount}</strong> has been initiated and will reflect in your account within 5-7 business days.</p>
+          ${htmlMsg}
           <p>We apologize for the inconvenience.</p>
         </div>
       `,
