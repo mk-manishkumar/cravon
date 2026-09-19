@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import asyncHandler from "../utils/asyncHandler.js";
-import { getActiveRestaurantsService, getRestaurantByIdService, exploreFoodsService } from "../services/public.service.js";
+import { getActiveRestaurantsService, getRestaurantByIdService, exploreFoodsService, searchPublicRestaurantsService } from "../services/public.service.js";
 
 // Get all active onboarded restaurants for public listing
 export const getActiveRestaurants = asyncHandler(async (req: Request, res: Response) => {
@@ -31,11 +31,22 @@ export const getRestaurantById = asyncHandler(async (req: Request, res: Response
 
 // Explore food items across all active restaurants
 export const exploreFoods = asyncHandler(async (req: Request, res: Response) => {
-  const { filter } = req.query;
-  const foods = await exploreFoodsService(filter as string);
+  const { filter, city } = req.query;
+  const foods = await exploreFoodsService(filter as string, city as string);
 
   res.status(200).json({
     status: "success",
     data: foods,
+  });
+});
+
+// Search restaurants and dishes
+export const searchPublicRestaurants = asyncHandler(async (req: Request, res: Response) => {
+  const { q, city } = req.query;
+  const results = await searchPublicRestaurantsService(q as string, city as string);
+
+  res.status(200).json({
+    status: "success",
+    data: results,
   });
 });

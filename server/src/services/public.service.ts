@@ -25,11 +25,15 @@ export const getRestaurantByIdService = async (id: string) => {
 };
 
 // Explore food items across all active restaurants
-export const exploreFoodsService = async (filter?: string) => {
+export const exploreFoodsService = async (filter?: string, city?: string) => {
   const matchStage: any = {
     status: "active",
     isOnboarded: true,
   };
+
+  if (city && typeof city === "string" && city !== "Select City") {
+    matchStage.address = { $regex: new RegExp(city, "i") };
+  }
 
   if (filter === "franchise") matchStage.franchiseName = { $exists: true, $ne: "" };
 
@@ -59,4 +63,31 @@ export const exploreFoodsService = async (filter?: string) => {
   ];
 
   return await Restaurant.aggregate(pipeline);
+};
+
+// Search restaurants and dishes (Atlas Search with phonetic/fuzzy fallback to Regex)
+export const searchPublicRestaurantsService = async (query: string, city?: string) => {
+  if (!query) return [];
+
+  const baseMatch: any = { status: "active", isOnboarded: true };
+
+  if (city && typeof city === "string" && city !== "Select City") {
+    baseMatch.address = { $regex: new RegExp(city, "i") };
+  }
+
+  return await Restaurant.aggregate([
+    {
+      $search: {
+        index: "default",
+        text: {
+          query: query,
+          path: ["name", "franchiseName", "menu.name"],
+          fuzzy: { maxEdits: 1, prefixLength: 1 },
+        },
+      },
+    },
+    { $match: baseMatch },
+    { $project: { menu: 0 } }, // exclude full menu to save bandwidth
+    { $limit: 10 },
+  ]);
 };
