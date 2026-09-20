@@ -47,16 +47,6 @@ export default function MobileNavMenu({ showMobileMenu, setShowMobileMenu }: Mob
   return (
     <div className="md:hidden border-t border-[#F1E1D6] bg-white animate-in slide-in-from-top-2 shadow-md">
       <nav className="flex flex-col py-2">
-        <Link href="/" className={getMobileNavClass()} onClick={() => setShowMobileMenu(false)}>
-          Home
-        </Link>
-        <Link href="/restaurants" className={getMobileNavClass()} onClick={() => setShowMobileMenu(false)}>
-          Restaurants
-        </Link>
-        <Link href="/offers" className={getMobileNavClass()} onClick={() => setShowMobileMenu(false)}>
-          Offers
-        </Link>
-
         <div className="w-full h-px bg-gray-100 my-2" />
 
         {/* Mobile Location Selector */}

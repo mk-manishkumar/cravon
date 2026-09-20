@@ -6,9 +6,12 @@ import DesktopLocationSelector from "./customer-header/DesktopLocationSelector";
 import DesktopAuthDropdown from "./customer-header/DesktopAuthDropdown";
 import MobileNavMenu from "./customer-header/MobileNavMenu";
 import CartIconBadge from "./customer-header/CartIconBadge";
+import { usePathname } from "next/navigation";
+import SearchBar from "../customer/SearchBar";
 
 export default function CustomerHeader() {
   const [showMobileMenu, setShowMobileMenu] = useState(false);
+  const pathname = usePathname();
 
   const displayFont = "'Baloo 2', 'Poppins', 'Segoe UI', sans-serif";
 
@@ -23,18 +26,10 @@ export default function CustomerHeader() {
             </span>
           </Link>
 
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex gap-8">
-            <Link href="/" className="text-[15px] font-medium text-gray-700 hover:text-[#FF3D57] transition-colors">
-              Home
-            </Link>
-            <Link href="/restaurants" className="text-[15px] font-medium text-gray-700 hover:text-[#FF3D57] transition-colors">
-              Restaurants
-            </Link>
-            <Link href="/offers" className="text-[15px] font-medium text-gray-700 hover:text-[#FF3D57] transition-colors">
-              Offers
-            </Link>
-          </nav>
+          {/* Desktop SearchBar */}
+          <div className="hidden md:flex flex-1 max-w-lg mx-auto px-6">
+            {pathname === "/" && <SearchBar />}
+          </div>
 
           {/* Right side */}
           <div className="flex items-center gap-4 md:gap-6">
@@ -59,6 +54,13 @@ export default function CustomerHeader() {
             </button>
           </div>
         </div>
+
+        {/* Mobile SearchBar */}
+        {pathname === "/" && (
+          <div className="md:hidden pb-4">
+            <SearchBar />
+          </div>
+        )}
       </div>
 
       {/* Mobile Navigation Menu */}

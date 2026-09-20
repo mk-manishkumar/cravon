@@ -6,6 +6,7 @@ import { useQuery } from "@tanstack/react-query";
 import { publicService } from "@/services/public.service";
 import { useCartStore } from "@/store/cartStore";
 import { useAuthStore } from "@/store/authStore";
+import { useLocationStore } from "@/store/locationStore";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { useRef, useState } from "react";
@@ -79,6 +80,7 @@ export default function FoodCarousel({ title, filter }: FoodCarouselProps) {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
   const { user } = useAuthStore();
+  const { city } = useLocationStore();
 
   const scroll = (direction: "left" | "right") => {
     if (scrollContainerRef.current) {
@@ -91,8 +93,8 @@ export default function FoodCarousel({ title, filter }: FoodCarouselProps) {
   };
 
   const { data: foods, isLoading } = useQuery({
-    queryKey: ["exploreFoods", filter],
-    queryFn: () => publicService.exploreFoods(filter),
+    queryKey: ["exploreFoods", filter, city],
+    queryFn: () => publicService.exploreFoods(filter, city),
   });
 
   const { addItem, replaceCart } = useCartStore();

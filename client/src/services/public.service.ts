@@ -17,8 +17,11 @@ export const publicService = {
   },
 
   // Explore food items across all active restaurants
-  exploreFoods: async (filter?: string) => {
-    const url = filter ? `/public/explore-foods?filter=${filter}` : `/public/explore-foods`;
+  exploreFoods: async (filter?: string, city?: string) => {
+    let url = "/public/explore-foods?";
+    if (filter) url += `filter=${filter}&`;
+    if (city && city !== "Select City") url += `city=${encodeURIComponent(city)}&`;
+    
     const response = await api.get(url);
     return response.data.data;
   }
