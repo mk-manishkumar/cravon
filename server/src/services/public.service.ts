@@ -79,12 +79,33 @@ export const searchPublicRestaurantsService = async (query: string, city?: strin
     {
       $search: {
         index: "default",
-        text: {
-          query: query,
-          path: ["name", "franchiseName", "menu.name"],
-          fuzzy: { maxEdits: 1, prefixLength: 1 },
-        },
-      },
+        compound: {
+          should: [
+            {
+              autocomplete: {
+                query: query,
+                path: "name",
+                fuzzy: { maxEdits: 1, prefixLength: 1 }
+              }
+            },
+            {
+              autocomplete: {
+                query: query,
+                path: "franchiseName",
+                fuzzy: { maxEdits: 1, prefixLength: 1 }
+              }
+            },
+            {
+              autocomplete: {
+                query: query,
+                path: "menu.name",
+                fuzzy: { maxEdits: 1, prefixLength: 1 }
+              }
+            }
+          ],
+          minimumShouldMatch: 1
+        }
+      }
     },
     { $match: baseMatch },
     { $project: { menu: 0 } }, 

@@ -14,6 +14,7 @@ export default function CustomerHeader() {
   const pathname = usePathname();
 
   const displayFont = "'Baloo 2', 'Poppins', 'Segoe UI', sans-serif";
+  const showSearchBar = pathname === "/" || pathname.startsWith("/restaurants/");
 
   return (
     <header className="sticky top-0 z-50 w-full bg-white/90 backdrop-blur-md border-b border-[#F1E1D6] shadow-sm">
@@ -28,7 +29,7 @@ export default function CustomerHeader() {
 
           {/* Desktop SearchBar */}
           <div className="hidden md:flex flex-1 max-w-lg mx-auto px-6">
-            {pathname === "/" && <SearchBar />}
+            {showSearchBar && <SearchBar />}
           </div>
 
           {/* Right side */}
@@ -56,7 +57,7 @@ export default function CustomerHeader() {
         </div>
 
         {/* Mobile SearchBar */}
-        {pathname === "/" && (
+        {showSearchBar && (
           <div className="md:hidden pb-4">
             <SearchBar />
           </div>
