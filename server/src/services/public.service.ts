@@ -65,7 +65,7 @@ export const exploreFoodsService = async (filter?: string, city?: string) => {
   return await Restaurant.aggregate(pipeline);
 };
 
-// Search restaurants and dishes (Atlas Search with phonetic/fuzzy fallback to Regex)
+// Search restaurants and dishes
 export const searchPublicRestaurantsService = async (query: string, city?: string) => {
   if (!query) return [];
 
@@ -87,7 +87,7 @@ export const searchPublicRestaurantsService = async (query: string, city?: strin
       },
     },
     { $match: baseMatch },
-    { $project: { menu: 0 } }, // exclude full menu to save bandwidth
+    { $project: { menu: 0 } }, 
     { $limit: 10 },
   ]);
 };
