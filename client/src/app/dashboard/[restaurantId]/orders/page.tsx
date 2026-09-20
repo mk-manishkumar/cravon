@@ -3,7 +3,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
 import api from "@/lib/axios";
-import { Clock, CheckCircle2, XCircle, Search, Filter } from "lucide-react";
+import { Clock, CheckCircle2, XCircle } from "lucide-react";
 import toast from "react-hot-toast";
 
 export default function RestaurantOrdersPage() {
@@ -66,18 +66,6 @@ export default function RestaurantOrdersPage() {
       </div>
 
       <div className="bg-[#111] border border-[#222] rounded-3xl overflow-hidden shadow-sm">
-        <div className="p-4 border-b border-[#222] flex flex-wrap gap-4 items-center justify-between bg-[#151515]">
-          <div className="flex gap-4">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-[#666] w-4 h-4" />
-              <input type="text" placeholder="Search orders..." className="bg-[#0A0A0A] border border-[#333] text-sm rounded-xl pl-10 pr-4 py-2 text-white outline-none focus:border-[#FF7A30] w-64 transition-all" />
-            </div>
-            <button type="button" className="flex items-center gap-2 px-4 py-2 bg-[#0A0A0A] border border-[#333] hover:bg-[#1A1A1A] rounded-xl text-sm font-medium text-[#BBB] transition-colors">
-              <Filter className="w-4 h-4" /> Filter
-            </button>
-          </div>
-        </div>
-
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
@@ -109,7 +97,9 @@ export default function RestaurantOrdersPage() {
                       </div>
                     </td>
                     <td className="py-4 px-6">
-                      <div className="font-semibold text-[#DDD] text-sm">{order.user?.firstName} {order.user?.lastName}</div>
+                      <div className="font-semibold text-[#DDD] text-sm">
+                        {order.user?.firstName} {order.user?.lastName}
+                      </div>
                       <div className="text-[12px] text-[#888]">{order.paymentMethod?.toUpperCase()}</div>
                     </td>
                     <td className="py-4 px-6">
@@ -118,30 +108,21 @@ export default function RestaurantOrdersPage() {
                         {order.items.map((i: any) => `${i.quantity}x ${i.name}`).join(", ")}
                       </div>
                     </td>
-                    <td className="py-4 px-6 font-bold text-[#DDD]">
-                      ₹{order.grandTotal}
-                    </td>
+                    <td className="py-4 px-6 font-bold text-[#DDD]">₹{order.grandTotal}</td>
                     <td className="py-4 px-6">
-                      <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${getOrderStatusClasses(order.orderStatus)}`}>
-                        {order.orderStatus}
-                      </span>
+                      <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${getOrderStatusClasses(order.orderStatus)}`}>{order.orderStatus}</span>
                     </td>
                     <td className="py-4 px-6 text-right">
-                      {order.orderStatus === 'pending' ? (
+                      {order.orderStatus === "pending" ? (
                         <div className="flex items-center justify-end gap-2">
-                          <button 
-                            type="button"
-                            onClick={() => updateStatusMutation.mutate({ id: order._id, status: 'preparing' })}
-                            disabled={updateStatusMutation.isPending}
-                            className="cursor-pointer flex items-center gap-1.5 px-3 py-1.5 bg-[#10B981]/10 hover:bg-[#10B981]/20 text-[#10B981] rounded-lg text-xs font-bold transition-colors disabled:opacity-50"
-                          >
+                          <button type="button" onClick={() => updateStatusMutation.mutate({ id: order._id, status: "preparing" })} disabled={updateStatusMutation.isPending} className="cursor-pointer flex items-center gap-1.5 px-3 py-1.5 bg-[#10B981]/10 hover:bg-[#10B981]/20 text-[#10B981] rounded-lg text-xs font-bold transition-colors disabled:opacity-50">
                             <CheckCircle2 className="w-4 h-4" /> Accept
                           </button>
-                          <button 
+                          <button
                             type="button"
                             onClick={() => {
-                              if(confirm("Are you sure you want to reject this order? This will cancel it and initiate a refund if paid online.")) {
-                                updateStatusMutation.mutate({ id: order._id, status: 'cancelled' });
+                              if (confirm("Are you sure you want to reject this order? This will cancel it and initiate a refund if paid online.")) {
+                                updateStatusMutation.mutate({ id: order._id, status: "cancelled" });
                               }
                             }}
                             disabled={updateStatusMutation.isPending}
