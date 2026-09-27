@@ -1,10 +1,20 @@
-export default function App() {
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { useAuthStore } from "./store/authStore";
+import Login from "./pages/Login";
+import Dashboard from "./pages/Dashboard";
+
+function App() {
+  const { token } = useAuthStore();
+
   return (
-    <div className="flex h-screen items-center justify-center bg-gray-100">
-      <div className="p-8 bg-white rounded-xl shadow-lg text-center">
-        <h1 className="text-3xl font-bold text-orange-500 mb-2">Cravon Driver</h1>
-        <p className="text-gray-600">Tailwind v4 is working perfectly!</p>
-      </div>
-    </div>
-  )
+    <BrowserRouter>
+      <Routes>
+        <Route path="/login" element={!token ? <Login /> : <Navigate to="/dashboard" replace />} />
+        <Route path="/dashboard" element={token ? <Dashboard /> : <Navigate to="/login" replace />} />
+        <Route path="*" element={<Navigate to={token ? "/dashboard" : "/login"} replace />} />
+      </Routes>
+    </BrowserRouter>
+  );
 }
+
+export default App;
