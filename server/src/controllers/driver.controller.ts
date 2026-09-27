@@ -1,11 +1,17 @@
 import { Request, Response, NextFunction } from "express";
 import asyncHandler from "../utils/asyncHandler.js";
-import { loginDriverService, updateDriverStatusService, updateDriverLocationService, getDriverOrdersService, updateOrderStatusService } from "../services/driver.service.js";
+import { loginDriverService, updateDriverStatusService, updateDriverLocationService, getDriverOrdersService, updateOrderStatusService, updateDriverProfileService } from "../services/driver.service.js";
 
 // Controller for driver login
 export const loginDriver = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
   const { email, password } = req.body;
   const data = await loginDriverService(email, password);
+  res.json({ success: true, data });
+});
+
+// Controller for updating driver profile
+export const updateProfile = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
+  const data = await updateDriverProfileService((req as any).user.id, req.body);
   res.json({ success: true, data });
 });
 

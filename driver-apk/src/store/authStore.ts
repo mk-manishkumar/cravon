@@ -14,6 +14,7 @@ interface AuthState {
   driver: Driver | null;
   token: string | null;
   setAuth: (driver: Driver, token: string) => void;
+  updateDriver: (driver: Driver) => void;
   logout: () => void;
 }
 
@@ -24,6 +25,10 @@ export const useAuthStore = create<AuthState>((set) => ({
     localStorage.setItem("driver_token", token);
     localStorage.setItem("driver_data", JSON.stringify(driver));
     set({ driver, token });
+  },
+  updateDriver: (driver) => {
+    localStorage.setItem("driver_data", JSON.stringify(driver));
+    set({ driver });
   },
   logout: () => {
     localStorage.removeItem("driver_token");

@@ -2,14 +2,22 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../store/authStore";
 import api from "../lib/axios";
-import { LogOut, MapPin, Package, Navigation, CheckCircle2 } from "lucide-react";
+import { LogOut, MapPin, Package, Navigation, CheckCircle2, Edit3, X } from "lucide-react";
 
 export default function Dashboard() {
-  const { driver, logout } = useAuthStore();
+  const { driver, logout, updateDriver } = useAuthStore();
   const navigate = useNavigate();
   const [orders, setOrders] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [isOnline, setIsOnline] = useState(driver?.isAvailable || false);
+  const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
+  const [profileData, setProfileData] = useState({
+    firstName: driver?.firstName || "",
+    lastName: driver?.lastName || "",
+    phone: driver?.phone || "",
+    vehicleDetails: driver?.vehicleDetails || "",
+  });
+  const [savingProfile, setSavingProfile] = useState(false);
 
   useEffect(() => {
     if (!driver) {
@@ -80,6 +88,21 @@ export default function Dashboard() {
     navigate("/login");
   };
 
+  const handleSaveProfile = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      setSavingProfile(true);
+      const res = await api.put("/driver/profile", profileData);
+      updateDriver(res.data.data);
+      setIsEditProfileOpen(false);
+    } catch (error) {
+      console.error("Failed to update profile", error);
+      alert("Failed to update profile");
+    } finally {
+      setSavingProfile(false);
+    }
+  };
+
   if (!driver) return null;
 
   return (
@@ -95,9 +118,14 @@ export default function Dashboard() {
             <p className="text-xs text-gray-500">Driver Mode</p>
           </div>
         </div>
-        <button onClick={handleLogout} className="p-2 text-gray-400 hover:text-gray-800 bg-gray-50 rounded-full">
-          <LogOut className="w-5 h-5" />
-        </button>
+        <div className="flex items-center gap-2">
+          <button onClick={() => setIsEditProfileOpen(true)} className="p-2 text-gray-400 hover:text-gray-800 bg-gray-50 rounded-full cursor-pointer">
+            <Edit3 className="w-5 h-5" />
+          </button>
+          <button onClick={handleLogout} className="p-2 text-gray-400 hover:text-gray-800 bg-gray-50 rounded-full cursor-pointer">
+            <LogOut className="w-5 h-5" />
+          </button>
+        </div>
       </header>
 
       {/* Online Toggle */}
@@ -180,7 +208,7 @@ export default function Dashboard() {
                   href={`https://www.google.com/maps/dir/?api=1&destination=${order.deliveryAddress?.latitude},${order.deliveryAddress?.longitude}`}
                   target="_blank"
                   rel="noreferrer"
-                  className="flex items-center justify-center gap-2 py-3 px-4 bg-gray-100 hover:bg-gray-200 text-gray-800 rounded-xl text-sm font-bold transition-colors"
+                  className="flex items-center justify-center gap-2 py-3 px-4 bg-gray-100 hover:bg-gray-200 text-gray-800 rounded-xl text-sm font-bold transition-colors cursor-pointer"
                 >
                   <Navigation className="w-4 h-4" />
                   Navigate
@@ -189,7 +217,7 @@ export default function Dashboard() {
                 {(order.orderStatus === "ready" || order.orderStatus === "preparing") && (
                   <button
                     onClick={() => updateOrderStatus(order._id, "out_for_delivery")}
-                    className="flex items-center justify-center gap-2 py-3 px-4 bg-[#FF7A30] hover:bg-[#e66a25] text-white rounded-xl text-sm font-bold transition-colors shadow-sm shadow-orange-200"
+                    className="flex items-center justify-center gap-2 py-3 px-4 bg-[#FF7A30] hover:bg-[#e66a25] text-white rounded-xl text-sm font-bold transition-colors shadow-sm shadow-orange-200 cursor-pointer"
                   >
                     Accept Order
                   </button>
@@ -198,7 +226,7 @@ export default function Dashboard() {
                 {order.orderStatus === "out_for_delivery" && (
                   <button
                     onClick={() => updateOrderStatus(order._id, "delivered")}
-                    className="flex items-center justify-center gap-2 py-3 px-4 bg-green-500 hover:bg-green-600 text-white rounded-xl text-sm font-bold transition-colors shadow-sm shadow-green-200"
+                    className="flex items-center justify-center gap-2 py-3 px-4 bg-green-500 hover:bg-green-600 text-white rounded-xl text-sm font-bold transition-colors shadow-sm shadow-green-200 cursor-pointer"
                   >
                     <CheckCircle2 className="w-4 h-4" />
                     Delivered
@@ -209,6 +237,85 @@ export default function Dashboard() {
           ))
         )}
       </div>
+
+      {isEditProfileOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden flex flex-col max-h-[90vh]">
+            <div className="flex items-center justify-between p-4 border-b border-gray-100">
+              <h2 className="font-bold text-lg text-gray-900">Edit Profile</h2>
+              <button onClick={() => setIsEditProfileOpen(false)} className="p-2 text-gray-400 hover:text-gray-800 rounded-full cursor-pointer">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="p-4 overflow-y-auto">
+              <form id="profile-form" onSubmit={handleSaveProfile} className="space-y-4">
+                <div>
+                  <label htmlFor="firstName" className="block text-sm font-medium text-gray-700">First Name</label>
+                  <input
+                    id="firstName"
+                    type="text"
+                    required
+                    value={profileData.firstName}
+                    onChange={(e) => setProfileData({ ...profileData, firstName: e.target.value })}
+                    className="mt-1 block w-full px-3 py-3 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-[#FF7A30] focus:border-[#FF7A30] sm:text-sm"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="lastName" className="block text-sm font-medium text-gray-700">Last Name</label>
+                  <input
+                    id="lastName"
+                    type="text"
+                    required
+                    value={profileData.lastName}
+                    onChange={(e) => setProfileData({ ...profileData, lastName: e.target.value })}
+                    className="mt-1 block w-full px-3 py-3 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-[#FF7A30] focus:border-[#FF7A30] sm:text-sm"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="phone" className="block text-sm font-medium text-gray-700">Phone Number</label>
+                  <input
+                    id="phone"
+                    type="tel"
+                    required
+                    value={profileData.phone}
+                    onChange={(e) => setProfileData({ ...profileData, phone: e.target.value })}
+                    className="mt-1 block w-full px-3 py-3 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-[#FF7A30] focus:border-[#FF7A30] sm:text-sm"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="vehicleDetails" className="block text-sm font-medium text-gray-700">Vehicle Details</label>
+                  <input
+                    id="vehicleDetails"
+                    type="text"
+                    required
+                    value={profileData.vehicleDetails}
+                    onChange={(e) => setProfileData({ ...profileData, vehicleDetails: e.target.value })}
+                    className="mt-1 block w-full px-3 py-3 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-[#FF7A30] focus:border-[#FF7A30] sm:text-sm"
+                    placeholder="e.g. Honda Activa, White"
+                  />
+                </div>
+              </form>
+            </div>
+            <div className="p-4 border-t border-gray-100 flex justify-end gap-3 bg-gray-50">
+              <button
+                type="button"
+                onClick={() => setIsEditProfileOpen(false)}
+                className="px-4 py-2 text-sm font-bold text-gray-700 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                form="profile-form"
+                disabled={savingProfile}
+                className="px-4 py-2 text-sm font-bold text-white bg-[#FF7A30] hover:bg-[#e66a25] rounded-xl shadow-sm disabled:opacity-70 cursor-pointer"
+              >
+                {savingProfile ? "Saving..." : "Save Changes"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

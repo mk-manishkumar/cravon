@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
-import Driver from "../models/driver.model.js";
+import Driver, { IDriver } from "../models/driver.model.js";
 import Order from "../models/order.model.js";
 import { ApiError } from "../utils/errorHandler.js";
 
@@ -43,6 +43,19 @@ export const loginDriverService = async (email: string, password?: string) => {
 // Service function to update driver availability status
 export const updateDriverStatusService = async (driverId: string, isAvailable: boolean) => {
   const driver = await Driver.findByIdAndUpdate(driverId, { isAvailable }, { new: true }).select("-password");
+  if (!driver) throw new ApiError(404, "Driver not found");
+  return driver;
+};
+
+// Service function to update driver profile
+export const updateDriverProfileService = async (driverId: string, profileData: Partial<IDriver>) => {
+  const { firstName, lastName, phone, vehicleDetails } = profileData;
+  const driver = await Driver.findByIdAndUpdate(
+    driverId,
+    { firstName, lastName, phone, vehicleDetails },
+    { new: true, runValidators: true }
+  ).select("-password");
+  
   if (!driver) throw new ApiError(404, "Driver not found");
   return driver;
 };
