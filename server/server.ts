@@ -10,6 +10,7 @@ import paymentRoutes from "./src/routes/payment.routes.js";
 import staffRoutes from "./src/routes/staff.routes.js";
 import publicRoutes from "./src/routes/public.routes.js";
 import orderRoutes from "./src/routes/order.routes.js";
+import driverRoutes from "./src/routes/driver.routes.js";
 import { errorHandler } from "./src/utils/errorHandler.js";
 import { globalLimiter } from "./src/middlewares/rateLimiter.middleware.js";
 
@@ -48,6 +49,7 @@ app.use("/api/v1/payments", paymentRoutes);
 app.use("/api/v1/staff", staffRoutes);
 app.use("/api/v1/public", publicRoutes);
 app.use("/api/v1/orders", orderRoutes);
+app.use("/api/v1/driver", driverRoutes);
 
 // ERROR HANDLING
 // 404 Route Not Found Middleware

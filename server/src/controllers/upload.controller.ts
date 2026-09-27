@@ -1,33 +1,25 @@
 import { Request, Response } from "express";
+import asyncHandler from "../utils/asyncHandler.js";
 import { getAuthParameters, processAndUploadImage } from "../services/upload.service.js";
+import { ApiError } from "../utils/errorHandler.js";
 
 // Controller for handling image upload requests
-export const getAuthParams = (req: Request, res: Response) => {
-  try {
-    const authParams = getAuthParameters();
-    res.json(authParams);
-  } catch (error) {
-    console.error("ImageKit auth error:", error);
-    res.status(500).json({ status: "error", message: "Failed to generate image upload signature." });
-  }
-};
+export const getAuthParams = asyncHandler(async (req: Request, res: Response) => {
+  const authParams = getAuthParameters();
+  res.json(authParams);
+});
 
 // Controller for handling image upload requests
-export const uploadImage = async (req: Request, res: Response): Promise<any> => {
-  try {
-    if (!req.file) {
-      return res.status(400).json({ status: "error", message: "No file provided." });
-    }
-
-    const result = await processAndUploadImage(req.file.buffer);
-
-    res.status(200).json({
-      status: "success",
-      url: result.url,
-      fileId: result.fileId,
-    });
-  } catch (error) {
-    console.error("Backend upload error:", error);
-    res.status(500).json({ status: "error", message: "Failed to process and upload image." });
+export const uploadImage = asyncHandler(async (req: Request, res: Response): Promise<any> => {
+  if (!req.file) {
+    throw new ApiError(400, "No file provided.");
   }
-};
+
+  const result = await processAndUploadImage(req.file.buffer);
+
+  res.status(200).json({
+    status: "success",
+    url: result.url,
+    fileId: result.fileId,
+  });
+});

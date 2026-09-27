@@ -4,6 +4,7 @@ import Order from "../models/order.model.js";
 import Restaurant from "../models/restaurant.model.js";
 import RestaurantStaff from "../models/restaurantStaff.model.js";
 import { sendRefundEmail } from "../utils/mailer.js";
+import { ApiError } from "../utils/errorHandler.js";
 
 interface CreateOrderDTO {
   userId: string;
@@ -163,7 +164,7 @@ export const verifyRestaurantAccess = async (userId: string, restaurantId: strin
 // Retrieves all orders for a specific restaurant
 export const getRestaurantOrdersService = async (restaurantId: string, userId: string) => {
   if (!(await verifyRestaurantAccess(userId, restaurantId))) {
-    throw new Error("Forbidden");
+    throw new ApiError(403, "Forbidden");
   }
 
   // sweep stale orders before returning
@@ -201,10 +202,10 @@ export const getPartnerNotificationsService = async (userId: string) => {
 // Updates the status of a specific order
 export const updateOrderStatusService = async (orderId: string, status: string, userId: string) => {
   const order = await Order.findById(orderId).populate("user", "email");
-  if (!order) throw new Error("Order not found");
+  if (!order) throw new ApiError(404, "Order not found");
 
   if (!(await verifyRestaurantAccess(userId, order.restaurant.toString()))) {
-    throw new Error("Forbidden");
+    throw new ApiError(403, "Forbidden");
   }
 
   if (status === "preparing") {

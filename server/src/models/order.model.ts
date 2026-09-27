@@ -26,6 +26,7 @@ export interface IOrder extends Document {
     zipCode?: string;
   };
   deliveryInstructions?: string;
+  driver?: mongoose.Types.ObjectId;
   
   // Statuses
   orderStatus: 'pending' | 'preparing' | 'out_for_delivery' | 'delivered' | 'cancelled';
@@ -67,6 +68,7 @@ const OrderSchema = new Schema({
     zipCode: { type: String }
   },
   deliveryInstructions: { type: String },
+  driver: { type: Schema.Types.ObjectId, ref: 'Driver' },
   
   orderStatus: { 
     type: String, 
