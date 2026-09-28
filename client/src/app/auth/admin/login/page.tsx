@@ -16,6 +16,11 @@ export default function AdminLoginPage() {
 
   const handleSubmit = async (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (!email.trim() || !password.trim()) {
+      toast.error("Please fill in all required fields.");
+      return;
+    }
+
     setIsLoading(true);
 
     try {
@@ -59,7 +64,7 @@ export default function AdminLoginPage() {
           Admin Portal
         </h2>
 
-        <form onSubmit={handleSubmit} className="space-y-4" noValidate>
+        <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block text-[11px] font-semibold uppercase tracking-widest text-[#555555] mb-1.5" htmlFor="email">
               Admin Email

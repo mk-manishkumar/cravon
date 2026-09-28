@@ -19,6 +19,11 @@ export default function LoginPage() {
 
   const handleSubmit = async (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (!email.trim() || !password.trim()) {
+      toast.error("Please fill in all required fields.");
+      return;
+    }
+
     setIsLoading(true);
 
     try {
@@ -69,7 +74,7 @@ export default function LoginPage() {
             Welcome back
           </h2>
 
-        <form onSubmit={handleSubmit} className="space-y-3" noValidate>
+        <form onSubmit={handleSubmit} className="space-y-3">
           <div>
             <label className="block text-[12px] font-bold uppercase tracking-[0.04em] text-[#B08A81] mb-1.5" htmlFor="email">
               Email address

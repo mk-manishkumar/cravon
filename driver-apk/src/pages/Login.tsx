@@ -15,11 +15,16 @@ export default function Login() {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!email.trim() || !password.trim()) {
+      setError("Please fill in all required fields.");
+      return;
+    }
+
     setLoading(true);
     setError("");
 
     try {
-      // We will create this backend route later
+      // Will create this backend route later
       const res = await api.post("/driver/login", { email, password });
       setAuth(res.data.data.driver, res.data.data.token);
       navigate("/dashboard");

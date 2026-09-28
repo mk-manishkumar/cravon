@@ -25,6 +25,11 @@ export default function RestaurantRegisterPage() {
 
   const handleSubmit = async (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (!formData.firstName.trim() || !formData.lastName.trim() || !formData.email.trim() || !formData.phone.trim() || !formData.password.trim()) {
+      toast.error("Please fill in all required fields.");
+      return;
+    }
+
     setIsLoading(true);
 
     try {
@@ -70,7 +75,7 @@ export default function RestaurantRegisterPage() {
           Apply to Partner
         </h2>
 
-        <form onSubmit={handleSubmit} className="space-y-4" noValidate>
+        <form onSubmit={handleSubmit} className="space-y-4">
 
           <div className="grid grid-cols-2 gap-4">
             <div>

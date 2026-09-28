@@ -74,7 +74,7 @@ function MenuItemCard({ item, handleAddToCart }: Readonly<MenuItemCardProps>) {
 
       <div className="shrink-0 w-36 relative overflow-hidden rounded-xl">
         {item.image ? (
-          <Image src={item.image} alt={item.name} fill className="object-cover" />
+          <Image src={item.image} alt={item.name} fill sizes="144px" className="object-cover" />
         ) : (
           <div className="w-full h-full bg-orange-50 flex items-center justify-center text-orange-200">
             <Star className="w-8 h-8 opacity-50" />

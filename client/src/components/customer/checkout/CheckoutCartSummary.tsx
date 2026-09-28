@@ -17,7 +17,7 @@ export default function CheckoutCartSummary({ restaurant, restaurantName, items,
   return (
     <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 sticky top-24">
       <div className="flex items-center gap-4 mb-6 pb-6 border-b border-gray-100">
-        <div className="w-12 h-12 bg-gray-200 rounded-lg overflow-hidden relative shrink-0">{restaurant?.image ? <Image src={restaurant.image} alt="Restaurant" fill className="object-cover" /> : <div className="w-full h-full bg-gray-800"></div>}</div>
+        <div className="w-12 h-12 bg-gray-200 rounded-lg overflow-hidden relative shrink-0">{restaurant?.image ? <Image src={restaurant.image} alt="Restaurant" fill sizes="48px" className="object-cover" /> : <div className="w-full h-full bg-gray-800"></div>}</div>
         <div>
           <h3 className="font-bold text-gray-900 text-lg line-clamp-1">{restaurantName}</h3>
           <p className="text-gray-500 text-sm line-clamp-1">{restaurant?.address}</p>

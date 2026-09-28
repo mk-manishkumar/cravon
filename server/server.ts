@@ -24,7 +24,8 @@ app.disable("x-powered-by");
 const PORT = process.env.PORT || 5000;
 
 // GLOBAL MIDDLEWARES
-const allowedOrigins = [process.env.CLIENT_URL || "http://localhost:3000", "http://localhost:5173"];
+const localOrigins = process.env.LOCAL_ORIGINS ? process.env.LOCAL_ORIGINS.split(",") : [];
+const allowedOrigins = [process.env.CLIENT_URL, ...localOrigins].filter(Boolean) as string[];
 
 const corsOptions = {
   origin: allowedOrigins,
@@ -64,7 +65,7 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 app.use(errorHandler);
 
 // Only listen if not running in a serverless environment
-if (process.env.NODE_ENV !== 'production') {
+if (process.env.NODE_ENV !== "production") {
   app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
   });

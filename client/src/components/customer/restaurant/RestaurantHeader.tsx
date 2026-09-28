@@ -17,7 +17,7 @@ export default function RestaurantHeader({ restaurant }: { readonly restaurant: 
 
   return (
     <div className="relative w-full h-75 md:h-100 bg-gray-900">
-      {restaurant.image && <Image src={restaurant.image} alt={restaurant.name} fill className="object-cover opacity-60" />}
+      {restaurant.image && <Image src={restaurant.image} alt={restaurant.name} fill sizes="100vw" className="object-cover opacity-60" />}
       <div className="absolute inset-0 bg-linear-to-t from-black/80 via-transparent to-transparent"></div>
 
       <div className="absolute bottom-0 left-0 w-full p-6 md:p-12">

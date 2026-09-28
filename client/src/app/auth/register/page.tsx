@@ -25,6 +25,12 @@ export default function RegisterPage() {
 
   const handleSubmit = async (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
+    
+    if (!formData.firstName.trim() || !formData.lastName.trim() || !formData.email.trim() || !formData.phone.trim() || !formData.password.trim()) {
+      toast.error("Please fill in all required fields.");
+      return;
+    }
+
     setIsLoading(true);
 
     try {
@@ -78,7 +84,7 @@ export default function RegisterPage() {
           Create an account
         </h2>
 
-        <form onSubmit={handleSubmit} className="space-y-3" noValidate>
+        <form onSubmit={handleSubmit} className="space-y-3">
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-[12px] font-bold uppercase tracking-widest text-[#B08A81] mb-1.5" htmlFor="firstName">

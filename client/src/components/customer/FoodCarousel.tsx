@@ -32,7 +32,7 @@ function FoodCarouselCard({ food, handleAddToCart }: Readonly<{ food: any; handl
     <div className="snap-start shrink-0 w-65 bg-white border border-gray-100 rounded-2xl shadow-sm hover:shadow-md transition-shadow flex flex-col overflow-hidden">
       <div className="relative w-full h-40 bg-gray-50">
         {food.image ? (
-          <Image src={food.image} alt={food.name} fill className="object-cover" />
+          <Image src={food.image} alt={food.name} fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover" />
         ) : (
           <div className="w-full h-full flex items-center justify-center text-orange-200">
             <Star className="w-8 h-8 opacity-50" />
