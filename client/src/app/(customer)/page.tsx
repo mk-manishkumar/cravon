@@ -39,7 +39,7 @@ export default function CustomerLandingPage() {
 
       {/* Explore Foods Sections */}
       <section className="py-8">
-        <FoodCarousel title="Foods based on Franchise" filter="franchise" />
+        <FoodCarousel title="Franchise" filter="franchise" />
         <FoodCarousel title="Pure Veg Delights" filter="veg" />
         <FoodCarousel title="Non-Veg Cravings" filter="nonveg" />
       </section>

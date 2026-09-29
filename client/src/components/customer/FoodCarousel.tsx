@@ -9,72 +9,14 @@ import { useAuthStore } from "@/store/authStore";
 import { useLocationStore } from "@/store/locationStore";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 
 interface FoodCarouselProps {
   readonly title: string;
   readonly filter: "veg" | "nonveg" | "franchise";
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function FoodCarouselCard({ food, handleAddToCart }: Readonly<{ food: any; handleAddToCart: (food: any, quantity?: number) => void }>) {
-  const [count, setCount] = useState(1);
 
-  const increment = () => setCount((c) => c + 1);
-  const decrement = () => setCount((c) => Math.max(1, c - 1));
-
-  const onAdd = () => {
-    handleAddToCart(food, count);
-    setCount(1);
-  };
-
-  return (
-    <div className="snap-start shrink-0 w-65 bg-white border border-gray-100 rounded-2xl shadow-sm hover:shadow-md transition-shadow flex flex-col overflow-hidden">
-      <div className="relative w-full h-40 bg-gray-50">
-        {food.image ? (
-          <Image src={food.image} alt={food.name} fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover" />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center text-orange-200">
-            <Star className="w-8 h-8 opacity-50" />
-          </div>
-        )}
-
-        {/* Veg/Non-Veg Icon overlay */}
-        <div className="absolute top-3 left-3 bg-white p-1 rounded shadow-sm">
-          <div className={`w-3 h-3 flex items-center justify-center border rounded-sm ${food.isVeg !== false ? "border-green-600" : "border-red-600"}`}>
-            <div className={`w-1.5 h-1.5 rounded-full ${food.isVeg !== false ? "bg-green-600" : "bg-red-600"}`}></div>
-          </div>
-        </div>
-      </div>
-
-      <div className="p-4 flex flex-col grow">
-        <h3 className="font-bold text-gray-900 line-clamp-1 mb-1" title={food.name}>
-          {food.name}
-        </h3>
-        <p className="font-semibold text-gray-800 mb-2">₹{food.price}</p>
-
-        {/* Restaurant Name */}
-        <p className="text-xs text-gray-500 line-clamp-1 mb-4 mt-auto">By {food.restaurantName}</p>
-
-        {/* Add Button & Counter */}
-        <div className="mt-auto flex items-center justify-between gap-2">
-          <div className="flex items-center border border-[#FF7A30] rounded-xl overflow-hidden h-9 w-27.5 shrink-0">
-            <button type="button" onClick={decrement} className="cursor-pointer h-full flex-1 flex items-center justify-center text-[#FF7A30] hover:bg-orange-50 transition-colors">
-              <Minus size={16} strokeWidth={3} />
-            </button>
-            <span className="text-sm font-bold w-6 text-center flex items-center justify-center h-full leading-none">{count}</span>
-            <button type="button" onClick={increment} className="cursor-pointer h-full flex-1 flex items-center justify-center text-[#FF7A30] hover:bg-orange-50 transition-colors">
-              <Plus size={16} strokeWidth={3} />
-            </button>
-          </div>
-          <button type="button" onClick={onAdd} className="cursor-pointer h-9 flex-1 bg-[#FF7A30] hover:bg-[#FF8E4D] text-white font-bold rounded-xl shadow-[0_4px_12px_rgba(255,122,48,0.3)] transition-transform active:scale-[0.98] text-sm uppercase flex items-center justify-center">
-            ADD
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
 
 export default function FoodCarousel({ title, filter }: FoodCarouselProps) {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -98,6 +40,33 @@ export default function FoodCarousel({ title, filter }: FoodCarouselProps) {
   });
 
   const { addItem, replaceCart } = useCartStore();
+
+  useEffect(() => {
+    if (!foods || foods.length === 0) return;
+
+    const intervalId = setInterval(() => {
+      if (scrollContainerRef.current) {
+        const { scrollLeft, scrollWidth, clientWidth } = scrollContainerRef.current;
+        const scrollAmount = 800;
+        
+        // If we've reached the end, snap back to the start smoothly
+        if (scrollLeft + clientWidth >= scrollWidth - 10) {
+          scrollContainerRef.current.scrollTo({
+            left: 0,
+            behavior: "smooth",
+          });
+        } else {
+          // Otherwise keep scrolling right
+          scrollContainerRef.current.scrollBy({
+            left: scrollAmount,
+            behavior: "smooth",
+          });
+        }
+      }
+    }, 4000); // 4 seconds per auto-scroll
+
+    return () => clearInterval(intervalId);
+  }, [foods]);
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleAddToCart = (food: any, quantity: number = 1) => {
@@ -158,8 +127,72 @@ export default function FoodCarousel({ title, filter }: FoodCarouselProps) {
       <div ref={scrollContainerRef} className="flex overflow-x-auto gap-6 px-6 pb-6 snap-x hide-scrollbar max-w-7xl mx-auto" style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}>
         {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
         {foods.map((food: any) => (
-          <FoodCarouselCard key={food._id} food={food} handleAddToCart={handleAddToCart} />
+          <FoodCarouselCard key={food._id} food={food} filter={filter} handleAddToCart={handleAddToCart} />
         ))}
+      </div>
+    </div>
+  );
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function FoodCarouselCard({ food, filter, handleAddToCart }: Readonly<{ food: any; filter?: string; handleAddToCart: (food: any, quantity?: number) => void }>) {
+  const [count, setCount] = useState(1);
+
+  const increment = () => setCount((c) => c + 1);
+  const decrement = () => setCount((c) => Math.max(1, c - 1));
+
+  const onAdd = () => {
+    handleAddToCart(food, count);
+    setCount(1);
+  };
+
+  return (
+    <div className="snap-start shrink-0 w-65 bg-white border border-gray-100 rounded-2xl shadow-sm hover:shadow-md transition-shadow flex flex-col overflow-hidden">
+      <div className="relative w-full h-40 bg-gray-50">
+        {food.image ? (
+          <Image src={food.image} alt={food.name} fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover" />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center text-orange-200">
+            <Star className="w-8 h-8 opacity-50" />
+          </div>
+        )}
+
+        {/* Veg/Non-Veg Icon overlay */}
+        <div className="absolute top-3 left-3 bg-white p-1 rounded shadow-sm">
+          <div className={`w-3 h-3 flex items-center justify-center border rounded-sm ${food.isVeg !== false ? "border-green-600" : "border-red-600"}`}>
+            <div className={`w-1.5 h-1.5 rounded-full ${food.isVeg !== false ? "bg-green-600" : "bg-red-600"}`}></div>
+          </div>
+        </div>
+      </div>
+
+      <div className="p-4 flex flex-col grow">
+        <h3 className="font-bold text-gray-900 line-clamp-1 mb-1" title={filter === "franchise" ? (food.franchiseName || food.restaurantName) : food.name}>
+          {filter === "franchise" ? (food.franchiseName || food.restaurantName) : food.name}
+        </h3>
+        <p className="font-semibold text-gray-800 mb-2">
+          {filter === "franchise" ? <span className="font-normal text-sm text-gray-600 line-clamp-1">{food.name}</span> : `₹${food.price}`}
+        </p>
+
+        {/* Dynamic bottom text */}
+        <p className="text-xs text-gray-500 line-clamp-1 mb-4 mt-auto">
+          {filter === "franchise" ? <span className="font-semibold text-gray-800 text-sm">₹{food.price}</span> : `By ${food.restaurantName}`}
+        </p>
+
+        {/* Add Button & Counter */}
+        <div className="mt-auto flex items-center justify-between gap-2">
+          <div className="flex items-center border border-[#FF7A30] rounded-xl overflow-hidden h-9 w-27.5 shrink-0">
+            <button type="button" onClick={decrement} className="cursor-pointer h-full flex-1 flex items-center justify-center text-[#FF7A30] hover:bg-orange-50 transition-colors">
+              <Minus size={16} strokeWidth={3} />
+            </button>
+            <span className="text-sm font-bold w-6 text-center flex items-center justify-center h-full leading-none">{count}</span>
+            <button type="button" onClick={increment} className="cursor-pointer h-full flex-1 flex items-center justify-center text-[#FF7A30] hover:bg-orange-50 transition-colors">
+              <Plus size={16} strokeWidth={3} />
+            </button>
+          </div>
+          <button type="button" onClick={onAdd} className="cursor-pointer h-9 flex-1 bg-[#FF7A30] hover:bg-[#FF8E4D] text-white font-bold rounded-xl shadow-[0_4px_12px_rgba(255,122,48,0.3)] transition-transform active:scale-[0.98] text-sm uppercase flex items-center justify-center">
+            ADD
+          </button>
+        </div>
       </div>
     </div>
   );

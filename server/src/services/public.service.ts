@@ -57,6 +57,7 @@ export const exploreFoodsService = async (filter?: string, city?: string) => {
         image: "$menu.image",
         restaurantId: "$_id",
         restaurantName: "$name",
+        franchiseName: "$franchiseName",
         deliveryTime: "$deliveryTime",
       },
     },
