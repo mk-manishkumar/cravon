@@ -38,9 +38,9 @@ export default function RestaurantHeader({ restaurant }: { readonly restaurant: 
 
                 {/* Hover Map Tooltip (Only for logged in users) */}
                 {user && (
-                  <div className="absolute top-full left-0 mt-3 w-90 h-60 bg-[#1A1A1A] rounded-2xl shadow-[0_20px_50px_-12px_rgba(0,0,0,0.8)] z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 border border-white/20 overflow-hidden pointer-events-none origin-top-left transform scale-95 group-hover:scale-100">
-                    <MapWidget lat={restaurant.location?.coordinates?.[1] || 28.6139} lng={restaurant.location?.coordinates?.[0] || 77.209} readOnly={true} />
-                    <div className="absolute bottom-3 left-3 right-3 bg-black/90 backdrop-blur-md text-[13px] font-bold text-white px-4 py-2.5 rounded-xl shadow-lg z-1000 truncate border border-white/10 text-center">{restaurant.address}</div>
+                  <div className="absolute top-full left-0 mt-3 w-90 h-60 bg-[#1A1A1A] rounded-2xl shadow-[0_20px_50px_-12px_rgba(0,0,0,0.8)] z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 border border-white/20 overflow-hidden origin-top-left transform scale-95 group-hover:scale-100 cursor-default">
+                    <MapWidget lat={restaurant.location?.coordinates?.[1] || 28.6139} lng={restaurant.location?.coordinates?.[0] || 77.209} />
+                    <div className="absolute bottom-3 left-3 right-3 bg-black/90 backdrop-blur-md text-[13px] font-bold text-white px-4 py-2.5 rounded-xl shadow-lg z-1000 truncate border border-white/10 text-center pointer-events-none">{restaurant.address}</div>
                   </div>
                 )}
               </div>
