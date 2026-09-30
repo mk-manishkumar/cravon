@@ -7,6 +7,7 @@ export interface IMenuItem {
   description?: string;
   isVeg?: boolean;
   image?: string;
+  rating?: number;
 }
 
 export interface IRestaurant extends Document {
@@ -31,6 +32,7 @@ export interface IRestaurant extends Document {
   };
   rating: number;
   deliveryTime?: number;
+  averageCost?: number;
   image?: string;
   menu?: IMenuItem[];
   status: 'active' | 'inactive' | 'pending';
@@ -44,7 +46,8 @@ const menuItemSchema = new Schema<IMenuItem>({
   price: { type: Number, required: true },
   description: { type: String },
   isVeg: { type: Boolean },
-  image: { type: String }
+  image: { type: String },
+  rating: { type: Number, default: 0 }
 });
 
 const restaurantSchema = new Schema<IRestaurant>({
@@ -69,6 +72,7 @@ const restaurantSchema = new Schema<IRestaurant>({
   },
   rating: { type: Number, default: 0 },
   deliveryTime: { type: Number },
+  averageCost: { type: Number, default: 200 },
   image: { type: String },
   menu: { type: [menuItemSchema], default: [] },
   status: { type: String, enum: ['active', 'inactive', 'pending'], default: 'pending' },
@@ -77,5 +81,14 @@ const restaurantSchema = new Schema<IRestaurant>({
 
 // Index for geospatial queries
 restaurantSchema.index({ location: '2dsphere' });
+
+// Calculate dynamic average cost based on menu items
+restaurantSchema.pre('save', function (next) {
+  if (this.menu && this.menu.length > 0) {
+    const total = this.menu.reduce((sum, item) => sum + item.price, 0);
+    this.averageCost = Math.round(total / this.menu.length);
+  }
+  next();
+});
 
 export default mongoose.model<IRestaurant>('Restaurant', restaurantSchema);

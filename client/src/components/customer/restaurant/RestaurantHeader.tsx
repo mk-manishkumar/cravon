@@ -55,6 +55,11 @@ export default function RestaurantHeader({ restaurant }: { readonly restaurant: 
                 <span>{restaurant.deliveryTime || "30-40"} mins</span>
               </div>
 
+              <div className="flex items-center gap-1">
+                <span className="opacity-60">•</span>
+                <span>₹{restaurant.averageCost || 200} for one</span>
+              </div>
+
               {/* Status Tag */}
               <div className="flex-1 min-w-4 hidden sm:block"></div>
               <span className={`inline-flex items-center px-3 py-1 rounded-full text-[13px] font-bold tracking-wide uppercase text-white shadow-md ${currentStatus.color}`}>{currentStatus.text}</span>

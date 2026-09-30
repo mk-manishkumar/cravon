@@ -13,6 +13,7 @@ type Restaurant = {
   image?: string;
   rating?: number;
   deliveryTime?: number;
+  averageCost?: number;
   address?: string;
 };
 
@@ -68,14 +69,17 @@ export default function RestaurantGrid() {
           <div className="px-1">
             <h3 className="text-lg font-bold text-gray-900 truncate">{restaurant.name}</h3>
 
-            <div className="flex items-center gap-3 mt-1">
-              <div className="flex items-center gap-1 bg-green-600 text-white px-1.5 py-0.5 rounded text-xs font-bold">
+            <div className="flex flex-wrap items-center gap-3 mt-1">
+              <div className="flex items-center gap-1 bg-green-600 text-white px-1.5 py-0.5 rounded text-xs font-bold shrink-0">
                 <Star className="w-3 h-3 fill-white" />
                 <span>{restaurant.rating && restaurant.rating > 0 ? restaurant.rating.toFixed(1) : "New"}</span>
               </div>
-              <div className="flex items-center gap-1 text-gray-500 text-sm">
+              <div className="flex items-center gap-1 text-gray-500 text-sm shrink-0">
                 <Clock className="w-4 h-4" />
                 <span>{restaurant.deliveryTime || "30-40"} mins</span>
+              </div>
+              <div className="text-gray-500 text-sm font-medium shrink-0">
+                • ₹{restaurant.averageCost || 200} for one
               </div>
             </div>
 

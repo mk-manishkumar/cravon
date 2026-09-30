@@ -9,7 +9,7 @@ interface LocationState {
 export const useLocationStore = create<LocationState>()(
   persist(
     (set) => ({
-      city: "Delhi",
+      city: "Patna",
       setCity: (city) => set({ city }),
     }),
     {
