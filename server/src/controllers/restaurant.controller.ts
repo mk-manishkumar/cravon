@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import mongoose from "mongoose";
 import asyncHandler from "../utils/asyncHandler.js";
-import { createRestaurant, updateRestaurant, deleteRestaurant, getMyRestaurants as getMyRestaurantsService, toggleRestaurantStatus, getRestaurantById, updateRestaurantMenuPrice } from "../services/restaurant.service.js";
+import { createRestaurant, updateRestaurant, deleteRestaurant, getMyRestaurants as getMyRestaurantsService, toggleRestaurantStatus, getRestaurantById, updateRestaurantMenuItem } from "../services/restaurant.service.js";
 import { ApiError } from "../utils/errorHandler.js";
 import User from "../models/user.model.js";
 import { getTierConfig } from "../config/pricing.config.js";
@@ -84,22 +84,22 @@ export const getRestaurant = asyncHandler(async (req: Request, res: Response) =>
 });
 
 // Update a specific menu item's price
-export const updateMenuPrice = asyncHandler(async (req: Request, res: Response) => {
+export const updateMenuItem = asyncHandler(async (req: Request, res: Response) => {
   const userId = (req as any).user?.id;
   if (!userId) throw new ApiError(401, "Unauthorized");
 
   const { id } = req.params;
-  const { itemName, newPrice } = req.body;
+  const { oldItemName, updates } = req.body;
 
   if (!id) throw new ApiError(400, "Restaurant ID is required");
-  if (!itemName || newPrice === undefined) throw new ApiError(400, "Item name and new price are required");
+  if (!oldItemName || !updates) throw new ApiError(400, "Old item name and updates object are required");
   if (!mongoose.isValidObjectId(id)) throw new ApiError(400, "Invalid Restaurant ID format");
 
-  const updatedMenuItem = await updateRestaurantMenuPrice(userId, id, itemName, newPrice);
+  const updatedMenuItem = await updateRestaurantMenuItem(userId, id, oldItemName, updates);
 
   res.status(200).json({
     status: "success",
-    message: "Price updated successfully",
+    message: "Menu item updated successfully",
     data: updatedMenuItem,
   });
 });

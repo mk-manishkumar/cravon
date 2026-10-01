@@ -35,46 +35,49 @@ export default function RestaurantProfileCard({ restaurant, isOnboarded, onEdit,
                 <span className="truncate">{restaurant?.name || "Your Restaurant"}</span>
                 {restaurant?.userRole && <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider shrink-0 ${getRoleBadgeClasses(restaurant.userRole)}`}>{restaurant.userRole}</span>}
               </h2>
-              {restaurant?.franchiseName && <p className="text-[13px] font-semibold text-[#FF7A30] truncate">{restaurant.franchiseName}</p>}
+              {restaurant?.franchiseName && <p className="text-[13px] font-semibold text-[#FF7A30] truncate my-1.5">{restaurant.franchiseName}</p>}
               <div className="flex items-center gap-2 mt-1 w-full pr-1">
                 <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider shrink-0 ${isActive ? "bg-[#00C853]/10 text-[#00C853] border border-[#00C853]/20" : "bg-red-500/10 text-red-500 border border-red-500/20"}`}>{restaurant?.status || "PENDING"}</span>
                 {!isOnboarded && <span className="text-[10px] text-[#888] shrink-0">(Pending Onboarding)</span>}
-                {isOnboarded && (
-                  <Link href={`/dashboard/${restaurant._id}/orders`} className="text-[11px] font-bold text-[#FF7A30] hover:text-[#FF8A4D] hover:underline underline-offset-2 transition-all ml-auto shrink-0">
-                    View Orders
-                  </Link>
-                )}
               </div>
             </div>
           </div>
 
           {/* Actions */}
-          <div className="flex items-center gap-2 shrink-0 ml-4">
-            {restaurant?.userRole === "Owner" &&
-              (!isOnboarded ? (
-                <button type="button" onClick={onEdit} className="cursor-pointer px-4 py-2 bg-[#FF7A30]/10 text-[#FF7A30] hover:bg-[#FF7A30]/20 rounded-xl text-xs font-bold transition-all border border-[#FF7A30]/20 flex items-center gap-1.5">
-                  Complete Onboarding
-                </button>
-              ) : (
-                <>
-                  <button type="button" className="cursor-pointer p-2 bg-[#1A1A1A] border border-[#333] hover:border-[#FF7A30] hover:text-[#FF7A30] text-[#888] rounded-xl transition-all" onClick={onEdit} title="Edit Restaurant">
-                    <Pencil size={16} />
+          <div className="flex flex-col gap-3 items-end shrink-0 ml-4">
+            <div className="flex items-center gap-2">
+              {restaurant?.userRole === "Owner" &&
+                (!isOnboarded ? (
+                  <button type="button" onClick={onEdit} className="cursor-pointer px-4 py-2 bg-[#FF7A30]/10 text-[#FF7A30] hover:bg-[#FF7A30]/20 rounded-xl text-xs font-bold transition-all border border-[#FF7A30]/20 flex items-center gap-1.5">
+                    Complete Onboarding
                   </button>
-                  <button
-                    type="button"
-                    disabled={isDeleting}
-                    className="cursor-pointer p-2 bg-[#1A1A1A] border border-[#333] hover:border-red-500 hover:text-red-500 text-[#888] rounded-xl transition-all disabled:opacity-50"
-                    onClick={() => {
-                      if (confirm("Are you sure you want to delete your restaurant? This action cannot be undone.")) {
-                        onDelete();
-                      }
-                    }}
-                    title="Delete Restaurant"
-                  >
-                    <Trash2 size={16} />
-                  </button>
-                </>
-              ))}
+                ) : (
+                  <>
+                    <button type="button" className="cursor-pointer p-2 bg-[#1A1A1A] border border-[#333] hover:border-[#FF7A30] hover:text-[#FF7A30] text-[#888] rounded-xl transition-all" onClick={onEdit} title="Edit Restaurant">
+                      <Pencil size={16} />
+                    </button>
+                    <button
+                      type="button"
+                      disabled={isDeleting}
+                      className="cursor-pointer p-2 bg-[#1A1A1A] border border-[#333] hover:border-red-500 hover:text-red-500 text-[#888] rounded-xl transition-all disabled:opacity-50"
+                      onClick={() => {
+                        if (confirm("Are you sure you want to delete your restaurant? This action cannot be undone.")) {
+                          onDelete();
+                        }
+                      }}
+                      title="Delete Restaurant"
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  </>
+                ))}
+            </div>
+
+            {isOnboarded && (
+              <Link href={`/dashboard/${restaurant._id}/orders`} className="cursor-pointer px-4 py-1.5 bg-[#FF7A30]/10 text-[#FF7A30] hover:bg-[#FF7A30]/20 border border-[#FF7A30]/20 rounded-xl text-[11px] font-bold transition-all flex items-center justify-center">
+                View Orders
+              </Link>
+            )}
           </div>
         </div>
 

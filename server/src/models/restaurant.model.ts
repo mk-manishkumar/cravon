@@ -2,10 +2,14 @@ import mongoose, { Document, Schema } from 'mongoose';
 
 export interface IMenuItem {
   _id?: mongoose.Types.ObjectId;
+  category?: string;
   name: string;
   price: number;
   description?: string;
   isVeg?: boolean;
+  dietary?: string;
+  spiceLevel?: string;
+  prepTime?: string;
   image?: string;
   rating?: number;
 }
@@ -42,10 +46,14 @@ export interface IRestaurant extends Document {
 }
 
 const menuItemSchema = new Schema<IMenuItem>({
+  category: { type: String, default: "Undefined" },
   name: { type: String, required: true },
   price: { type: Number, required: true },
   description: { type: String },
   isVeg: { type: Boolean },
+  dietary: { type: String },
+  spiceLevel: { type: String },
+  prepTime: { type: String },
   image: { type: String },
   rating: { type: Number, default: 0 }
 });

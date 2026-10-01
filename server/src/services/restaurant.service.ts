@@ -1,28 +1,28 @@
 import Restaurant from "../models/restaurant.model.js";
 import { ApiError } from "../utils/errorHandler.js";
-
 import RestaurantStaff from "../models/restaurantStaff.model.js";
 
 // Get all restaurants for the logged-in user (owned or staff)
 export const getMyRestaurants = async (userId: string) => {
   const ownedRestaurants = await Restaurant.find({ ownerId: userId }).lean();
-  
-  const staffRecords = await RestaurantStaff.find({ userId, status: "active" });
-  const staffRestaurantIds = staffRecords.map(record => record.restaurantId);
-  
+
+  const staffRecords: Array<{ restaurantId: string | { toString(): string }; role?: string }> =
+    await RestaurantStaff.find({ userId, status: "active" }).lean();
+  const staffRestaurantIds: string[] = staffRecords.map((record) => record.restaurantId.toString());
+
   const staffRestaurants = await Restaurant.find({ _id: { $in: staffRestaurantIds } }).lean();
-  
+
   // Combine and deduplicate, attaching the user's role
-  const allRestaurants = ownedRestaurants.map(r => ({ ...r, userRole: "Owner" }));
-  const ownedIds = new Set(ownedRestaurants.map(r => r._id.toString()));
-  
+  const allRestaurants = ownedRestaurants.map((r) => ({ ...r, userRole: "Owner" }));
+  const ownedIds = new Set(ownedRestaurants.map((r) => r._id.toString()));
+
   for (const r of staffRestaurants) {
     if (!ownedIds.has(r._id.toString())) {
-      const staffRecord = staffRecords.find(sr => sr.restaurantId.toString() === r._id.toString());
+      const staffRecord = staffRecords.find((sr) => sr.restaurantId.toString() === r._id.toString());
       allRestaurants.push({ ...r, userRole: staffRecord?.role || "Staff" });
     }
   }
-  
+
   return allRestaurants;
 };
 
@@ -109,11 +109,11 @@ export const deleteRestaurant = async (ownerId: string, restaurantId: string) =>
 };
 
 // Toggle the active/inactive status of a specific restaurant
-export const toggleRestaurantStatus = async (ownerId: string, restaurantId: string, status: 'active' | 'inactive') => {
+export const toggleRestaurantStatus = async (ownerId: string, restaurantId: string, status: "active" | "inactive") => {
   const restaurant = await Restaurant.findOne({ _id: restaurantId, ownerId });
   if (!restaurant) throw new ApiError(404, "Restaurant not found");
-  
-  if (restaurant.status === 'pending') {
+
+  if (restaurant.status === "pending") {
     throw new ApiError(400, "Cannot change status of a pending restaurant. Please complete onboarding first.");
   }
 
@@ -123,32 +123,38 @@ export const toggleRestaurantStatus = async (ownerId: string, restaurantId: stri
   return restaurant;
 };
 
-// Update a specific menu item's price
-export const updateRestaurantMenuPrice = async (userId: string, restaurantId: string, itemName: string, newPrice: number) => {
+// Update a specific menu item
+export const updateRestaurantMenuItem = async (userId: string, restaurantId: string, oldItemName: string, updates: { name?: string; price?: number; description?: string; dietary?: string }) => {
   const restaurant = await Restaurant.findById(restaurantId);
   if (!restaurant) throw new ApiError(404, "Restaurant not found");
 
   const isOwner = restaurant.ownerId.toString() === userId.toString();
-
   if (!isOwner) {
-    const { default: RestaurantStaff } = await import("../models/restaurantStaff.model.js");
-    const staffRecord = await RestaurantStaff.findOne({ userId, restaurantId, status: "active" });
+    const staff = await RestaurantStaff.findOne({ userId, restaurantId, status: "active" });
 
-    if (!staffRecord) throw new ApiError(403, "You do not have access to this restaurant");
+    if (!staff) throw new ApiError(403, "You do not have access to this restaurant");
 
-    if (staffRecord.role !== "Owner") {
-      if (!staffRecord.permissions.includes("edit_price")) {
-        throw new ApiError(403, "You do not have permission to edit prices");
-      }
-    }
+    const canEditMenu = staff.role === "Owner" || staff.permissions.includes("edit_price");
+    if (!canEditMenu) throw new ApiError(403, "You do not have permission to edit menu items");
   }
 
   if (!restaurant.menu) throw new ApiError(404, "Menu not found");
 
-  const itemIndex = restaurant.menu.findIndex((item) => item.name === itemName);
+  const itemIndex = restaurant.menu.findIndex((item) => item.name === oldItemName);
   if (itemIndex === -1) throw new ApiError(404, "Menu item not found");
 
-  restaurant.menu[itemIndex].price = Number(newPrice);
+  const currentItem = restaurant.menu[itemIndex];
+  const { name, price, description, dietary } = updates;
+
+  if (name !== undefined) currentItem.name = name;
+  if (price !== undefined) currentItem.price = Number(price);
+  if (description !== undefined) currentItem.description = description;
+
+  if (dietary !== undefined) {
+    currentItem.dietary = dietary;
+    if (dietary === "Veg") currentItem.isVeg = true;
+    else if (dietary === "Non-Veg") currentItem.isVeg = false;
+  }
 
   restaurant.markModified("menu");
   await restaurant.save();

@@ -37,9 +37,9 @@ export const restaurantService = {
     return response.data;
   },
 
-  // Update a specific menu item's price
-  updateMenuPrice: async (id: string, itemName: string, newPrice: number) => {
-    const response = await api.patch(`/restaurants/${id}/menu/price`, { itemName, newPrice });
+  // Update a specific menu item
+  updateMenuItem: async (id: string, oldItemName: string, updates: { name?: string; price?: number; description?: string; dietary?: string }) => {
+    const response = await api.patch(`/restaurants/${id}/menu/item`, { oldItemName, updates });
     return response.data;
   },
 };
