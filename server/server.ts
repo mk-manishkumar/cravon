@@ -12,7 +12,7 @@ import publicRoutes from "./src/routes/public.routes.js";
 import orderRoutes from "./src/routes/order.routes.js";
 import driverRoutes from "./src/routes/driver.routes.js";
 import { errorHandler } from "./src/utils/errorHandler.js";
-import { globalLimiter } from "./src/middlewares/rateLimiter.middleware.js";
+import { globalLimiter, partnerLimiter, customerLimiter } from "./src/middlewares/rateLimiter.middleware.js";
 
 const app: Application = express();
 
@@ -44,11 +44,11 @@ app.use(express.urlencoded({ extended: true }));
 //  ROUTES
 app.use("/api", globalLimiter);
 app.use("/api/v1/auth", authRoutes);
-app.use("/api/v1/restaurants", restaurantRoutes);
+app.use("/api/v1/restaurants", partnerLimiter, restaurantRoutes);
 app.use("/api/v1/upload", uploadRoutes);
 app.use("/api/v1/payments", paymentRoutes);
-app.use("/api/v1/staff", staffRoutes);
-app.use("/api/v1/public", publicRoutes);
+app.use("/api/v1/staff", partnerLimiter, staffRoutes);
+app.use("/api/v1/public", customerLimiter, publicRoutes);
 app.use("/api/v1/orders", orderRoutes);
 app.use("/api/v1/driver", driverRoutes);
 

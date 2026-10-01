@@ -39,3 +39,23 @@ export const paymentLimiter = rateLimit({
     message: `Too many payment requests from this IP, please try again after ${windowMsg}`,
   },
 });
+
+// Rate limiter for partners
+export const partnerLimiter = rateLimit({
+  ...baseConfig,
+  max: Number.parseInt(process.env.RATE_LIMIT_PARTNER || "1000", 10),
+  message: {
+    status: "error",
+    message: `Too many partner API requests from this IP, please try again after ${windowMsg}`,
+  },
+});
+
+// Rate limiter for customers
+export const customerLimiter = rateLimit({
+  ...baseConfig,
+  max: Number.parseInt(process.env.RATE_LIMIT_CUSTOMER || "1000", 10),
+  message: {
+    status: "error",
+    message: `Too many customer API requests from this IP, please try again after ${windowMsg}`,
+  },
+});
