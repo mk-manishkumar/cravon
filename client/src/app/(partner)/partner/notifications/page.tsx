@@ -14,6 +14,8 @@ export default function PartnerNotificationsPage() {
       return res.data?.data || [];
     },
     refetchInterval: 15000,
+    staleTime: 60 * 1000, // 1 minute
+    gcTime: 5 * 60 * 1000, // 5 minutes
   });
 
   const getOrderStatusClasses = (orderStatus: string) => {

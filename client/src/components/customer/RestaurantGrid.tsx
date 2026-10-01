@@ -1,6 +1,6 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { publicService } from "@/services/public.service";
 import { Star, Clock } from "lucide-react";
 import { useLocationStore } from "@/store/locationStore";
@@ -19,6 +19,7 @@ type Restaurant = {
 
 export default function RestaurantGrid() {
   const city = useLocationStore((state) => state.city);
+  const queryClient = useQueryClient();
 
   const {
     data: restaurants,
@@ -28,6 +29,14 @@ export default function RestaurantGrid() {
     queryKey: ["active-restaurants", city],
     queryFn: () => publicService.getActiveRestaurants(city),
   });
+
+  const handlePrefetch = (id: string) => {
+    void queryClient.prefetchQuery({
+      queryKey: ["restaurant", id],
+      queryFn: () => publicService.getRestaurantById(id),
+      staleTime: 10 * 60 * 1000,
+    });
+  };
 
   if (isLoading) {
     return (
@@ -59,7 +68,7 @@ export default function RestaurantGrid() {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
       {restaurants.map((restaurant) => (
-        <Link key={restaurant._id} href={`/restaurants/${restaurant._id}`} className="group cursor-pointer flex flex-col gap-3">
+        <Link key={restaurant._id} href={`/restaurants/${restaurant._id}`} onMouseEnter={() => handlePrefetch(restaurant._id)} className="group cursor-pointer flex flex-col gap-3">
           <div className="relative h-48 w-full rounded-2xl overflow-hidden shadow-sm">
             {restaurant.image ? <Image src={restaurant.image} alt={restaurant.name} fill sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw" className="object-cover group-hover:scale-105 transition-transform duration-300" /> : <div className="w-full h-full bg-gray-100 flex items-center justify-center text-gray-400 group-hover:scale-105 transition-transform duration-300">No Image</div>}
 
@@ -78,9 +87,7 @@ export default function RestaurantGrid() {
                 <Clock className="w-4 h-4" />
                 <span>{restaurant.deliveryTime || "30-40"} mins</span>
               </div>
-              <div className="text-gray-500 text-sm font-medium shrink-0">
-                • ₹{restaurant.averageCost || 200} for one
-              </div>
+              <div className="text-gray-500 text-sm font-medium shrink-0">• ₹{restaurant.averageCost || 200} for one</div>
             </div>
 
             <p className="text-gray-500 text-sm mt-1 truncate">{restaurant.address || "Local Area"}</p>

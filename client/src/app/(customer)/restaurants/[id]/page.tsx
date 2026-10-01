@@ -31,6 +31,8 @@ export default function RestaurantPage() {
     queryKey: ["restaurant", params.id],
     queryFn: () => publicService.getRestaurantById(params.id as string),
     enabled: !!params.id,
+    staleTime: 10 * 60 * 1000, // 10 minutes
+    gcTime: 30 * 60 * 1000, // Keep in cache for 30 minutes
   });
 
   // Auto-add logic for guests returning from login
