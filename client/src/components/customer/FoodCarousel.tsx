@@ -60,8 +60,26 @@ export default function FoodCarousel({ title, filter }: FoodCarouselProps) {
 
   if (isLoading) {
     return (
-      <div className="w-full h-48 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500"></div>
+      <div className="mb-12 relative">
+        <div className="flex justify-between items-center mb-6 px-6 max-w-7xl mx-auto">
+          <h2 className="text-2xl font-bold text-gray-900">{title}</h2>
+          <div className="hidden md:flex gap-2">
+            <div className="w-10 h-10 rounded-full bg-gray-100 animate-pulse"></div>
+            <div className="w-10 h-10 rounded-full bg-gray-100 animate-pulse"></div>
+          </div>
+        </div>
+        <div className="flex overflow-x-hidden gap-6 px-6 pb-6 max-w-7xl mx-auto">
+          {[1, 2, 3, 4, 5].map((id) => (
+            <div key={id} className="shrink-0 w-65 bg-white border border-gray-100 rounded-2xl shadow-sm flex flex-col overflow-hidden animate-pulse">
+              <div className="w-full h-40 bg-gray-200"></div>
+              <div className="p-4 flex flex-col grow">
+                <div className="h-5 bg-gray-200 rounded-md w-3/4 mb-2"></div>
+                <div className="h-4 bg-gray-200 rounded-md w-1/4 mb-4"></div>
+                <div className="h-3 bg-gray-200 rounded-md w-1/2 mt-auto"></div>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     );
   }

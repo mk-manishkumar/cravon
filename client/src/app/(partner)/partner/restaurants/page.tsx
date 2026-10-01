@@ -89,15 +89,35 @@ export default function PartnerRestaurantsPage() {
 
   const toggleStatusMutation = useMutation({
     mutationFn: ({ id, status }: { id: string; status: "active" | "inactive" }) => restaurantService.toggleStatus(id, status),
+    onMutate: async ({ id, status }) => {
+      await queryClient.cancelQueries({ queryKey: ["myRestaurants"] });
+      const previousRestaurants = queryClient.getQueryData(["myRestaurants"]);
+      
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      queryClient.setQueryData(["myRestaurants"], (old: any) => {
+        if (!old) return old;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        return old.map((r: any) => 
+          r._id === id ? { ...r, status } : r
+        );
+      });
+      
+      return { previousRestaurants };
+    },
     onSuccess: (data) => {
       toast.success(data.message || "Restaurant status updated");
-      queryClient.invalidateQueries({ queryKey: ["myRestaurants"] });
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    onError: (error: any) => {
+    onError: (error: any, variables, context: any) => {
+      if (context?.previousRestaurants) {
+        queryClient.setQueryData(["myRestaurants"], context.previousRestaurants);
+      }
       console.error(error);
       const message = error.response?.data?.message || error.message || "Failed to update status";
       toast.error(`Status update failed: ${message}`);
+    },
+    onSettled: () => {
+      void queryClient.invalidateQueries({ queryKey: ["myRestaurants"] });
     },
   });
 

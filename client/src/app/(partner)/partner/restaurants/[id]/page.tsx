@@ -1,6 +1,6 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { restaurantService } from "@/services/restaurant.service";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
@@ -9,6 +9,7 @@ import RestaurantMenuDisplay from "../components/RestaurantMenuDisplay";
 
 export default function RestaurantMenuPage({ params }: { readonly params: Promise<{ readonly id: string }> }) {
   const unwrappedParams = React.use(params);
+  const queryClient = useQueryClient();
   
   const { data: restaurant, isLoading } = useQuery({
     queryKey: ["restaurant", unwrappedParams.id],
@@ -16,9 +17,16 @@ export default function RestaurantMenuPage({ params }: { readonly params: Promis
       const response = await restaurantService.getRestaurantById(unwrappedParams.id);
       return response.data;
     },
+    staleTime: 5 * 60 * 1000,
+    initialData: () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const myRestaurants = queryClient.getQueryData<any[]>(["myRestaurants"]);
+      if (myRestaurants) return myRestaurants.find(r => r._id === unwrappedParams.id);
+      return undefined;
+    }
   });
 
-  if (isLoading) {
+  if (isLoading && !restaurant) {
     return (
       <div className="flex-1 flex items-center justify-center min-h-screen">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#FF7A30]"></div>

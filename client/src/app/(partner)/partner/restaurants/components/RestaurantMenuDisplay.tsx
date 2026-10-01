@@ -38,14 +38,34 @@ export default function RestaurantMenuDisplay({ menu, restaurantId }: Props) {
       if (!restaurantId) throw new Error("No restaurant ID");
       return await restaurantService.updateMenuItem(restaurantId, itemName, updates);
     },
+    onMutate: async ({ itemName, updates }) => {
+      if (!restaurantId) return;
+      await queryClient.cancelQueries({ queryKey: ["restaurant", restaurantId] });
+      const previousRestaurant = queryClient.getQueryData(["restaurant", restaurantId]);
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      queryClient.setQueryData(["restaurant", restaurantId], (old: any) => {
+        if (!old?.menu) return old;
+        return {
+          ...old,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          menu: old.menu.map((item: any) =>
+            item.name === itemName ? { ...item, ...updates } : item
+          ),
+        };
+      });
+
+      return { previousRestaurant };
+    },
     onSuccess: () => {
       toast.success("Menu item updated successfully!");
       setEditingItem(null);
-      if (restaurantId) {
-        void queryClient.invalidateQueries({ queryKey: ["restaurant", restaurantId] });
-      }
     },
-    onError: (error: unknown) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    onError: (error: unknown, variables, context: any) => {
+      if (context?.previousRestaurant && restaurantId) {
+        queryClient.setQueryData(["restaurant", restaurantId], context.previousRestaurant);
+      }
       let msg = "Failed to update menu item";
       if (axios.isAxiosError(error) && error.response?.data?.message) {
         msg = error.response.data.message;
@@ -53,6 +73,11 @@ export default function RestaurantMenuDisplay({ menu, restaurantId }: Props) {
         msg = error.message;
       }
       toast.error(msg);
+    },
+    onSettled: () => {
+      if (restaurantId) {
+        void queryClient.invalidateQueries({ queryKey: ["restaurant", restaurantId] });
+      }
     },
   });
 
@@ -94,21 +119,8 @@ export default function RestaurantMenuDisplay({ menu, restaurantId }: Props) {
         <span className="text-sm text-[#888] bg-[#1A1A1A] px-3 py-1 rounded-full border border-[#333]">{menu.length} Items</span>
       </div>
 
-      <div className="space-y-8">
-        {Object.entries(
-          (menu as RestaurantMenuItem[]).reduce(
-            (acc, item) => {
-              if (!acc[item.category]) acc[item.category] = [];
-              acc[item.category].push(item);
-              return acc;
-            },
-            {} as Record<string, RestaurantMenuItem[]>,
-          ),
-        ).map(([category, items]) => (
-          <div key={category} className="space-y-4">
-            <h4 className="text-[13px] font-bold uppercase tracking-widest text-[#FF7A30] border-b border-[#222] pb-2">{category}</h4>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {items.map((item) => (
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {(menu as RestaurantMenuItem[]).map((item) => (
                 <div key={item.name} className="bg-[#1A1A1A] border border-[#2A2A2A] rounded-xl p-4 hover:border-[#FF7A30]/50 transition-colors group">
                   {editingItem === item.name ? (
                     <div className="flex flex-col gap-3">
@@ -163,9 +175,6 @@ export default function RestaurantMenuDisplay({ menu, restaurantId }: Props) {
                 </div>
               ))}
             </div>
-          </div>
-        ))}
-      </div>
     </div>
   );
 }

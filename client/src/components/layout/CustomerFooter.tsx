@@ -22,7 +22,7 @@ export default function CustomerFooter() {
 
           {/* Apply for Partner Link */}
           <div className="flex flex-col items-center md:items-end">
-            <Link href="/partner/register" className="text-[15px] font-bold text-white bg-linear-to-r from-[#FF3D57] to-[#FF7A30] hover:from-[#E22B45] hover:to-[#E06020] px-8 py-3 rounded-full shadow-md transition-all active:scale-95">
+            <Link href="/auth/restaurant/register" className="text-[15px] font-bold text-white bg-linear-to-r from-[#FF3D57] to-[#FF7A30] hover:from-[#E22B45] hover:to-[#E06020] px-8 py-3 rounded-full shadow-md transition-all active:scale-95">
               Apply for Partner
             </Link>
           </div>

@@ -37,14 +37,34 @@ export default function RestaurantOrdersPage() {
       const res = await api.put(`/orders/${id}/status`, { status });
       return res.data;
     },
+    onMutate: async ({ id, status }) => {
+      await queryClient.cancelQueries({ queryKey: ["restaurantOrders", restaurantId] });
+      const previousOrders = queryClient.getQueryData(["restaurantOrders", restaurantId]);
+      
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      queryClient.setQueryData(["restaurantOrders", restaurantId], (old: any) => {
+        if (!old) return old;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        return old.map((order: any) => 
+          order._id === id ? { ...order, orderStatus: status } : order
+        );
+      });
+      
+      return { previousOrders };
+    },
     onSuccess: (data) => {
       toast.success(data.message || "Order updated");
-      queryClient.invalidateQueries({ queryKey: ["restaurantOrders", restaurantId] });
-      queryClient.invalidateQueries({ queryKey: ["partnerNotifications"] });
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    onError: (error: any) => {
+    onError: (error: any, variables, context: any) => {
+      if (context?.previousOrders) {
+        queryClient.setQueryData(["restaurantOrders", restaurantId], context.previousOrders);
+      }
       toast.error(error.response?.data?.message || "Failed to update order");
+    },
+    onSettled: () => {
+      void queryClient.invalidateQueries({ queryKey: ["restaurantOrders", restaurantId] });
+      void queryClient.invalidateQueries({ queryKey: ["partnerNotifications"] });
     },
   });
 
