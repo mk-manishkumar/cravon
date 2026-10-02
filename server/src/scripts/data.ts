@@ -11,7 +11,7 @@ export const MOCK_RESTAURANTS = [
     isOnboarded: true,
     operatingDays: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
     menu: [
-      { name: 'Dal Bukhara', price: 403, description: 'Signature North Indian dish.', isVeg: false, image: 'https://images.unsplash.com/photo-1546833999-b9f581a1996d?q=80&w=800&auto=format&fit=crop' },
+      { name: 'Dal Bukhara', price: 403, description: 'Signature North Indian dish.', isVeg: false, image: 'https://images.unsplash.com/photo-1668236543090-82eba5ee5976?q=80&w=800&auto=format&fit=crop' },
       { name: 'Chef Special', price: 448, description: 'Highly recommended by the chef.', isVeg: true, image: 'https://images.unsplash.com/photo-1550547660-d9450f859349?q=80&w=800&auto=format&fit=crop' },
       { name: 'Refreshing Beverage', price: 73, description: 'Cold drink to go with your meal.', isVeg: true }
     ]
@@ -27,7 +27,7 @@ export const MOCK_RESTAURANTS = [
     isOnboarded: true,
     operatingDays: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
     menu: [
-      { name: 'Blue Cheese Naan', price: 225, description: 'Signature Modern Indian dish.', isVeg: false, image: 'https://images.unsplash.com/photo-1546833999-b9f581a1996d?q=80&w=800&auto=format&fit=crop' },
+      { name: 'Blue Cheese Naan', price: 225, description: 'Signature Modern Indian dish.', isVeg: false, image: 'https://images.unsplash.com/photo-1668236543090-82eba5ee5976?q=80&w=800&auto=format&fit=crop' },
       { name: 'Chef Special', price: 395, description: 'Highly recommended by the chef.', isVeg: true, image: 'https://images.unsplash.com/photo-1550547660-d9450f859349?q=80&w=800&auto=format&fit=crop' },
       { name: 'Refreshing Beverage', price: 104, description: 'Cold drink to go with your meal.', isVeg: true }
     ]
@@ -43,7 +43,7 @@ export const MOCK_RESTAURANTS = [
     isOnboarded: true,
     operatingDays: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
     menu: [
-      { name: 'Mutton Nihari', price: 288, description: 'Signature Mughlai dish.', isVeg: true, image: 'https://images.unsplash.com/photo-1546833999-b9f581a1996d?q=80&w=800&auto=format&fit=crop' },
+      { name: 'Mutton Nihari', price: 288, description: 'Signature Mughlai dish.', isVeg: true, image: 'https://images.unsplash.com/photo-1668236543090-82eba5ee5976?q=80&w=800&auto=format&fit=crop' },
       { name: 'Chef Special', price: 483, description: 'Highly recommended by the chef.', isVeg: true, image: 'https://images.unsplash.com/photo-1550547660-d9450f859349?q=80&w=800&auto=format&fit=crop' },
       { name: 'Refreshing Beverage', price: 53, description: 'Cold drink to go with your meal.', isVeg: true }
     ]
@@ -59,7 +59,7 @@ export const MOCK_RESTAURANTS = [
     isOnboarded: true,
     operatingDays: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
     menu: [
-      { name: 'Butter Chicken', price: 153, description: 'Signature North Indian dish.', isVeg: true, image: 'https://images.unsplash.com/photo-1546833999-b9f581a1996d?q=80&w=800&auto=format&fit=crop' },
+      { name: 'Butter Chicken', price: 153, description: 'Signature North Indian dish.', isVeg: true, image: 'https://images.unsplash.com/photo-1668236543090-82eba5ee5976?q=80&w=800&auto=format&fit=crop' },
       { name: 'Chef Special', price: 434, description: 'Highly recommended by the chef.', isVeg: true, image: 'https://images.unsplash.com/photo-1550547660-d9450f859349?q=80&w=800&auto=format&fit=crop' },
       { name: 'Refreshing Beverage', price: 144, description: 'Cold drink to go with your meal.', isVeg: true }
     ]
@@ -75,7 +75,7 @@ export const MOCK_RESTAURANTS = [
     isOnboarded: true,
     operatingDays: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
     menu: [
-      { name: 'Masala Dosa', price: 182, description: 'Signature South Indian dish.', isVeg: true, image: 'https://images.unsplash.com/photo-1546833999-b9f581a1996d?q=80&w=800&auto=format&fit=crop' },
+      { name: 'Masala Dosa', price: 182, description: 'Signature South Indian dish.', isVeg: true, image: 'https://images.unsplash.com/photo-1668236543090-82eba5ee5976?q=80&w=800&auto=format&fit=crop' },
       { name: 'Chef Special', price: 373, description: 'Highly recommended by the chef.', isVeg: true, image: 'https://images.unsplash.com/photo-1550547660-d9450f859349?q=80&w=800&auto=format&fit=crop' },
       { name: 'Refreshing Beverage', price: 85, description: 'Cold drink to go with your meal.', isVeg: true }
     ]
@@ -91,7 +91,7 @@ export const MOCK_RESTAURANTS = [
     isOnboarded: true,
     operatingDays: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
     menu: [
-      { name: 'Penne Vodka', price: 284, description: 'Signature Italian dish.', isVeg: true, image: 'https://images.unsplash.com/photo-1546833999-b9f581a1996d?q=80&w=800&auto=format&fit=crop' },
+      { name: 'Penne Vodka', price: 284, description: 'Signature Italian dish.', isVeg: true, image: 'https://images.unsplash.com/photo-1668236543090-82eba5ee5976?q=80&w=800&auto=format&fit=crop' },
       { name: 'Chef Special', price: 233, description: 'Highly recommended by the chef.', isVeg: true, image: 'https://images.unsplash.com/photo-1550547660-d9450f859349?q=80&w=800&auto=format&fit=crop' },
       { name: 'Refreshing Beverage', price: 54, description: 'Cold drink to go with your meal.', isVeg: true }
     ]
@@ -107,7 +107,7 @@ export const MOCK_RESTAURANTS = [
     isOnboarded: true,
     operatingDays: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
     menu: [
-      { name: 'Paneer Tikka', price: 434, description: 'Signature North Indian dish.', isVeg: true, image: 'https://images.unsplash.com/photo-1546833999-b9f581a1996d?q=80&w=800&auto=format&fit=crop' },
+      { name: 'Paneer Tikka', price: 434, description: 'Signature North Indian dish.', isVeg: true, image: 'https://images.unsplash.com/photo-1668236543090-82eba5ee5976?q=80&w=800&auto=format&fit=crop' },
       { name: 'Chef Special', price: 408, description: 'Highly recommended by the chef.', isVeg: true, image: 'https://images.unsplash.com/photo-1550547660-d9450f859349?q=80&w=800&auto=format&fit=crop' },
       { name: 'Refreshing Beverage', price: 119, description: 'Cold drink to go with your meal.', isVeg: true }
     ]
@@ -123,7 +123,7 @@ export const MOCK_RESTAURANTS = [
     isOnboarded: true,
     operatingDays: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
     menu: [
-      { name: 'Chicken Curry', price: 406, description: 'Signature North Indian dish.', isVeg: true, image: 'https://images.unsplash.com/photo-1546833999-b9f581a1996d?q=80&w=800&auto=format&fit=crop' },
+      { name: 'Chicken Curry', price: 406, description: 'Signature North Indian dish.', isVeg: true, image: 'https://images.unsplash.com/photo-1668236543090-82eba5ee5976?q=80&w=800&auto=format&fit=crop' },
       { name: 'Chef Special', price: 410, description: 'Highly recommended by the chef.', isVeg: true, image: 'https://images.unsplash.com/photo-1550547660-d9450f859349?q=80&w=800&auto=format&fit=crop' },
       { name: 'Refreshing Beverage', price: 130, description: 'Cold drink to go with your meal.', isVeg: true }
     ]
@@ -140,7 +140,7 @@ export const MOCK_RESTAURANTS = [
     isOnboarded: true,
     operatingDays: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
     menu: [
-      { name: 'Fully Loaded Nachos', price: 238, description: 'Signature Continental dish.', isVeg: false, image: 'https://images.unsplash.com/photo-1546833999-b9f581a1996d?q=80&w=800&auto=format&fit=crop' },
+      { name: 'Fully Loaded Nachos', price: 238, description: 'Signature Continental dish.', isVeg: false, image: 'https://images.unsplash.com/photo-1668236543090-82eba5ee5976?q=80&w=800&auto=format&fit=crop' },
       { name: 'Chef Special', price: 307, description: 'Highly recommended by the chef.', isVeg: true, image: 'https://images.unsplash.com/photo-1550547660-d9450f859349?q=80&w=800&auto=format&fit=crop' },
       { name: 'Refreshing Beverage', price: 110, description: 'Cold drink to go with your meal.', isVeg: true }
     ]
@@ -156,7 +156,7 @@ export const MOCK_RESTAURANTS = [
     isOnboarded: true,
     operatingDays: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
     menu: [
-      { name: 'Dal Chawal Arancini', price: 231, description: 'Signature Modern Indian dish.', isVeg: true, image: 'https://images.unsplash.com/photo-1546833999-b9f581a1996d?q=80&w=800&auto=format&fit=crop' },
+      { name: 'Dal Chawal Arancini', price: 231, description: 'Signature Modern Indian dish.', isVeg: true, image: 'https://images.unsplash.com/photo-1668236543090-82eba5ee5976?q=80&w=800&auto=format&fit=crop' },
       { name: 'Chef Special', price: 442, description: 'Highly recommended by the chef.', isVeg: true, image: 'https://images.unsplash.com/photo-1550547660-d9450f859349?q=80&w=800&auto=format&fit=crop' },
       { name: 'Refreshing Beverage', price: 137, description: 'Cold drink to go with your meal.', isVeg: true }
     ]
@@ -172,7 +172,7 @@ export const MOCK_RESTAURANTS = [
     isOnboarded: true,
     operatingDays: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
     menu: [
-      { name: 'Khao Suey', price: 326, description: 'Signature Asian dish.', isVeg: true, image: 'https://images.unsplash.com/photo-1546833999-b9f581a1996d?q=80&w=800&auto=format&fit=crop' },
+      { name: 'Khao Suey', price: 326, description: 'Signature Asian dish.', isVeg: true, image: 'https://images.unsplash.com/photo-1668236543090-82eba5ee5976?q=80&w=800&auto=format&fit=crop' },
       { name: 'Chef Special', price: 335, description: 'Highly recommended by the chef.', isVeg: true, image: 'https://images.unsplash.com/photo-1550547660-d9450f859349?q=80&w=800&auto=format&fit=crop' },
       { name: 'Refreshing Beverage', price: 108, description: 'Cold drink to go with your meal.', isVeg: true }
     ]
@@ -188,7 +188,7 @@ export const MOCK_RESTAURANTS = [
     isOnboarded: true,
     operatingDays: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
     menu: [
-      { name: 'Sweet Corn Khichdi', price: 157, description: 'Signature Indian dish.', isVeg: true, image: 'https://images.unsplash.com/photo-1546833999-b9f581a1996d?q=80&w=800&auto=format&fit=crop' },
+      { name: 'Sweet Corn Khichdi', price: 157, description: 'Signature Indian dish.', isVeg: true, image: 'https://images.unsplash.com/photo-1668236543090-82eba5ee5976?q=80&w=800&auto=format&fit=crop' },
       { name: 'Chef Special', price: 249, description: 'Highly recommended by the chef.', isVeg: true, image: 'https://images.unsplash.com/photo-1550547660-d9450f859349?q=80&w=800&auto=format&fit=crop' },
       { name: 'Refreshing Beverage', price: 145, description: 'Cold drink to go with your meal.', isVeg: true }
     ]
@@ -204,7 +204,7 @@ export const MOCK_RESTAURANTS = [
     isOnboarded: true,
     operatingDays: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
     menu: [
-      { name: 'Wood Fired Pizza', price: 415, description: 'Signature Italian dish.', isVeg: false, image: 'https://images.unsplash.com/photo-1546833999-b9f581a1996d?q=80&w=800&auto=format&fit=crop' },
+      { name: 'Wood Fired Pizza', price: 415, description: 'Signature Italian dish.', isVeg: false, image: 'https://images.unsplash.com/photo-1668236543090-82eba5ee5976?q=80&w=800&auto=format&fit=crop' },
       { name: 'Chef Special', price: 467, description: 'Highly recommended by the chef.', isVeg: true, image: 'https://images.unsplash.com/photo-1550547660-d9450f859349?q=80&w=800&auto=format&fit=crop' },
       { name: 'Refreshing Beverage', price: 62, description: 'Cold drink to go with your meal.', isVeg: true }
     ]
@@ -220,7 +220,7 @@ export const MOCK_RESTAURANTS = [
     isOnboarded: true,
     operatingDays: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
     menu: [
-      { name: 'Sushi Platter', price: 294, description: 'Signature Asian dish.', isVeg: true, image: 'https://images.unsplash.com/photo-1546833999-b9f581a1996d?q=80&w=800&auto=format&fit=crop' },
+      { name: 'Sushi Platter', price: 294, description: 'Signature Asian dish.', isVeg: true, image: 'https://images.unsplash.com/photo-1668236543090-82eba5ee5976?q=80&w=800&auto=format&fit=crop' },
       { name: 'Chef Special', price: 358, description: 'Highly recommended by the chef.', isVeg: true, image: 'https://images.unsplash.com/photo-1550547660-d9450f859349?q=80&w=800&auto=format&fit=crop' },
       { name: 'Refreshing Beverage', price: 115, description: 'Cold drink to go with your meal.', isVeg: true }
     ]

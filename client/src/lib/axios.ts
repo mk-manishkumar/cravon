@@ -11,6 +11,22 @@ const api = axios.create({
 
 api.interceptors.request.use(
   (config) => {
+    if (typeof window !== "undefined") {
+      const currentPath = window.location.pathname;
+      let token = null;
+
+      if (currentPath.startsWith("/partner") || currentPath.startsWith("/dashboard") || currentPath.startsWith("/staff")) {
+        token = localStorage.getItem("partner_token");
+      } else if (currentPath.startsWith("/admin")) {
+        token = localStorage.getItem("admin_token");
+      } else {
+        token = localStorage.getItem("customer_token");
+      }
+
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
+    }
     return config;
   },
   (error) => Promise.reject(error),

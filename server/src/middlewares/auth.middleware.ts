@@ -7,8 +7,13 @@ import RestaurantStaff from "../models/restaurantStaff.model.js";
 
 export const verifyJWT = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const token = req.cookies?.accessToken;
-    if (!token) throw new ApiError(401, "Unauthorized request: No access token found in cookies");
+    let token = req.cookies?.accessToken;
+    
+    if (req.headers.authorization?.startsWith("Bearer ")) {
+      token = req.headers.authorization.split(" ")[1];
+    }
+
+    if (!token) throw new ApiError(401, "Unauthorized request: No access token found in cookies or headers");
 
     const decodedToken = jwt.verify(token, process.env.JWT_ACCESS_SECRET as string) as { id: string };
 

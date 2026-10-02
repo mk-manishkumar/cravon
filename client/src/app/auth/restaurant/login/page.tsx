@@ -28,10 +28,12 @@ function RestaurantLoginContent() {
     setIsLoading(true);
 
     try {
-      await authService.loginRestaurant({ email, password });
+      const response = await authService.loginRestaurant({ email, password });
+      if (response?.token) localStorage.setItem("partner_token", response.token);
+
       await useAuthStore.getState().checkAuth();
       toast.success("Welcome back, partner!");
-      
+
       if (redirectPath) {
         router.push(redirectPath);
       } else {
@@ -91,9 +93,14 @@ function RestaurantLoginContent() {
               <input id="password" name="password" type={showPassword ? "text" : "password"} required autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} className="w-full px-4 py-3 pr-11 bg-[#1A1A1A] border border-[#2A2A2A] rounded-xl text-[14px] text-white placeholder:text-[#555555] outline-none transition-all focus:bg-[#222222] focus:border-[#FF7A30] focus:ring-1 focus:ring-[#FF7A30]" />
               <button type="button" onClick={() => setShowPassword((v) => !v)} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[#555555] hover:text-white transition-colors cursor-pointer">
                 {showPassword ? (
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6"><path d="M3 3l18 18M10.6 10.6a2 2 0 002.8 2.8M9.3 5.3A9.6 9.6 0 0112 5c5.4 0 9 5 9 7-1.06 1.6-2.34 3.16-3.98 4.36M6.6 6.6C4.6 7.9 3 10.1 3 12c0 2 3.6 7 9 7 1.1 0 2.14-.2 3.1-.56" strokeLinecap="round" strokeLinejoin="round" /></svg>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
+                    <path d="M3 3l18 18M10.6 10.6a2 2 0 002.8 2.8M9.3 5.3A9.6 9.6 0 0112 5c5.4 0 9 5 9 7-1.06 1.6-2.34 3.16-3.98 4.36M6.6 6.6C4.6 7.9 3 10.1 3 12c0 2 3.6 7 9 7 1.1 0 2.14-.2 3.1-.56" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
                 ) : (
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6"><path d="M3 12c0-2 3.6-7 9-7s9 5 9 7-3.6 7-9 7-9-5-9-7z" strokeLinecap="round" strokeLinejoin="round" /><circle cx="12" cy="12" r="2.6" strokeLinecap="round" strokeLinejoin="round" /></svg>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
+                    <path d="M3 12c0-2 3.6-7 9-7s9 5 9 7-3.6 7-9 7-9-5-9-7z" strokeLinecap="round" strokeLinejoin="round" />
+                    <circle cx="12" cy="12" r="2.6" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
                 )}
               </button>
             </div>

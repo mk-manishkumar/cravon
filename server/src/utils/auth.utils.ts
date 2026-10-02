@@ -81,6 +81,7 @@ export const setAuthCookies = (res: Response, accessToken: string, refreshToken:
 // Helper to format login response
 export const formatLoginResponse = (data: any) => ({
   message: "Login successful",
+  token: data.accessToken,
   user: {
     id: data.user._id,
     firstName: data.user.firstName,

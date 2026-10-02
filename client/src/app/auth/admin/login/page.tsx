@@ -24,7 +24,9 @@ export default function AdminLoginPage() {
     setIsLoading(true);
 
     try {
-      await authService.loginAdmin({ email, password });
+      const response = await authService.loginAdmin({ email, password });
+      if (response?.token) localStorage.setItem("admin_token", response.token);
+      
       await useAuthStore.getState().checkAuth();
       toast.success("Welcome back, Administrator!");
       router.push("/admin/dashboard");

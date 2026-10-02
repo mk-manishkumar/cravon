@@ -79,6 +79,14 @@ export const useAuthStore = create<AuthState>((set) => ({
       useCartStore.getState().clearCart();
       if (typeof window !== 'undefined') {
         localStorage.removeItem('pendingCartItem');
+        const currentPath = window.location.pathname;
+        if (currentPath.startsWith("/partner") || currentPath.startsWith("/dashboard") || currentPath.startsWith("/staff")) {
+          localStorage.removeItem("partner_token");
+        } else if (currentPath.startsWith("/admin")) {
+          localStorage.removeItem("admin_token");
+        } else {
+          localStorage.removeItem("customer_token");
+        }
       }
     }
   },
