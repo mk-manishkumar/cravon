@@ -1,6 +1,13 @@
 import { Request, Response, NextFunction } from "express";
 import asyncHandler from "../utils/asyncHandler.js";
-import { loginDriverService, updateDriverStatusService, updateDriverLocationService, getDriverOrdersService, updateOrderStatusService, updateDriverProfileService } from "../services/driver.service.js";
+import { loginDriverService, registerDriverService, updateDriverStatusService, updateDriverLocationService, getDriverOrdersService, updateOrderStatusService, updateDriverProfileService } from "../services/driver.service.js";
+import { driverRegisterSchema } from "../utils/zod.js";
+
+export const registerDriver = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
+  const parsedData = driverRegisterSchema.parse(req.body);
+  const data = await registerDriverService(parsedData as any);
+  res.status(201).json({ success: true, data });
+});
 
 // Controller for driver login
 export const loginDriver = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {

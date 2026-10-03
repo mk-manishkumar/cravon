@@ -6,32 +6,47 @@ import { ApiError } from "../utils/errorHandler.js";
 
 // Helper to generate token
 const generateToken = (id: string) => {
-  return jwt.sign({ id, role: "driver" }, process.env.JWT_SECRET || "fallback_secret", {
-    expiresIn: "30d",
-  });
+  const secret = process.env.JWT_SECRET || "fallback_secret";
+  const expiresIn = process.env.JWT_DRIVER_EXPIRES_IN || "30d";
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return jwt.sign({ id, role: "driver" }, secret, { expiresIn: expiresIn as any });
 };
 
 // Service functions for driver operations
 export const loginDriverService = async (email: string, password?: string) => {
-  // If driver doesn't exist, create one automatically (Seed on first login)
-  let driver = await Driver.findOne({ email });
+  const driver = await Driver.findOne({ email });
 
-  if (!driver) {
-    if (!password) throw new ApiError(400, "Password is required to create a new driver");
+  if (!driver) throw new ApiError(401, "Invalid credentials");
+  if (!password) throw new ApiError(400, "Password is required");
 
-    const hashedPassword = await bcrypt.hash(password, 10);
-    driver = await Driver.create({
-      firstName: "Test",
-      lastName: "Driver",
-      email,
-      password: hashedPassword,
-      phone: "1234567890",
-      vehicleDetails: "Honda Activa",
-    });
-  } else if (password) {
-    const isMatch = await bcrypt.compare(password, driver.password as string);
-    if (!isMatch) throw new ApiError(401, "Invalid credentials");
-  }
+  const isMatch = await bcrypt.compare(password, driver.password as string);
+  if (!isMatch) throw new ApiError(401, "Invalid credentials");
+
+  const token = generateToken(driver._id.toString());
+  const driverObj = driver.toObject();
+  delete driverObj.password;
+
+  return { driver: driverObj, token };
+};
+
+export const registerDriverService = async (data: Partial<IDriver>) => {
+  const { firstName, lastName, email, password, phone, vehicleDetails } = data;
+
+  const existingDriver = await Driver.findOne({ email });
+  if (existingDriver) throw new ApiError(400, "Driver with this email already exists");
+
+  if (!password) throw new ApiError(400, "Password is required");
+
+  const hashedPassword = await bcrypt.hash(password, 10);
+  
+  const driver = await Driver.create({
+    firstName,
+    lastName,
+    email,
+    password: hashedPassword,
+    phone,
+    vehicleDetails,
+  });
 
   const token = generateToken(driver._id.toString());
   const driverObj = driver.toObject();
