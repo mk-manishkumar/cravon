@@ -12,6 +12,7 @@ import publicRoutes from "./src/routes/public.routes.js";
 import orderRoutes from "./src/routes/order.routes.js";
 import driverRoutes from "./src/routes/driver.routes.js";
 import { errorHandler } from "./src/utils/errorHandler.js";
+import { startMatchmaker } from "./src/cron/driverMatchMaker.js";
 import { globalLimiter, partnerLimiter, customerLimiter } from "./src/middlewares/rateLimiter.middleware.js";
 
 const app: Application = express();
@@ -22,6 +23,9 @@ await connectDB();
 app.disable("x-powered-by");
 
 const PORT = process.env.PORT || 5000;
+
+// Start the driver matchmaker cron job
+startMatchmaker();
 
 // GLOBAL MIDDLEWARES
 const localOrigins = process.env.LOCAL_ORIGINS ? process.env.LOCAL_ORIGINS.split(",") : [];
