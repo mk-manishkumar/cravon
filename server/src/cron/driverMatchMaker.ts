@@ -41,7 +41,7 @@ const assignDriverToOrder = (order: any, availableDrivers: any[], newlyAssignedD
   if (closestDriver && minDistance <= 15) { 
     order.driver = closestDriver._id;
     newlyAssignedDriverIds.push(closestDriver._id.toString());
-    console.log(`[Matchmaker] 🍔 Order ${order._id.toString().substring(0, 6)} assigned to Driver ${closestDriver.firstName} (${minDistance.toFixed(1)}km away)`);
+    console.log(`Order ${order._id.toString().substring(0, 6)} assigned to Driver ${closestDriver.firstName} (${minDistance.toFixed(1)}km away)`);
     return order.save();
   }
   
