@@ -15,9 +15,9 @@ api.interceptors.request.use(
       const currentPath = window.location.pathname;
       let token = null;
 
-      if (currentPath.startsWith("/partner") || currentPath.startsWith("/dashboard") || currentPath.startsWith("/staff")) {
+      if (currentPath.startsWith("/partner") || currentPath.startsWith("/dashboard") || currentPath.startsWith("/staff") || currentPath.startsWith("/auth/restaurant")) {
         token = localStorage.getItem("partner_token");
-      } else if (currentPath.startsWith("/admin")) {
+      } else if (currentPath.startsWith("/admin") || currentPath.startsWith("/auth/admin")) {
         token = localStorage.getItem("admin_token");
       } else {
         token = localStorage.getItem("customer_token");
