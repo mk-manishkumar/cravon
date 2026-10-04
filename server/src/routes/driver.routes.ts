@@ -1,11 +1,12 @@
 import { Router } from "express";
-import { loginDriver, registerDriver, updateStatus, updateLocation, getDriverOrders, updateOrderStatus, updateProfile } from "../controllers/driver.controller.js";
+import { loginDriver, registerDriver, getCurrentDriverProfile, updateStatus, updateLocation, getDriverOrders, updateOrderStatus, updateProfile } from "../controllers/driver.controller.js";
 import { verifyDriverJWT } from "../middlewares/driverAuth.middleware.js";
 
 const router = Router();
 
 router.post("/register", registerDriver);
 router.post("/login", loginDriver);
+router.get("/me", verifyDriverJWT, getCurrentDriverProfile);
 router.put("/profile", verifyDriverJWT, updateProfile);
 router.put("/status", verifyDriverJWT, updateStatus);
 router.post("/location", verifyDriverJWT, updateLocation);

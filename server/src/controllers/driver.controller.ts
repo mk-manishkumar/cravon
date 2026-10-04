@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import asyncHandler from "../utils/asyncHandler.js";
-import { loginDriverService, registerDriverService, updateDriverStatusService, updateDriverLocationService, getDriverOrdersService, updateOrderStatusService, updateDriverProfileService } from "../services/driver.service.js";
+import { loginDriverService, registerDriverService, getDriverProfileService, updateDriverStatusService, updateDriverLocationService, getDriverOrdersService, updateOrderStatusService, updateDriverProfileService } from "../services/driver.service.js";
 import { driverRegisterSchema } from "../utils/zod.js";
 
 export const registerDriver = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
@@ -14,6 +14,13 @@ export const loginDriver = asyncHandler(async (req: Request, res: Response, next
   const { email, password } = req.body;
   const data = await loginDriverService(email, password);
   res.json({ success: true, data });
+});
+
+// Controller for fetching driver profile
+export const getCurrentDriverProfile = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
+  const driverId = (req as any).user.id;
+  const profile = await getDriverProfileService(driverId);
+  res.json({ success: true, user: profile });
 });
 
 // Controller for updating driver profile

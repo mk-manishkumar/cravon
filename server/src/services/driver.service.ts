@@ -29,6 +29,7 @@ export const loginDriverService = async (email: string, password?: string) => {
   return { driver: driverObj, token };
 };
 
+// Service function to register a new driver
 export const registerDriverService = async (data: Partial<IDriver>) => {
   const { firstName, lastName, email, password, phone, vehicleDetails } = data;
 
@@ -53,6 +54,13 @@ export const registerDriverService = async (data: Partial<IDriver>) => {
   delete driverObj.password;
 
   return { driver: driverObj, token };
+};
+
+// Service function to fetch driver profile
+export const getDriverProfileService = async (driverId: string) => {
+  const driver = await Driver.findById(driverId).select("-password");
+  if (!driver) throw new ApiError(404, "Driver not found");
+  return driver;
 };
 
 // Service function to update driver availability status
