@@ -72,12 +72,19 @@ export default function OrderCard({ order, status }: Readonly<OrderCardProps>) {
           {status.icon}
           {status.label}
         </div>
-        {order.orderStatus === "delivered" && (
-          <button onClick={() => downloadInvoice(order)} className="flex items-center gap-1 text-[11px] font-bold text-orange-500 hover:text-orange-600 transition-colors bg-orange-50 hover:bg-orange-100 px-3 py-1.5 rounded-full border border-orange-100 cursor-pointer">
-            <Download className="w-3.5 h-3.5" />
-            Download Invoice
-          </button>
-        )}
+        <div className="flex items-center gap-2">
+          {order.orderStatus !== "delivered" && order.orderStatus !== "cancelled" && (
+            <a href={`/orders/${order._id}`} className="flex items-center gap-1 text-[11px] font-bold text-white bg-[#FF7A30] hover:bg-[#e66a25] transition-colors px-3 py-1.5 rounded-full shadow-xs cursor-pointer animate-pulse">
+              Track Live 📍
+            </a>
+          )}
+          {order.orderStatus === "delivered" && (
+            <button onClick={() => downloadInvoice(order)} className="flex items-center gap-1 text-[11px] font-bold text-orange-500 hover:text-orange-600 transition-colors bg-orange-50 hover:bg-orange-100 px-3 py-1.5 rounded-full border border-orange-100 cursor-pointer">
+              <Download className="w-3.5 h-3.5" />
+              Download Invoice
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Items */}

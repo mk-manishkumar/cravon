@@ -26,7 +26,7 @@ export const staffService = {
     return res.data;
   },
 
-  acceptInviteNewUser: async (data: any) => {
+  acceptInviteNewUser: async (data: Record<string, unknown>) => {
     const res = await api.post('/staff/accept-invite-new', data);
     return res.data;
   },

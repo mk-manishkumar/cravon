@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useAuthStore } from "../store/authStore";
 import api from "../lib/axios";
 import { Bike, Loader2 } from "lucide-react";
@@ -27,7 +27,7 @@ export default function Login() {
       // Will create this backend route later
       const res = await api.post("/driver/login", { email, password });
       setAuth(res.data.data.driver, res.data.data.token);
-      navigate("/dashboard");
+      void navigate("/dashboard");
     } catch (err: any) {
       setError(err.response?.data?.message || "Failed to login. Try again.");
     } finally {
@@ -64,7 +64,18 @@ export default function Login() {
                 Password
               </label>
               <div className="mt-1">
-                <input id="password" type="password" required value={password} onChange={(e) => setPassword(e.target.value)} className="appearance-none block w-full px-3 py-3 border border-gray-300 rounded-xl shadow-sm placeholder-gray-400 focus:outline-none focus:ring-[#FF7A30] focus:border-[#FF7A30] sm:text-sm" placeholder="••••••••" />
+                <input
+                  id="password"
+                  type="password"
+                  inputMode="numeric"
+                  pattern="\d{4}"
+                  maxLength={4}
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value.replace(/\D/g, "").slice(0, 4))}
+                  className="appearance-none block w-full px-3 py-3 border border-gray-300 rounded-xl shadow-sm placeholder-gray-400 focus:outline-none focus:ring-[#FF7A30] focus:border-[#FF7A30] sm:text-sm"
+                  placeholder="••••"
+                />
               </div>
             </div>
 
@@ -76,6 +87,12 @@ export default function Login() {
               </button>
             </div>
           </form>
+
+          <div className="mt-6 text-center">
+            <Link to="/register" className="font-medium text-sm text-[#FF7A30] hover:text-[#e66a25] cursor-pointer">
+              Don't have an account? Sign up
+            </Link>
+          </div>
         </div>
       </div>
     </div>

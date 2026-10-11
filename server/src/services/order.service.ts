@@ -153,6 +153,16 @@ export const getMyOrders = async (userId: string) => {
   return await Order.find({ user: userId }).sort({ createdAt: -1 }).populate("restaurant", "name image address deliveryTime status");
 };
 
+// Fetches a single order by ID, populating driver and restaurant data for live tracking
+export const getOrderByIdService = async (orderId: string, userId: string) => {
+  const order = await Order.findOne({ _id: orderId, user: userId })
+    .populate("restaurant", "name location address image")
+    .populate("driver", "firstName phone location vehicleDetails");
+
+  if (!order) throw new ApiError(404, "Order not found");
+  return order;
+};
+
 // Helper to check if user has access to restaurant
 export const verifyRestaurantAccess = async (userId: string, restaurantId: string): Promise<boolean> => {
   const isOwner = await Restaurant.exists({ _id: restaurantId, ownerId: userId });
@@ -258,16 +268,18 @@ export const autoCancelOrdersService = async () => {
     createdAt: { $lt: cutoffTime },
   }).populate("user", "email");
 
-  for (const order of stalePendingOrders) {
-    order.orderStatus = "cancelled";
-    await order.save();
+  await Promise.all(
+    stalePendingOrders.map(async (order) => {
+      order.orderStatus = "cancelled";
+      await order.save();
 
-    if (order.paymentMethod === "online") {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const userEmail = (order.user as any)?.email;
-      if (userEmail) {
-        await sendRefundEmail(userEmail, order.grandTotal, order.paymentMethod, order._id.toString());
+      if (order.paymentMethod === "online") {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const userEmail = (order.user as any)?.email;
+        if (userEmail) {
+          await sendRefundEmail(userEmail, order.grandTotal, order.paymentMethod, order._id.toString());
+        }
       }
-    }
-  }
+    }),
+  );
 };

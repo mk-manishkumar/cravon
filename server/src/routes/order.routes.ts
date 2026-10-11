@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
 import { customerLimiter, partnerLimiter } from "../middlewares/rateLimiter.middleware.js";
-import { createOrder, verifyPayment, getMyOrders, getRestaurantOrders, getPartnerNotifications, updateOrderStatus, autoDeliverOrders } from "../controllers/order.controller.js";
+import { createOrder, verifyPayment, getMyOrders, getOrderById, getRestaurantOrders, getPartnerNotifications, updateOrderStatus, autoDeliverOrders } from "../controllers/order.controller.js";
 
 const router = Router();
 
@@ -9,6 +9,7 @@ const router = Router();
 router.post("/create", customerLimiter, verifyJWT, createOrder);
 router.post("/verify", customerLimiter, verifyJWT, verifyPayment);
 router.get("/my", customerLimiter, verifyJWT, getMyOrders);
+router.get("/:id", customerLimiter, verifyJWT, getOrderById);
 
 // Partner routes
 router.get("/restaurant/:id", partnerLimiter, verifyJWT, getRestaurantOrders);

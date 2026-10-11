@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import asyncHandler from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/errorHandler.js";
-import { createOrder as createOrderService, verifyPayment as verifyPaymentService, getMyOrders as getMyOrdersService, getRestaurantOrdersService, getPartnerNotificationsService, updateOrderStatusService, autoDeliverOrdersService } from "../services/order.service.js";
+import { createOrder as createOrderService, verifyPayment as verifyPaymentService, getMyOrders as getMyOrdersService, getOrderByIdService, getRestaurantOrdersService, getPartnerNotificationsService, updateOrderStatusService, autoDeliverOrdersService } from "../services/order.service.js";
 
 // Controller for creating a new order
 export const createOrder = asyncHandler(async (req: Request, res: Response) => {
@@ -52,6 +52,17 @@ export const getMyOrders = asyncHandler(async (req: Request, res: Response) => {
   res.status(200).json({
     status: "success",
     data: orders,
+  });
+});
+
+// Controller for fetching a single order details (for tracking)
+export const getOrderById = asyncHandler(async (req: Request, res: Response) => {
+  const userId = (req as any).user.id;
+  const order = await getOrderByIdService(req.params.id, userId);
+
+  res.status(200).json({
+    status: "success",
+    data: order,
   });
 });
 
