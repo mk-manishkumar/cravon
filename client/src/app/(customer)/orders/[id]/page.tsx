@@ -7,6 +7,7 @@ import MapTracking from "@/components/orders/MapTracking";
 import { Bike, Phone, Clock, ArrowLeft, AlertCircle, PackageCheck, Utensils } from "lucide-react";
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import toast from "react-hot-toast";
 
 interface OrderItem {
   _id?: string;
@@ -58,6 +59,17 @@ export default function OrderTrackingPage() {
 
     return () => clearInterval(interval);
   }, [isFinished, targetTime]);
+
+  // Redirect to orders page once driver delivers the order
+  useEffect(() => {
+    if (order?.orderStatus === "delivered") {
+      toast.success("Order delivered! Redirecting to orders...", { id: "order-delivered" });
+      const timer = setTimeout(() => {
+        router.replace("/orders");
+      }, 1200);
+      return () => clearTimeout(timer);
+    }
+  }, [order?.orderStatus, router]);
 
   const timeLeft = targetTime && !isFinished ? Math.max(0, Math.floor((targetTime - now) / 1000)) : null;
 
