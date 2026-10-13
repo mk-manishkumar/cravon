@@ -105,6 +105,15 @@ export const updateOrderStatusService = async (driverId: string, orderId: string
   const order = await Order.findById(orderId);
   if (!order) throw new ApiError(404, "Order not found");
 
+  if (order.driver && order.driver.toString() !== driverId.toString()) {
+    throw new ApiError(403, "You are not assigned to this order");
+  }
+
+  // Delivery strictly requires the order to already have been picked up
+  if (status === "delivered" && order.orderStatus !== "out_for_delivery") {
+    throw new ApiError(400, "Order must be out for delivery before confirming delivery");
+  }
+
   order.orderStatus = status as any;
   order.driver = driverId as any;
   await order.save();

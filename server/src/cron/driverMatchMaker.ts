@@ -1,5 +1,6 @@
 import Order from "../models/order.model.js";
 import Driver from "../models/driver.model.js";
+import { autoCancelOrdersService } from "../services/order.service.js";
 
 // Haversine formula to calculate distance between two lat/lon coordinates in kilometers
 const getDistance = (lat1: number, lon1: number, lat2: number, lon2: number) => {
@@ -92,6 +93,7 @@ export const startMatchmaker = () => {
     isRunning = true;
 
     try {
+      await autoCancelOrdersService();
       await processMatchmaking();
     } catch (err) {
       console.error("[Matchmaker Error]:", err);

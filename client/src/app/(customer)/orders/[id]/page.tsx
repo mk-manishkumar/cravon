@@ -60,13 +60,20 @@ export default function OrderTrackingPage() {
     return () => clearInterval(interval);
   }, [isFinished, targetTime]);
 
-  // Redirect to orders page once driver delivers the order
+  // Redirect to orders page once driver delivers the order or if cancelled
   useEffect(() => {
     if (order?.orderStatus === "delivered") {
-      toast.success("Order delivered! Redirecting to orders...", { id: "order-delivered" });
+      toast.success("Order delivered! Redirecting to orders...", { id: "order-status-change" });
       const timer = setTimeout(() => {
         router.replace("/orders");
       }, 1200);
+      return () => clearTimeout(timer);
+    }
+    if (order?.orderStatus === "cancelled") {
+      toast.error("Order cancelled: No delivery partner available. Refund initiated.", { id: "order-status-change" });
+      const timer = setTimeout(() => {
+        router.replace("/orders");
+      }, 2000);
       return () => clearTimeout(timer);
     }
   }, [order?.orderStatus, router]);
@@ -109,6 +116,16 @@ export default function OrderTrackingPage() {
   const isDelivered = order.orderStatus === "delivered";
   const isCancelled = order.orderStatus === "cancelled";
 
+  const getDeliveryStatusTitle = () => {
+    if (!order.driver) {
+      return "Finding Delivery Partner";
+    }
+    if (timeLeft !== null && timeLeft > 0) {
+      return `${timeLeft} seconds`;
+    }
+    return "Arriving any moment!";
+  };
+
   return (
     <div className="min-h-screen bg-zinc-50 pb-20">
       {/* Top Navbar */}
@@ -127,14 +144,21 @@ export default function OrderTrackingPage() {
           <div className="bg-white p-5 rounded-3xl shadow-sm border border-zinc-200/80 flex items-center justify-between">
             <div>
               <span className="text-xs font-bold uppercase tracking-wider text-orange-500 flex items-center mb-1">
-                <Clock className="w-3.5 h-3.5 mr-1" /> Estimated Arrival
+                <Clock className="w-3.5 h-3.5 mr-1" /> {order.driver ? "Estimated Arrival" : "Order Status"}
               </span>
-              <h2 className="text-2xl font-black text-zinc-900">{timeLeft !== null && timeLeft > 0 ? `${timeLeft} seconds` : "Arriving any moment!"}</h2>
-              <p className="text-xs text-zinc-500 mt-0.5">High-speed delivery is underway</p>
+              <h2 className="text-2xl font-black text-zinc-900">{getDeliveryStatusTitle()}</h2>
+              <p className="text-xs text-zinc-500 mt-0.5">
+                {order.driver ? "High-speed delivery is underway" : "Matching your order with nearby drivers..."}
+              </p>
             </div>
-            {timeLeft !== null && (
+            {order.driver && timeLeft !== null && (
               <div className="w-14 h-14 rounded-full border-4 border-orange-500/20 border-t-orange-500 flex items-center justify-center animate-spin">
                 <Bike className="w-6 h-6 text-orange-500 -rotate-45" />
+              </div>
+            )}
+            {!order.driver && (
+              <div className="w-14 h-14 rounded-full bg-orange-50 border border-orange-200 flex items-center justify-center animate-pulse">
+                <Bike className="w-6 h-6 text-orange-500" />
               </div>
             )}
           </div>
@@ -149,6 +173,19 @@ export default function OrderTrackingPage() {
             <div>
               <h2 className="text-xl font-bold">Order Delivered!</h2>
               <p className="text-sm text-green-100">Enjoy your meal from {order.restaurant?.name || "the restaurant"}.</p>
+            </div>
+          </div>
+        )}
+
+        {/* Banner for Cancelled Orders */}
+        {isCancelled && (
+          <div className="bg-red-500 text-white p-6 rounded-3xl shadow-lg shadow-red-500/20 flex items-center space-x-4">
+            <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center shrink-0">
+              <AlertCircle className="w-8 h-8 text-white" />
+            </div>
+            <div>
+              <h2 className="text-xl font-bold">Order Cancelled</h2>
+              <p className="text-sm text-red-100">Unable to assign a delivery partner. Any payment has been refunded.</p>
             </div>
           </div>
         )}

@@ -148,7 +148,6 @@ export const verifyPayment = async (razorpayOrderId: string, razorpayPaymentId: 
 export const getMyOrders = async (userId: string) => {
   // Lazy evaluation: sweep stale orders before returning
   await autoCancelOrdersService();
-  await autoDeliverOrdersService();
 
   return await Order.find({ user: userId }).sort({ createdAt: -1 }).populate("restaurant", "name image address deliveryTime status");
 };
@@ -218,12 +217,19 @@ export const updateOrderStatusService = async (orderId: string, status: string, 
     throw new ApiError(403, "Forbidden");
   }
 
+  if (status === "delivered") {
+    throw new ApiError(400, "Only the assigned delivery partner can confirm delivery");
+  }
+
   if (status === "preparing") {
     order.orderStatus = "preparing";
     order.acceptedAt = new Date();
     await order.save();
   } else if (status === "cancelled") {
     order.orderStatus = "cancelled";
+    if (order.paymentMethod === "online" && order.paymentStatus === "paid") {
+      order.paymentStatus = "refunded";
+    }
     await order.save();
 
     const userEmail = (order.user as any).email;
@@ -239,38 +245,49 @@ export const updateOrderStatusService = async (orderId: string, status: string, 
   return order;
 };
 
-// Cron endpoint to automatically transition stale orders
-export const autoDeliverOrdersService = async () => {
-  const timeoutMinutes = Number(process.env.ORDER_DELIVERY_TIME_MINUTES) || 30;
-  const cutoffTime = new Date(Date.now() - timeoutMinutes * 60 * 1000);
+// Deprecated: Preparing orders are never automatically marked as delivered.
+// Delivery requires explicit confirmation by the delivery partner via the Driver APK.
+export const autoDeliverOrdersService = () => Promise.resolve(0);
 
-  const result = await Order.updateMany(
-    {
-      orderStatus: "preparing",
-      acceptedAt: { $lt: cutoffTime },
-    },
-    {
-      $set: { orderStatus: "delivered" },
-    },
-  );
-
-  return result.modifiedCount;
-};
-
-// Cron/lazy endpoint to automatically cancel unaccepted orders
+// Cron/lazy endpoint to automatically cancel unaccepted orders or orders with no available driver
 export const autoCancelOrdersService = async () => {
-  const timeoutMinutes = Number(process.env.ORDER_ACCEPT_TIMEOUT_MINUTES) || 2;
-  const cutoffTime = new Date(Date.now() - timeoutMinutes * 60 * 1000);
+  const acceptTimeoutMinutes =
+    Number(process.env.ORDER_ACCEPT_TIME_OUT_MINUTES) ||
+    Number(process.env.ORDER_ACCEPT_TIMEOUT_MINUTES) ||
+    2;
+  const acceptCutoffTime = new Date(Date.now() - acceptTimeoutMinutes * 60 * 1000);
 
-  // Find orders that are still pending and past the timeout
+  const driverTimeoutMinutes =
+    Number(process.env.DRIVER_ASSIGN_TIMEOUT_MINUTES) ||
+    Number(process.env.ORDER_DELIVERY_TIME_MINUTES) ||
+    Number(process.env.ORDER_ACCEPT_TIME_OUT_MINUTES) ||
+    5;
+  const driverCutoffTime = new Date(Date.now() - driverTimeoutMinutes * 60 * 1000);
+
+  // 1. Stale pending orders (restaurant never accepted within timeout)
   const stalePendingOrders = await Order.find({
     orderStatus: "pending",
-    createdAt: { $lt: cutoffTime },
+    createdAt: { $lt: acceptCutoffTime },
   }).populate("user", "email");
 
+  // 2. Stale preparing orders where no delivery partner could be assigned within timeout
+  const staleUnassignedOrders = await Order.find({
+    orderStatus: "preparing",
+    driver: { $exists: false },
+    $or: [
+      { acceptedAt: { $lt: driverCutoffTime } },
+      { acceptedAt: { $exists: false }, createdAt: { $lt: driverCutoffTime } },
+    ],
+  }).populate("user", "email");
+
+  const ordersToCancel = [...stalePendingOrders, ...staleUnassignedOrders];
+
   await Promise.all(
-    stalePendingOrders.map(async (order) => {
+    ordersToCancel.map(async (order) => {
       order.orderStatus = "cancelled";
+      if (order.paymentMethod === "online" && order.paymentStatus === "paid") {
+        order.paymentStatus = "refunded";
+      }
       await order.save();
 
       if (order.paymentMethod === "online") {
