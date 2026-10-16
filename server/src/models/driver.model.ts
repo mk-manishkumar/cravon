@@ -8,6 +8,8 @@ export interface IDriver extends Document {
   phone: string;
   vehicleDetails: string;
   isAvailable: boolean;
+  profilePicture?: string;
+  city?: string;
   location?: {
     latitude: number;
     longitude: number;
@@ -24,6 +26,8 @@ const DriverSchema = new Schema({
   phone: { type: String, required: true },
   vehicleDetails: { type: String, required: true },
   isAvailable: { type: Boolean, default: false },
+  profilePicture: { type: String },
+  city: { type: String, default: "Patna" },
   location: {
     latitude: { type: Number },
     longitude: { type: Number }

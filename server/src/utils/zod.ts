@@ -25,9 +25,29 @@ export const driverRegisterSchema = z.object({
   firstName: z.string().min(2, "First name must be at least 2 characters"),
   lastName: z.string().min(2, "Last name must be at least 2 characters"),
   email: z.string().email("Invalid email format"),
-  password: z.string().regex(/^\d{4}$/, "Password must be exactly a 4-digit PIN"),
+  password: z.string().min(4, "Password must be at least 4 characters"),
   phone: z.string().min(10, "Valid phone number required"),
   vehicleDetails: z.string().min(3, "Vehicle details required (e.g. Honda Activa)"),
+  city: z.string().optional(),
+  profilePicture: z.string().optional(),
+});
+
+export const updateDriverProfileSchema = z.object({
+  firstName: z.string().min(2, "First name must be at least 2 characters").optional(),
+  lastName: z.string().min(2, "Last name must be at least 2 characters").optional(),
+  phone: z.string().min(10, "Valid phone number required").optional(),
+  vehicleDetails: z.string().min(3, "Vehicle details required").optional(),
+  profilePicture: z.string().optional(),
+  city: z.string().optional(),
+});
+
+export const changeDriverPasswordSchema = z.object({
+  oldPassword: z.string().min(1, "Old password is required"),
+  newPassword: z.string().min(4, "New password must be at least 4 characters"),
+});
+
+export const deleteDriverAccountSchema = z.object({
+  password: z.string().min(1, "Password is required to delete account"),
 });
 
 export const updateProfileSchema = z.object({

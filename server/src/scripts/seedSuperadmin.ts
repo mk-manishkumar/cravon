@@ -51,21 +51,29 @@ const seedDatabase = async () => {
     // Assigning Permissions to Roles
     console.log('Assigning Permissions to Roles...');
     // SuperAdmin gets everything
-    for (const p of permissions) {
-      await RolePermission.updateOne(
-        { roleId: superAdminRole!._id, permissionId: p._id },
-        { $set: { roleId: superAdminRole!._id, permissionId: p._id } },
-        { upsert: true }
+    if (permissions.length > 0) {
+      await RolePermission.bulkWrite(
+        permissions.map((p) => ({
+          updateOne: {
+            filter: { roleId: superAdminRole!._id, permissionId: p._id },
+            update: { $set: { roleId: superAdminRole!._id, permissionId: p._id } },
+            upsert: true,
+          },
+        }))
       );
     }
 
     // Admin gets limited permissions
-    const adminPerms = permissions.filter(p => ['verify_restaurant', 'manage_users'].includes(p.permissionName));
-    for (const p of adminPerms) {
-      await RolePermission.updateOne(
-        { roleId: adminRole!._id, permissionId: p._id },
-        { $set: { roleId: adminRole!._id, permissionId: p._id } },
-        { upsert: true }
+    const adminPerms = permissions.filter((p) => ['verify_restaurant', 'manage_users'].includes(p.permissionName));
+    if (adminPerms.length > 0) {
+      await RolePermission.bulkWrite(
+        adminPerms.map((p) => ({
+          updateOne: {
+            filter: { roleId: adminRole!._id, permissionId: p._id },
+            update: { $set: { roleId: adminRole!._id, permissionId: p._id } },
+            upsert: true,
+          },
+        }))
       );
     }
 
