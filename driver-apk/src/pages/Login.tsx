@@ -67,14 +67,11 @@ export default function Login() {
                 <input
                   id="password"
                   type="password"
-                  inputMode="numeric"
-                  pattern="\d{4}"
-                  maxLength={4}
                   required
                   value={password}
-                  onChange={(e) => setPassword(e.target.value.replace(/\D/g, "").slice(0, 4))}
+                  onChange={(e) => setPassword(e.target.value)}
                   className="appearance-none block w-full px-3 py-3 border border-gray-300 rounded-xl shadow-sm placeholder-gray-400 focus:outline-none focus:ring-[#FF7A30] focus:border-[#FF7A30] sm:text-sm"
-                  placeholder="••••"
+                  placeholder="••••••••"
                 />
               </div>
             </div>

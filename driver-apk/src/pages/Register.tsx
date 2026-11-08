@@ -3,6 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { useAuthStore } from "../store/authStore";
 import api from "../lib/axios";
 import { Bike, Loader2 } from "lucide-react";
+import { CITIES } from "../components/CitySelector";
 
 export default function Register() {
   const [formData, setFormData] = useState({
@@ -11,6 +12,7 @@ export default function Register() {
     email: "",
     phone: "",
     vehicleDetails: "",
+    city: "Patna",
     password: "",
   });
   const [loading, setLoading] = useState(false);
@@ -94,19 +96,35 @@ export default function Register() {
             </div>
 
             <div>
+              <label htmlFor="city" className={labelClass}>Operational City</label>
+              <div className="mt-1">
+                <select
+                  id="city"
+                  required
+                  value={formData.city}
+                  onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                  className={`${inputClass} bg-white cursor-pointer`}
+                >
+                  {CITIES.map((c) => (
+                    <option key={c} value={c}>
+                      {c}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            <div>
               <label htmlFor="password" className={labelClass}>Password</label>
               <div className="mt-1">
                 <input
                   id="password"
                   type="password"
-                  inputMode="numeric"
-                  pattern="\d{4}"
-                  maxLength={4}
                   required
                   value={formData.password}
-                  onChange={(e) => setFormData({ ...formData, password: e.target.value.replace(/\D/g, "").slice(0, 4) })}
+                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                   className={inputClass}
-                  placeholder="••••"
+                  placeholder="••••••••"
                 />
               </div>
             </div>

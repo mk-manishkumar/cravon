@@ -45,6 +45,7 @@ interface Order {
   createdAt: string;
   restaurant?: OrderRestaurant;
   items: OrderItem[];
+  driver?: any;
 }
 
 const fetchMyOrders = async (): Promise<Order[]> => {

@@ -1,6 +1,6 @@
 import { create } from "zustand";
 
-interface Driver {
+export interface Driver {
   _id: string;
   firstName: string;
   lastName: string;
@@ -8,13 +8,15 @@ interface Driver {
   phone: string;
   vehicleDetails: string;
   isAvailable: boolean;
+  profilePicture?: string;
+  city?: string;
 }
 
 interface AuthState {
   driver: Driver | null;
   token: string | null;
   setAuth: (driver: Driver, token: string) => void;
-  updateDriver: (driver: Driver) => void;
+  updateDriver: (driverData: Partial<Driver> | Driver) => void;
   logout: () => void;
 }
 
@@ -26,9 +28,13 @@ export const useAuthStore = create<AuthState>((set) => ({
     localStorage.setItem("driver_data", JSON.stringify(driver));
     set({ driver, token });
   },
-  updateDriver: (driver) => {
-    localStorage.setItem("driver_data", JSON.stringify(driver));
-    set({ driver });
+  updateDriver: (driverData) => {
+    set((state) => {
+      if (!state.driver) return { driver: null };
+      const updated = { ...state.driver, ...driverData };
+      localStorage.setItem("driver_data", JSON.stringify(updated));
+      return { driver: updated };
+    });
   },
   logout: () => {
     localStorage.removeItem("driver_token");

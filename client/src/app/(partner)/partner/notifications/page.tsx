@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import api from "@/lib/axios";
 import { formatDistanceToNow } from "date-fns";
@@ -7,6 +8,10 @@ import Link from "next/link";
 import { Bell } from "lucide-react";
 
 export default function PartnerNotificationsPage() {
+  useEffect(() => {
+    document.title = "Cravon | Notifications";
+  }, []);
+
   const { data: notifications = [], isLoading } = useQuery({
     queryKey: ["partnerNotifications"],
     queryFn: async () => {

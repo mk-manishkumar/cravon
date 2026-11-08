@@ -32,6 +32,15 @@ const assignDriverToOrder = (order: any, availableDrivers: any[], newlyAssignedD
   for (const driver of availableDrivers) {
     if (newlyAssignedDriverIds.includes(driver._id.toString())) continue; 
 
+    // Enforce city restriction: driver must match order city / restaurant address
+    if (driver.city) {
+      const driverCity = driver.city.trim().toLowerCase();
+      const orderCity = (order.deliveryAddress?.city || "").trim().toLowerCase();
+      const restaurantAddress = (restaurant.address || "").trim().toLowerCase();
+      const cityMatches = orderCity.includes(driverCity) || restaurantAddress.includes(driverCity);
+      if (!cityMatches) continue;
+    }
+
     const dist = getDistance(restLat, restLon, driver.location!.latitude, driver.location!.longitude);
     if (dist < minDistance) {
       minDistance = dist;

@@ -149,7 +149,10 @@ export const getMyOrders = async (userId: string) => {
   // Lazy evaluation: sweep stale orders before returning
   await autoCancelOrdersService();
 
-  return await Order.find({ user: userId }).sort({ createdAt: -1 }).populate("restaurant", "name image address deliveryTime status");
+  return await Order.find({ user: userId })
+    .sort({ createdAt: -1 })
+    .populate("restaurant", "name image address deliveryTime status")
+    .populate("driver", "firstName phone location vehicleDetails");
 };
 
 // Fetches a single order by ID, populating driver and restaurant data for live tracking

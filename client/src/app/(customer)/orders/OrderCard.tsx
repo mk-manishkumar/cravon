@@ -18,6 +18,13 @@ interface OrderRestaurant {
   };
 }
 
+interface OrderDriver {
+  _id?: string;
+  firstName?: string;
+  phone?: string;
+  vehicleDetails?: string;
+}
+
 interface Order {
   _id: string;
   orderStatus: string;
@@ -30,6 +37,7 @@ interface Order {
   createdAt: string;
   restaurant?: OrderRestaurant;
   items: OrderItem[];
+  driver?: OrderDriver | string | null;
 }
 
 interface OrderCardProps {
@@ -45,6 +53,7 @@ interface OrderCardProps {
 export default function OrderCard({ order, status }: Readonly<OrderCardProps>) {
   const restaurant = order.restaurant;
   const orderDate = new Date(order.createdAt);
+  const isDriverConfirmed = order.orderStatus === "out_for_delivery" && Boolean(order.driver);
 
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow flex flex-col">
@@ -73,7 +82,7 @@ export default function OrderCard({ order, status }: Readonly<OrderCardProps>) {
           {status.label}
         </div>
         <div className="flex items-center gap-2">
-          {order.orderStatus !== "delivered" && order.orderStatus !== "cancelled" && (
+          {isDriverConfirmed && (
             <a href={`/orders/${order._id}`} className="flex items-center gap-1 text-[11px] font-bold text-white bg-[#FF7A30] hover:bg-[#e66a25] transition-colors px-3 py-1.5 rounded-full shadow-xs cursor-pointer animate-pulse">
               Track Live 📍
             </a>

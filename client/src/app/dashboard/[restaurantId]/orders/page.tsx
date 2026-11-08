@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
 import api from "@/lib/axios";
@@ -9,6 +10,10 @@ import toast from "react-hot-toast";
 export default function RestaurantOrdersPage() {
   const { restaurantId } = useParams();
   const queryClient = useQueryClient();
+
+  useEffect(() => {
+    document.title = "Cravon | Restaurant Orders";
+  }, []);
 
   const getOrderStatusClasses = (orderStatus: string) => {
     switch (orderStatus) {

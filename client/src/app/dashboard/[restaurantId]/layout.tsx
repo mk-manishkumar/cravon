@@ -1,7 +1,12 @@
 import { ReactNode } from "react";
+import { Metadata } from "next";
 import PartnerHeader from "@/components/layout/PartnerHeader";
 import PartnerFooter from "@/components/layout/PartnerFooter";
 import RestaurantTitle from "@/components/partner/RestaurantTitle";
+
+export const metadata: Metadata = {
+  title: "Cravon | Restaurant Dashboard",
+};
 
 export default async function RestaurantDashboardLayout({ children, params }: Readonly<{ children: ReactNode; params: Promise<{ restaurantId: string }> }>) {
   const { restaurantId } = await params;

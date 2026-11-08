@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 import { ApiError } from "../utils/errorHandler.js";
 import User from "../models/user.model.js";
+import Driver from "../models/driver.model.js";
 import UserRole from "../models/userRole.model.js";
 import RestaurantStaff from "../models/restaurantStaff.model.js";
 
@@ -15,7 +16,31 @@ export const verifyJWT = async (req: Request, res: Response, next: NextFunction)
 
     if (!token) throw new ApiError(401, "Unauthorized request: No access token found in cookies or headers");
 
-    const decodedToken = jwt.verify(token, process.env.JWT_ACCESS_SECRET as string) as { id: string };
+    let decodedToken: { id: string } | null = null;
+    try {
+      decodedToken = jwt.verify(token, process.env.JWT_ACCESS_SECRET as string) as { id: string };
+    } catch {
+      try {
+        const decodedDriver = jwt.verify(token, process.env.JWT_SECRET || "fallback_secret") as { id: string; role?: string };
+        const driver = await Driver.findById(decodedDriver.id).select("-password");
+        if (driver) {
+          (req as any).user = {
+            id: driver._id,
+            firstName: driver.firstName,
+            lastName: driver.lastName,
+            email: driver.email,
+            phone: driver.phone,
+            profilePicture: driver.profilePicture,
+            roles: ["driver"],
+          };
+          return next();
+        }
+      } catch {
+        // Fall through to error below
+      }
+    }
+
+    if (!decodedToken) throw new ApiError(401, "Invalid Access Token");
 
     const user = await User.findById(decodedToken.id).select("-password");
     if (!user) throw new ApiError(401, "Invalid Access Token");
