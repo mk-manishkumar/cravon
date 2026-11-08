@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 
 export default function CustomerLandingPage() {
   return (
-    <div className="bg-white text-gray-900 font-sans min-h-[calc(100vh-140px)] selection:bg-[#FF7A30]/20 pb-20">
+    <div className="bg-white text-gray-900 font-sans min-h-[calc(100vh-140px)] selection:bg-[#FF7A30]/20 pb-4">
       {/* Hero Section */}
       <main className="px-6 py-16 md:py-24 bg-linear-to-b from-orange-50/50 to-white">
         <div className="max-w-7xl mx-auto flex flex-col items-center text-center">
@@ -38,7 +38,7 @@ export default function CustomerLandingPage() {
       </section>
 
       {/* Explore Foods Sections */}
-      <section className="py-8">
+      <section className="pt-6 pb-2">
         <FoodCarousel title="Franchise" filter="franchise" />
         <FoodCarousel title="Pure Veg Delights" filter="veg" />
         <FoodCarousel title="Non-Veg Cravings" filter="nonveg" />

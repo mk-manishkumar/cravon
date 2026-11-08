@@ -48,6 +48,17 @@ export default function MapComponent({ restaurantLocation, userLocation, driverL
   const center: [number, number] = status === "out_for_delivery" && driverLocation ? driverLocation : restaurantLocation;
 
   useEffect(() => {
+    const linkId = "leaflet-style";
+    if (!document.getElementById(linkId)) {
+      const link = document.createElement("link");
+      link.id = linkId;
+      link.rel = "stylesheet";
+      link.href = "/leaflet.css";
+      document.head.appendChild(link);
+    }
+  }, []);
+
+  useEffect(() => {
     if (map) {
       if (status === "out_for_delivery" && driverLocation) {
         map.setView(driverLocation, 15, { animate: true });

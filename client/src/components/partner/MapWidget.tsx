@@ -3,7 +3,6 @@
 import { useEffect } from "react";
 import { MapContainer, TileLayer, Marker, useMapEvents, useMap } from "react-leaflet";
 import L from "leaflet";
-import "leaflet/dist/leaflet.css";
 
 // Fix for default Leaflet icons in Next.js
 const DefaultIcon = L.icon({
@@ -58,6 +57,17 @@ interface MapWidgetProps {
 export default function MapWidget({ lat, lng, setCoordinates, readOnly = false }: Readonly<MapWidgetProps>) {
   const position: [number, number] = lat && lng ? [lat, lng] : [40.7128, -74.006];
   const zoom = lat && lng ? 15 : 3;
+
+  useEffect(() => {
+    const linkId = "leaflet-style";
+    if (!document.getElementById(linkId)) {
+      const link = document.createElement("link");
+      link.id = linkId;
+      link.rel = "stylesheet";
+      link.href = "/leaflet.css";
+      document.head.appendChild(link);
+    }
+  }, []);
 
   return (
     <MapContainer 

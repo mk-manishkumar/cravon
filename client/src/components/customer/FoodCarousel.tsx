@@ -60,7 +60,7 @@ export default function FoodCarousel({ title, filter }: FoodCarouselProps) {
 
   if (isLoading) {
     return (
-      <div className="mb-12 relative">
+      <div className="mb-8 last:mb-0 relative">
         <div className="flex justify-between items-center mb-6 px-6 max-w-7xl mx-auto">
           <h2 className="text-2xl font-bold text-gray-900">{title}</h2>
           <div className="hidden md:flex gap-2">
@@ -68,7 +68,7 @@ export default function FoodCarousel({ title, filter }: FoodCarouselProps) {
             <div className="w-10 h-10 rounded-full bg-gray-100 animate-pulse"></div>
           </div>
         </div>
-        <div className="flex overflow-x-hidden gap-6 px-6 pb-6 max-w-7xl mx-auto">
+        <div className="flex overflow-x-hidden gap-6 px-6 pb-4 max-w-7xl mx-auto">
           {[1, 2, 3, 4, 5].map((id) => (
             <div key={id} className="shrink-0 w-65 bg-white border border-gray-100 rounded-2xl shadow-sm flex flex-col overflow-hidden animate-pulse">
               <div className="w-full h-40 bg-gray-200"></div>
@@ -87,7 +87,7 @@ export default function FoodCarousel({ title, filter }: FoodCarouselProps) {
   if (!foods || foods.length === 0) return null;
 
   return (
-    <div className="mb-12 relative">
+    <div className="mb-8 last:mb-0 relative">
       <div className="flex justify-between items-center mb-6 px-6 max-w-7xl mx-auto">
         <h2 className="text-2xl font-bold text-gray-900">{title}</h2>
 
@@ -103,7 +103,7 @@ export default function FoodCarousel({ title, filter }: FoodCarouselProps) {
       </div>
 
       {/* Horizontal carousel */}
-      <div ref={scrollContainerRef} className="flex overflow-x-auto gap-6 px-6 pb-6 snap-x hide-scrollbar max-w-7xl mx-auto" style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}>
+      <div ref={scrollContainerRef} className="flex overflow-x-auto gap-6 px-6 pb-4 snap-x hide-scrollbar max-w-7xl mx-auto" style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}>
         {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
         {foods.map((food: any) => (
           <FoodCarouselCard key={food._id} food={food} filter={filter} />

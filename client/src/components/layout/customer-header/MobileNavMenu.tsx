@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { Bike } from "lucide-react";
 import { useAuthStore } from "@/store/authStore";
 import { useLocationStore } from "@/store/locationStore";
 import { CITIES } from "./DesktopLocationSelector";
@@ -61,6 +62,17 @@ export default function MobileNavMenu({ showMobileMenu, setShowMobileMenu }: Mob
               </option>
             ))}
           </select>
+        </div>
+
+        {/* Delivery Partner Mobile Link */}
+        <div className="px-5 py-1">
+          <Link href="/become-delivery-agent" onClick={() => setShowMobileMenu(false)} className="flex items-center justify-between p-3 rounded-xl bg-orange-50/80 border border-orange-100 text-[#FF7A30] font-bold text-sm hover:bg-orange-100 transition-colors">
+            <span className="flex items-center gap-2">
+              <Bike className="w-4 h-4" />
+              Become a Delivery Agent
+            </span>
+            <span className="text-[11px] bg-[#FF7A30] text-white font-semibold px-2 py-0.5 rounded-full">APK</span>
+          </Link>
         </div>
 
         <div className="w-full h-px bg-gray-100 my-2" />

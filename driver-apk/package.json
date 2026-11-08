@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
+    "build:apk": "npm run build && node scripts/package-apk.mjs",
     "preview": "vite preview"
   },
   "devDependencies": {
