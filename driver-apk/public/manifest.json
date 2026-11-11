@@ -1,0 +1,17 @@
+{
+  "short_name": "Cravon Driver",
+  "name": "Cravon Driver Partner Portal",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "type": "image/svg+xml",
+      "sizes": "192x192 512x512",
+      "purpose": "any maskable"
+    }
+  ],
+  "start_url": "/dashboard",
+  "background_color": "#0F0F11",
+  "theme_color": "#FF3D57",
+  "display": "standalone",
+  "orientation": "portrait"
+}
