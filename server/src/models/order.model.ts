@@ -5,6 +5,7 @@ export interface IOrderItem {
   name: string;
   price: number;
   quantity: number;
+  rating?: number;
 }
 
 export interface IOrder extends Document {
@@ -39,6 +40,8 @@ export interface IOrder extends Document {
   razorpaySignature?: string;
   
   acceptedAt?: Date;
+  isRated?: boolean;
+  ratedAt?: Date;
 
   createdAt: Date;
   updatedAt: Date;
@@ -48,7 +51,8 @@ const OrderItemSchema = new Schema({
   menuItemId: { type: Schema.Types.ObjectId, ref: 'Restaurant.menu', required: true },
   name: { type: String, required: true },
   price: { type: Number, required: true },
-  quantity: { type: Number, required: true, min: 1 }
+  quantity: { type: Number, required: true, min: 1 },
+  rating: { type: Number }
 });
 
 const OrderSchema = new Schema({
@@ -90,7 +94,9 @@ const OrderSchema = new Schema({
   razorpayPaymentId: { type: String },
   razorpaySignature: { type: String },
   
-  acceptedAt: { type: Date }
+  acceptedAt: { type: Date },
+  isRated: { type: Boolean, default: false },
+  ratedAt: { type: Date }
 
 }, { timestamps: true });
 

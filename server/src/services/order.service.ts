@@ -303,3 +303,107 @@ export const autoCancelOrdersService = async () => {
     }),
   );
 };
+
+export interface ItemRatingDTO {
+  menuItemId?: string;
+  name: string;
+  rating: number;
+}
+
+// Allows user to rate food items from a delivered order and updates cumulative item ratings
+export const rateOrderService = async (orderId: string, userId: string, ratings: ItemRatingDTO[]) => {
+  if (!ratings || !Array.isArray(ratings) || ratings.length === 0) {
+    throw new ApiError(400, "Please provide at least one item rating");
+  }
+
+  const order = await Order.findOne({ _id: orderId, user: userId });
+  if (!order) {
+    throw new ApiError(404, "Order not found");
+  }
+
+  if (order.orderStatus !== "delivered") {
+    throw new ApiError(400, "Only delivered orders can be rated");
+  }
+
+  const restaurant = await Restaurant.findById(order.restaurant);
+  if (!restaurant) {
+    throw new ApiError(404, "Restaurant not found");
+  }
+
+  const ratedItemsResult: Array<{ name: string; rating: number; cumulativeRating: number }> = [];
+
+  for (const r of ratings) {
+    const numericRating = Number(r.rating);
+    if (Number.isNaN(numericRating) || numericRating < 1 || numericRating > 5) {
+      continue; // Skip invalid or out-of-range rating values
+    }
+
+    // Match order item
+    const orderItem = order.items.find(
+      (item) =>
+        (r.menuItemId && item.menuItemId?.toString() === r.menuItemId) ||
+        item.name.trim().toLowerCase() === r.name.trim().toLowerCase()
+    );
+
+    // Match restaurant menu item
+    const menuItem = (restaurant.menu ?? []).find(
+      (m) =>
+        (r.menuItemId && m._id?.toString() === r.menuItemId) ||
+        (orderItem?.menuItemId && m._id?.toString() === orderItem.menuItemId.toString()) ||
+        m.name.trim().toLowerCase() === r.name.trim().toLowerCase()
+    );
+
+    if (menuItem) {
+      const prevOrderRating = orderItem?.rating;
+      const currentRating = menuItem.rating || 0;
+      const currentCount = menuItem.ratingCount || (currentRating > 0 ? 1 : 0);
+
+      if (prevOrderRating && currentCount > 0) {
+        // User is revising an existing rating for this item on this order
+        const diff = numericRating - prevOrderRating;
+        const newRating = Number(((currentRating * currentCount + diff) / currentCount).toFixed(1));
+        menuItem.rating = Math.max(1, Math.min(5, newRating));
+      } else {
+        // Brand new rating for this item
+        const newCount = currentCount + 1;
+        const newRating = Number(((currentRating * currentCount + numericRating) / newCount).toFixed(1));
+        menuItem.rating = Math.max(1, Math.min(5, newRating));
+        menuItem.ratingCount = newCount;
+      }
+
+      if (orderItem) {
+        orderItem.rating = numericRating;
+      }
+
+      ratedItemsResult.push({
+        name: menuItem.name,
+        rating: numericRating,
+        cumulativeRating: menuItem.rating,
+      });
+    }
+  }
+
+  if (ratedItemsResult.length === 0) {
+    throw new ApiError(400, "No valid items were rated");
+  }
+
+  // Update overall restaurant rating as average of all rated menu items
+  const ratedMenuItems = (restaurant.menu ?? []).filter((m) => (m.rating || 0) > 0);
+  if (ratedMenuItems.length > 0) {
+    const totalRating = ratedMenuItems.reduce((sum, m) => sum + (m.rating || 0), 0);
+    restaurant.rating = Number((totalRating / ratedMenuItems.length).toFixed(1));
+  }
+
+  order.isRated = true;
+  order.ratedAt = new Date();
+
+  await restaurant.save();
+  await order.save();
+
+  return {
+    orderId: order._id,
+    isRated: order.isRated,
+    ratedItems: ratedItemsResult,
+    restaurantRating: restaurant.rating,
+  };
+};

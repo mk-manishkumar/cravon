@@ -11,6 +11,7 @@ import staffRoutes from "./src/routes/staff.routes.js";
 import publicRoutes from "./src/routes/public.routes.js";
 import orderRoutes from "./src/routes/order.routes.js";
 import driverRoutes from "./src/routes/driver.routes.js";
+import reviewRoutes from "./src/routes/review.routes.js";
 import { errorHandler } from "./src/utils/errorHandler.js";
 import { startMatchmaker } from "./src/cron/driverMatchMaker.js";
 import { globalLimiter, partnerLimiter, customerLimiter } from "./src/middlewares/rateLimiter.middleware.js";
@@ -55,6 +56,7 @@ app.use("/api/v1/staff", partnerLimiter, staffRoutes);
 app.use("/api/v1/public", customerLimiter, publicRoutes);
 app.use("/api/v1/orders", orderRoutes);
 app.use("/api/v1/driver", driverRoutes);
+app.use("/api/v1/reviews", customerLimiter, reviewRoutes);
 
 // ERROR HANDLING
 // 404 Route Not Found Middleware

@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import asyncHandler from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/errorHandler.js";
-import { createOrder as createOrderService, verifyPayment as verifyPaymentService, getMyOrders as getMyOrdersService, getOrderByIdService, getRestaurantOrdersService, getPartnerNotificationsService, updateOrderStatusService, autoDeliverOrdersService } from "../services/order.service.js";
+import { createOrder as createOrderService, verifyPayment as verifyPaymentService, getMyOrders as getMyOrdersService, getOrderByIdService, getRestaurantOrdersService, getPartnerNotificationsService, updateOrderStatusService, autoDeliverOrdersService, rateOrderService } from "../services/order.service.js";
 
 // Controller for creating a new order
 export const createOrder = asyncHandler(async (req: Request, res: Response) => {
@@ -88,4 +88,19 @@ export const updateOrderStatus = asyncHandler(async (req: Request, res: Response
 export const autoDeliverOrders = asyncHandler(async (req: Request, res: Response) => {
   const updatedCount = await autoDeliverOrdersService();
   res.status(200).json({ status: "success", message: "Cron swept", updatedCount });
+});
+
+// Controller for rating food items in a delivered order
+export const rateOrder = asyncHandler(async (req: Request, res: Response) => {
+  const userId = (req as any).user.id;
+  const { id } = req.params;
+  const { ratings } = req.body;
+
+  const result = await rateOrderService(id, userId, ratings);
+
+  res.status(200).json({
+    status: "success",
+    message: "Thank you for rating your food items!",
+    data: result,
+  });
 });

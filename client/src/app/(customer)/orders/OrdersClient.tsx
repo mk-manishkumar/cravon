@@ -3,7 +3,7 @@
 import { useAuthStore } from "@/store/authStore";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, useMemo } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import axiosInstance from "@/lib/axios";
 import { Package, Clock, ChefHat, Truck, CheckCircle2, XCircle, ArrowLeft } from "lucide-react";
 import Link from "next/link";
@@ -20,9 +20,11 @@ const statusConfig: Record<string, { label: string; color: string; bg: string; i
 interface OrderItem {
   _id?: string;
   id?: string;
+  menuItemId?: string;
   name: string;
   price: number;
   quantity: number;
+  rating?: number;
 }
 
 interface OrderRestaurant {
@@ -31,6 +33,13 @@ interface OrderRestaurant {
   address?: {
     street?: string;
   };
+}
+
+interface OrderDriver {
+  _id?: string;
+  firstName?: string;
+  phone?: string;
+  vehicleDetails?: string;
 }
 
 interface Order {
@@ -45,7 +54,8 @@ interface Order {
   createdAt: string;
   restaurant?: OrderRestaurant;
   items: OrderItem[];
-  driver?: any;
+  driver?: OrderDriver | string | null;
+  isRated?: boolean;
 }
 
 const fetchMyOrders = async (): Promise<Order[]> => {
@@ -55,6 +65,7 @@ const fetchMyOrders = async (): Promise<Order[]> => {
 
 export default function OrdersClient() {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const { user, isLoading: isAuthLoading } = useAuthStore();
   const [mounted, setMounted] = useState(false);
 
@@ -80,11 +91,11 @@ export default function OrdersClient() {
   const filteredOrders = useMemo(() => {
     if (!orders) return [];
     if (filter === "all") return orders;
-    return orders.filter(o => o.orderStatus === filter);
+    return orders.filter((o) => o.orderStatus === filter);
   }, [orders, filter]);
 
   const totalPages = Math.ceil(filteredOrders.length / itemsPerPage);
-  
+
   const currentOrders = useMemo(() => {
     const start = (currentPage - 1) * itemsPerPage;
     return filteredOrders.slice(start, start + itemsPerPage);
@@ -112,9 +123,33 @@ export default function OrdersClient() {
           </div>
 
           <div className="flex bg-gray-200/80 p-1.5 rounded-xl gap-1 self-start sm:self-auto">
-            <button onClick={() => { setFilter('all'); setCurrentPage(1); }} className={`px-4 py-2 text-sm font-bold rounded-lg transition-colors cursor-pointer ${filter === 'all' ? 'bg-white text-gray-900 shadow-[0_2px_8px_rgba(0,0,0,0.08)]' : 'text-gray-500 hover:text-gray-700'}`}>All Orders</button>
-            <button onClick={() => { setFilter('delivered'); setCurrentPage(1); }} className={`px-4 py-2 text-sm font-bold rounded-lg transition-colors cursor-pointer ${filter === 'delivered' ? 'bg-white text-gray-900 shadow-[0_2px_8px_rgba(0,0,0,0.08)]' : 'text-gray-500 hover:text-gray-700'}`}>Delivered</button>
-            <button onClick={() => { setFilter('cancelled'); setCurrentPage(1); }} className={`px-4 py-2 text-sm font-bold rounded-lg transition-colors cursor-pointer ${filter === 'cancelled' ? 'bg-white text-gray-900 shadow-[0_2px_8px_rgba(0,0,0,0.08)]' : 'text-gray-500 hover:text-gray-700'}`}>Cancelled</button>
+            <button
+              onClick={() => {
+                setFilter("all");
+                setCurrentPage(1);
+              }}
+              className={`px-4 py-2 text-sm font-bold rounded-lg transition-colors cursor-pointer ${filter === "all" ? "bg-white text-gray-900 shadow-[0_2px_8px_rgba(0,0,0,0.08)]" : "text-gray-500 hover:text-gray-700"}`}
+            >
+              All Orders
+            </button>
+            <button
+              onClick={() => {
+                setFilter("delivered");
+                setCurrentPage(1);
+              }}
+              className={`px-4 py-2 text-sm font-bold rounded-lg transition-colors cursor-pointer ${filter === "delivered" ? "bg-white text-gray-900 shadow-[0_2px_8px_rgba(0,0,0,0.08)]" : "text-gray-500 hover:text-gray-700"}`}
+            >
+              Delivered
+            </button>
+            <button
+              onClick={() => {
+                setFilter("cancelled");
+                setCurrentPage(1);
+              }}
+              className={`px-4 py-2 text-sm font-bold rounded-lg transition-colors cursor-pointer ${filter === "cancelled" ? "bg-white text-gray-900 shadow-[0_2px_8px_rgba(0,0,0,0.08)]" : "text-gray-500 hover:text-gray-700"}`}
+            >
+              Cancelled
+            </button>
           </div>
         </div>
 
@@ -156,36 +191,24 @@ export default function OrdersClient() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
               {currentOrders.map((order: Order) => {
                 const status = statusConfig[order.orderStatus] || statusConfig.pending;
-                return <OrderCard key={order._id} order={order} status={status} />;
+                return <OrderCard key={order._id} order={order} status={status} onOrderUpdated={() => queryClient.invalidateQueries({ queryKey: ["my-orders"] })} />;
               })}
             </div>
-            
+
             {/* Pagination Controls */}
             {totalPages > 1 && (
               <div className="flex items-center justify-center gap-2 mt-8">
-                <button
-                  onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-                  disabled={currentPage === 1}
-                  className="px-4 py-2 bg-white border border-gray-200 rounded-lg font-medium text-sm text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer transition-colors"
-                >
+                <button onClick={() => setCurrentPage((p) => Math.max(1, p - 1))} disabled={currentPage === 1} className="px-4 py-2 bg-white border border-gray-200 rounded-lg font-medium text-sm text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer transition-colors">
                   Previous
                 </button>
                 <div className="flex items-center gap-1">
                   {Array.from({ length: totalPages }).map((_, i) => (
-                    <button
-                      key={i + 1}
-                      onClick={() => setCurrentPage(i + 1)}
-                      className={`w-10 h-10 rounded-lg font-bold text-sm flex items-center justify-center cursor-pointer transition-colors ${currentPage === i + 1 ? 'bg-[#FF3D57] text-white shadow-sm' : 'bg-white border border-gray-200 text-gray-700 hover:bg-gray-50'}`}
-                    >
+                    <button key={i + 1} onClick={() => setCurrentPage(i + 1)} className={`w-10 h-10 rounded-lg font-bold text-sm flex items-center justify-center cursor-pointer transition-colors ${currentPage === i + 1 ? "bg-[#FF3D57] text-white shadow-sm" : "bg-white border border-gray-200 text-gray-700 hover:bg-gray-50"}`}>
                       {i + 1}
                     </button>
                   ))}
                 </div>
-                <button
-                  onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
-                  disabled={currentPage === totalPages}
-                  className="px-4 py-2 bg-white border border-gray-200 rounded-lg font-medium text-sm text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer transition-colors"
-                >
+                <button onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages} className="px-4 py-2 bg-white border border-gray-200 rounded-lg font-medium text-sm text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer transition-colors">
                   Next
                 </button>
               </div>

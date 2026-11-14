@@ -11,7 +11,7 @@ const MapWidget = dynamic(() => import("@/components/partner/MapWidget"), {
 });
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export default function RestaurantHeader({ restaurant }: { readonly restaurant: any }) {
+export default function RestaurantHeader({ restaurant, onViewReviews }: { readonly restaurant: any; readonly onViewReviews?: () => void }) {
   const currentStatus = getRestaurantStatus(restaurant);
   const user = useAuthStore((state) => state.user);
 
@@ -32,7 +32,7 @@ export default function RestaurantHeader({ restaurant }: { readonly restaurant: 
             {!restaurant.franchiseName && <div className="mb-3"></div>}
 
             <div className="flex flex-wrap items-center gap-4 text-sm font-medium text-white/90 mb-4">
-              <div className={`relative flex items-center gap-1 ${user ? 'group cursor-pointer' : ''}`}>
+              <div className={`relative flex items-center gap-1 ${user ? "group cursor-pointer" : ""}`}>
                 <MapPin className="w-4 h-4" />
                 <span className={user ? "border-b border-dashed border-white/50 pb-0.5 hover:text-[#FF3D57] hover:border-[#FF3D57] transition-colors" : ""}>{restaurant.address || "Local Area"}</span>
 
@@ -45,10 +45,11 @@ export default function RestaurantHeader({ restaurant }: { readonly restaurant: 
                 )}
               </div>
 
-              <div className="flex items-center gap-1 bg-green-600 px-2 py-1 rounded-md text-white">
+              <button type="button" onClick={onViewReviews} className="flex items-center gap-1.5 bg-green-600 hover:bg-green-700 transition-colors px-2.5 py-1 rounded-md text-white cursor-pointer shadow-xs" title="View customer reviews and ratings">
                 <Star className="w-4 h-4 fill-white" />
-                <span>{restaurant.rating && restaurant.rating > 0 ? restaurant.rating.toFixed(1) : "New"}</span>
-              </div>
+                <span className="font-bold">{restaurant.rating && restaurant.rating > 0 ? restaurant.rating.toFixed(1) : "New"}</span>
+                {restaurant.reviewCount && restaurant.reviewCount > 0 ? <span className="text-white/80 text-xs">({restaurant.reviewCount})</span> : null}
+              </button>
 
               <div className="flex items-center gap-1">
                 <Clock className="w-4 h-4" />

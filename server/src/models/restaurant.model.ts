@@ -12,6 +12,7 @@ export interface IMenuItem {
   prepTime?: string;
   image?: string;
   rating?: number;
+  ratingCount?: number;
 }
 
 export interface IRestaurant extends Document {
@@ -35,6 +36,7 @@ export interface IRestaurant extends Document {
     dinner?: { open: string; close: string };
   };
   rating: number;
+  reviewCount?: number;
   deliveryTime?: number;
   averageCost?: number;
   image?: string;
@@ -55,7 +57,8 @@ const menuItemSchema = new Schema<IMenuItem>({
   spiceLevel: { type: String },
   prepTime: { type: String },
   image: { type: String },
-  rating: { type: Number, default: 0 }
+  rating: { type: Number, default: 0 },
+  ratingCount: { type: Number, default: 0 }
 });
 
 const restaurantSchema = new Schema<IRestaurant>({
@@ -79,6 +82,7 @@ const restaurantSchema = new Schema<IRestaurant>({
     dinner: { open: { type: String }, close: { type: String } },
   },
   rating: { type: Number, default: 0 },
+  reviewCount: { type: Number, default: 0 },
   deliveryTime: { type: Number },
   averageCost: { type: Number, default: 200 },
   image: { type: String },
