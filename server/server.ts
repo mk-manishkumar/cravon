@@ -33,25 +33,39 @@ const localOrigins = process.env.LOCAL_ORIGINS ? process.env.LOCAL_ORIGINS.split
 
 const explicitOrigins = [process.env.CLIENT_URL, process.env.DRIVER_URL, ...localOrigins].filter(Boolean) as string[];
 
+const isAllowedOrigin = (origin?: string): boolean => {
+  if (!origin) return true;
+  if (explicitOrigins.includes(origin)) return true;
+  try {
+    const parsedUrl = new URL(origin);
+    if (parsedUrl.hostname.endsWith(".vercel.app") || parsedUrl.hostname === "localhost" || parsedUrl.hostname === "127.0.0.1") {
+      return true;
+    }
+  } catch {
+    return false;
+  }
+  return false;
+};
+
+// preflight & CORS header middleware
+app.use((req: Request, res: Response, next: NextFunction) => {
+  const origin = req.headers.origin;
+  if (origin && isAllowedOrigin(origin)) {
+    res.setHeader("Access-Control-Allow-Origin", origin);
+    res.setHeader("Access-Control-Allow-Credentials", "true");
+    res.setHeader("Access-Control-Allow-Methods", "GET,POST,PUT,PATCH,DELETE,OPTIONS");
+    res.setHeader("Access-Control-Allow-Headers", "Content-Type,Authorization,X-Requested-With,Accept,Origin");
+  }
+
+  // Preflight requests should always return 200 OK immediately
+  if (req.method === "OPTIONS") return res.status(200).end();
+
+  next();
+});
+
 const corsOptions: cors.CorsOptions = {
   origin: (origin, callback) => {
-    // Allow non-browser requests (mobile apps, Postman, curl, server-to-server)
-    if (!origin) return callback(null, true);
-
-    // Allow explicitly registered origins
-    if (explicitOrigins.includes(origin)) return callback(null, true);
-
-    // Dynamically allow all Vercel deployments (*.vercel.app) and localhost
-    try {
-      const parsedUrl = new URL(origin);
-      const isVercelDomain = parsedUrl.hostname.endsWith(".vercel.app");
-      const isLocalhost = parsedUrl.hostname === "localhost" || parsedUrl.hostname === "127.0.0.1";
-
-      if (isVercelDomain || isLocalhost) return callback(null, true);
-    } catch {
-      // Ignore invalid URL formatting
-    }
-
+    if (isAllowedOrigin(origin)) return callback(null, true);
     return callback(null, false);
   },
   credentials: true,
@@ -61,6 +75,7 @@ const corsOptions: cors.CorsOptions = {
 };
 
 app.use(cors(corsOptions));
+app.options("*", cors(corsOptions));
 app.use(cookieParser());
 
 // Parse incoming JSON requests
@@ -68,6 +83,11 @@ app.use(express.json());
 
 // Parse URL-encoded bodies
 app.use(express.urlencoded({ extended: true }));
+
+// Health check endpoint
+app.get("/api/health", (_req: Request, res: Response) => {
+  res.json({ status: "ok", timestamp: new Date().toISOString() });
+});
 
 //  ROUTES
 app.use("/api", globalLimiter);
