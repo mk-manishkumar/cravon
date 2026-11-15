@@ -13,6 +13,15 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  async redirects() {
+    return [
+      {
+        source: "/become-delivery-agent",
+        destination: "https://cravon-driver.vercel.app/register",
+        permanent: true,
+      },
+    ];
+  },
 };
 
 export default nextConfig;

@@ -6,6 +6,7 @@ import api from "../lib/axios";
 
 // Layout & Modals
 import DriverHeader from "../components/DriverHeader";
+import DriverFooter from "../components/DriverFooter";
 import EditProfileModal from "../components/EditProfileModal";
 import ChangePasswordModal from "../components/ChangePasswordModal";
 import DeleteAccountModal from "../components/DeleteAccountModal";
@@ -113,7 +114,12 @@ export default function Dashboard() {
     return (
       <div className="min-h-screen bg-gray-50 flex flex-col">
         <DriverHeader driver={driver} isOnline={isOnline} onToggleStatus={toggleStatus} onSelectCity={handleSelectCity} onOpenEditProfile={() => setIsEditProfileOpen(true)} onOpenDeliveries={() => setCurrentView("deliveries")} onOpenChangePassword={() => setIsChangePasswordOpen(true)} onOpenDeleteAccount={() => setIsDeleteAccountOpen(true)} onLogout={handleLogout} isCityUpdating={isCityUpdating} />
-        <MyDeliveries onBack={() => setCurrentView("live")} />
+        <div className="flex-1">
+          <MyDeliveries onBack={() => setCurrentView("live")} />
+        </div>
+
+        {/* Common Driver Footer */}
+        <DriverFooter />
 
         <EditProfileModal
           driver={driver}
@@ -152,6 +158,9 @@ export default function Dashboard() {
         {/* Section 2: Available City Deliveries */}
         <AvailableDeliveriesSection orders={availableOrders} city={driver.city || "Patna"} loading={loading} onOpenMap={handleOpenMap} onAcceptOrder={(orderId) => updateOrderStatus(orderId, "out_for_delivery")} />
       </main>
+
+      {/* Common Driver Footer */}
+      <DriverFooter />
 
       {/* Modals */}
       <EditProfileModal

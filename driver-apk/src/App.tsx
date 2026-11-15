@@ -6,9 +6,11 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import InstallPrompt from "./components/InstallPrompt";
+import { usePwaInit } from "./hooks/usePwaInit";
 
 function App() {
   const { token, updateDriver } = useAuthStore();
+  usePwaInit();
 
   useEffect(() => {
     if (token) {

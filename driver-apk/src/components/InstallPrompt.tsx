@@ -1,78 +1,30 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Download, X, Smartphone, Share } from "lucide-react";
-
-interface BeforeInstallPromptEvent extends Event {
-  prompt: () => Promise<void>;
-  userChoice: Promise<{ outcome: "accepted" | "dismissed"; platform: string }>;
-}
+import { usePwaStore } from "../store/pwaStore";
 
 export default function InstallPrompt() {
-  const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
-  const [isStandalone, setIsStandalone] = useState(false);
-  const [isDismissed, setIsDismissed] = useState(false);
-  const [isIos, setIsIos] = useState(false);
+  const { deferredPrompt, isStandalone, isMobile, isIos, isDismissed, dismissBanner, triggerInstall } = usePwaStore();
   const [showIosGuide, setShowIosGuide] = useState(false);
 
-  useEffect(() => {
-    // 1. Check if already installed & running as standalone PWA
-    const checkStandalone = window.matchMedia("(display-mode: standalone)").matches || (window.navigator as unknown as { standalone?: boolean }).standalone === true;
-
-    if (checkStandalone) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setIsStandalone(true);
-      return;
-    }
-
-    // 2. Check if previously dismissed in this session
-    if (sessionStorage.getItem("driver_pwa_dismissed") === "true") {
-      setIsDismissed(true);
-    }
-
-    // 3. Detect iOS device
-    const userAgent = window.navigator.userAgent.toLowerCase();
-    const isIosDevice = /iphone|ipad|ipod/.test(userAgent);
-    setIsIos(isIosDevice);
-
-    // 4. Capture beforeinstallprompt on Android/Chrome
-    const handleBeforeInstall = (e: Event) => {
-      e.preventDefault();
-      setDeferredPrompt(e as BeforeInstallPromptEvent);
-    };
-
-    window.addEventListener("beforeinstallprompt", handleBeforeInstall);
-    return () => window.removeEventListener("beforeinstallprompt", handleBeforeInstall);
-  }, []);
-
-  const handleInstallClick = async () => {
-    if (deferredPrompt) {
-      await deferredPrompt.prompt();
-      const choice = await deferredPrompt.userChoice;
-      if (choice.outcome === "accepted") {
-        setDeferredPrompt(null);
-        setIsDismissed(true);
-      }
-    } else if (isIos) {
-      setShowIosGuide(true);
-    }
-  };
-
-  const handleDismiss = () => {
-    setIsDismissed(true);
-    sessionStorage.setItem("driver_pwa_dismissed", "true");
-  };
-
-  // Do not show if already in standalone app mode or dismissed
-  if (isStandalone || isDismissed) {
+  // Only show on mobile screens, not already standalone, and not dismissed
+  if (!isMobile || isStandalone || isDismissed) {
     return null;
   }
 
-  // Show if Android prompt is ready OR on iOS
+  // Show if Android install prompt is ready OR on iOS
   if (!deferredPrompt && !isIos) {
     return null;
   }
 
+  const handleInstallClick = async () => {
+    const outcome = await triggerInstall();
+    if (outcome === "ios") {
+      setShowIosGuide(true);
+    }
+  };
+
   return (
-    <div className="fixed bottom-4 left-4 right-4 z-50 max-w-md mx-auto animate-in slide-in-from-bottom duration-300">
+    <div className="md:hidden fixed bottom-4 left-4 right-4 z-50 max-w-md mx-auto animate-in slide-in-from-bottom duration-300">
       <div className="bg-[#1A1A1E] border border-white/10 rounded-2xl p-4 shadow-2xl backdrop-blur-md flex items-center justify-between gap-3">
         <div className="flex items-center gap-3">
           <div className="w-11 h-11 rounded-xl bg-linear-to-br from-[#FF3D57] to-[#FF7A30] flex items-center justify-center text-white shrink-0 shadow-md">
@@ -89,7 +41,7 @@ export default function InstallPrompt() {
             <Download className="w-3.5 h-3.5" />
             <span>Install</span>
           </button>
-          <button type="button" onClick={handleDismiss} className="p-1.5 text-gray-400 hover:text-white rounded-lg transition-colors cursor-pointer" aria-label="Dismiss banner">
+          <button type="button" onClick={dismissBanner} className="p-1.5 text-gray-400 hover:text-white rounded-lg transition-colors cursor-pointer" aria-label="Dismiss banner">
             <X className="w-4 h-4" />
           </button>
         </div>
@@ -102,7 +54,7 @@ export default function InstallPrompt() {
             <div className="flex items-center gap-1.5 font-semibold text-white mb-1">
               <Share className="w-3.5 h-3.5 text-[#FF3D57]" /> Install on iPhone:
             </div>
-            <button type="button" onClick={() => setShowIosGuide(false)} className="text-gray-400 hover:text-white">
+            <button type="button" onClick={() => setShowIosGuide(false)} className="text-gray-400 hover:text-white cursor-pointer">
               <X className="w-3.5 h-3.5" />
             </button>
           </div>

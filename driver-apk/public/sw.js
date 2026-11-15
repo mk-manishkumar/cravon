@@ -1,13 +1,6 @@
 const CACHE_NAME = "cravon-driver-v2";
 
-const PRECACHE_ASSETS = [
-  "/",
-  "/index.html",
-  "/manifest.json",
-  "/favicon.svg",
-  "/icons/icon-192x192.png",
-  "/icons/icon-512x512.png",
-];
+const PRECACHE_ASSETS = ["/", "/index.html", "/manifest.json", "/favicon.svg", "/icons/icon-192x192.png", "/icons/icon-512x512.png"];
 
 // Install Service Worker
 self.addEventListener("install", (event) => {
@@ -15,7 +8,7 @@ self.addEventListener("install", (event) => {
     caches
       .open(CACHE_NAME)
       .then((cache) => cache.addAll(PRECACHE_ASSETS))
-      .then(() => self.skipWaiting())
+      .then(() => self.skipWaiting()),
   );
 });
 
@@ -30,10 +23,10 @@ self.addEventListener("activate", (event) => {
             if (name !== CACHE_NAME) {
               return caches.delete(name);
             }
-          })
-        )
+          }),
+        ),
       )
-      .then(() => self.clients.claim())
+      .then(() => self.clients.claim()),
   );
 });
 
@@ -42,7 +35,7 @@ self.addEventListener("fetch", (event) => {
   const { request } = event;
   const url = new URL(request.url);
 
-  // Completely ignore cross-origin requests 
+  // Completely ignore cross-origin requests
   // Let the browser handle them directly without SW interception
   if (url.origin !== self.location.origin) {
     return;
@@ -55,11 +48,7 @@ self.addEventListener("fetch", (event) => {
 
   // SPA navigation: Network-first, fallback to /index.html if offline
   if (request.mode === "navigate") {
-    event.respondWith(
-      fetch(request).catch(() =>
-        caches.match("/index.html").then((res) => res || caches.match("/"))
-      )
-    );
+    event.respondWith(fetch(request).catch(() => caches.match("/index.html").then((res) => res || caches.match("/"))));
     return;
   }
 
@@ -90,6 +79,6 @@ self.addEventListener("fetch", (event) => {
         });
         return networkResponse;
       });
-    })
+    }),
   );
 });

@@ -2,8 +2,9 @@ import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuthStore } from "../store/authStore";
 import api from "../lib/axios";
-import { Bike, Loader2 } from "lucide-react";
+import { Bike, Loader2, Smartphone, Download, Info } from "lucide-react";
 import { CITIES } from "../components/CitySelector";
+import { usePwaStore } from "../store/pwaStore";
 
 export default function Register() {
   const [formData, setFormData] = useState({
@@ -17,9 +18,11 @@ export default function Register() {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [installNotice, setInstallNotice] = useState("");
 
   const navigate = useNavigate();
   const setAuth = useAuthStore((state) => state.setAuth);
+  const { isStandalone, isMobile, triggerInstall } = usePwaStore();
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -41,6 +44,17 @@ export default function Register() {
     }
   };
 
+  const handleInstallAction = async () => {
+    const res = await triggerInstall();
+    if (res === "ios") {
+      setInstallNotice("On Safari: Tap the Share button at the bottom, then choose 'Add to Home Screen' ➕.");
+    } else if (res === "manual") {
+      setInstallNotice("Tap your browser menu (⋮ or ⋯) and select 'Install app' or 'Add to Home screen'.");
+    } else if (res === "accepted") {
+      setInstallNotice("Driver App installed successfully! You can launch it from your home screen.");
+    }
+  };
+
   const inputClass = "appearance-none block w-full px-3 py-3 border border-gray-300 rounded-xl shadow-sm placeholder-gray-400 focus:outline-none focus:ring-[#FF7A30] focus:border-[#FF7A30] sm:text-sm text-gray-900 bg-white";
   const labelClass = "block text-sm font-medium text-gray-700";
 
@@ -57,6 +71,43 @@ export default function Register() {
       </div>
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md px-4 pb-12">
+        {/* Mobile-Only Install App Card */}
+        {isMobile && !isStandalone && (
+          <div className="md:hidden mb-5 bg-[#1A1A1E] border border-white/10 rounded-2xl p-4 shadow-xl text-white">
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-linear-to-br from-[#FF3D57] to-[#FF7A30] flex items-center justify-center text-white shrink-0 shadow-md">
+                  <Smartphone className="w-5 h-5" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-1.5">
+                    <h4 className="text-sm font-bold text-white">Install Driver App</h4>
+                    <span className="text-[10px] bg-[#FF7A30] text-white font-extrabold px-1.5 py-0.5 rounded-full uppercase tracking-wider">App</span>
+                  </div>
+                  <p className="text-[11px] text-gray-300 mt-0.5">Quick access &amp; real-time order alerts</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={handleInstallAction}
+                className="flex items-center gap-1.5 bg-[#FF3D57] hover:bg-[#E22B45] text-white text-xs font-bold px-3.5 py-2 rounded-xl shadow-md transition-all active:scale-95 shrink-0 cursor-pointer"
+              >
+                <Download className="w-3.5 h-3.5" />
+                <span>Install</span>
+              </button>
+            </div>
+
+            {installNotice && (
+              <div className="mt-3 pt-3 border-t border-white/10 text-xs text-gray-300">
+                <p className="flex items-start gap-1.5 text-[11px] text-gray-200">
+                  <Info className="w-3.5 h-3.5 text-[#FF7A30] shrink-0 mt-0.5" />
+                  <span>{installNotice}</span>
+                </p>
+              </div>
+            )}
+          </div>
+        )}
+
         <div className="bg-white py-8 px-4 shadow-xl sm:rounded-2xl sm:px-10 border border-gray-100">
           <form className="space-y-5" onSubmit={handleRegister}>
             <div className="grid grid-cols-2 gap-4">

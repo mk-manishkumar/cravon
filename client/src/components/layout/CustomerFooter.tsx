@@ -23,10 +23,10 @@ export default function CustomerFooter() {
 
           {/* Action Links */}
           <div className="flex flex-col sm:flex-row items-center gap-3 md:items-center">
-            <Link href="/become-delivery-agent" className="text-[14px] sm:text-[15px] font-bold text-white bg-[#1A1A1A] hover:bg-black px-6 py-3 rounded-full shadow-md transition-all active:scale-95 cursor-pointer flex items-center gap-2">
+            <a href="https://cravon-driver.vercel.app/register" target="_blank" rel="noopener noreferrer" className="text-[14px] sm:text-[15px] font-bold text-white bg-[#1A1A1A] hover:bg-black px-6 py-3 rounded-full shadow-md transition-all active:scale-95 cursor-pointer flex items-center gap-2">
               <Bike className="w-4 h-4 text-[#FF7A30]" />
               Become a Delivery Agent
-            </Link>
+            </a>
 
             <Link href="/auth/restaurant/register" className="text-[14px] sm:text-[15px] font-bold text-white bg-linear-to-r from-[#FF3D57] to-[#FF7A30] hover:from-[#E22B45] hover:to-[#E06020] px-6 py-3 rounded-full shadow-md transition-all active:scale-95 cursor-pointer">
               Apply for Partner
