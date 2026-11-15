@@ -5,6 +5,7 @@ import api from "./lib/axios";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
+import InstallPrompt from "./components/InstallPrompt";
 
 function App() {
   const { token, updateDriver } = useAuthStore();
@@ -32,6 +33,7 @@ function App() {
         <Route path="/dashboard" element={token ? <Dashboard /> : <Navigate to="/login" replace />} />
         <Route path="*" element={<Navigate to={token ? "/dashboard" : "/login"} replace />} />
       </Routes>
+      <InstallPrompt />
     </BrowserRouter>
   );
 }
