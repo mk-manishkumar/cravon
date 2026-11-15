@@ -118,7 +118,7 @@ export default function ChangePasswordModal({ isOpen, onClose }: ChangePasswordM
                     oldPassword: e.target.value,
                   })
                 }
-                className="w-full px-3.5 py-2.5 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#FF7A30]/20 focus:border-[#FF7A30] transition-colors"
+                className="w-full px-3.5 py-2.5 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#FF7A30]/20 focus:border-[#FF7A30] transition-colors text-gray-900"
                 placeholder="Enter current password"
               />
             </div>
@@ -141,7 +141,7 @@ export default function ChangePasswordModal({ isOpen, onClose }: ChangePasswordM
                     newPassword: e.target.value,
                   })
                 }
-                className="w-full px-3.5 py-2.5 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#FF7A30]/20 focus:border-[#FF7A30] transition-colors"
+                className="w-full px-3.5 py-2.5 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#FF7A30]/20 focus:border-[#FF7A30] transition-colors text-gray-900"
                 placeholder="Enter new password"
               />
             </div>
@@ -164,7 +164,7 @@ export default function ChangePasswordModal({ isOpen, onClose }: ChangePasswordM
                     confirmPassword: e.target.value,
                   })
                 }
-                className="w-full px-3.5 py-2.5 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#FF7A30]/20 focus:border-[#FF7A30] transition-colors"
+                className="w-full px-3.5 py-2.5 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#FF7A30]/20 focus:border-[#FF7A30] transition-colors text-gray-900"
                 placeholder="Confirm new password"
               />
             </div>

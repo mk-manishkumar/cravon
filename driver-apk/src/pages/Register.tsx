@@ -41,7 +41,7 @@ export default function Register() {
     }
   };
 
-  const inputClass = "appearance-none block w-full px-3 py-3 border border-gray-300 rounded-xl shadow-sm placeholder-gray-400 focus:outline-none focus:ring-[#FF7A30] focus:border-[#FF7A30] sm:text-sm";
+  const inputClass = "appearance-none block w-full px-3 py-3 border border-gray-300 rounded-xl shadow-sm placeholder-gray-400 focus:outline-none focus:ring-[#FF7A30] focus:border-[#FF7A30] sm:text-sm text-gray-900 bg-white";
   const labelClass = "block text-sm font-medium text-gray-700";
 
   return (
