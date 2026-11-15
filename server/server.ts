@@ -29,14 +29,37 @@ const PORT = process.env.PORT || 5000;
 startMatchmaker();
 
 // GLOBAL MIDDLEWARES
-const localOrigins = process.env.LOCAL_ORIGINS ? process.env.LOCAL_ORIGINS.split(",") : [];
-const allowedOrigins = [process.env.CLIENT_URL, ...localOrigins].filter(Boolean) as string[];
+const localOrigins = process.env.LOCAL_ORIGINS ? process.env.LOCAL_ORIGINS.split(",").map((o) => o.trim()) : ["http://localhost:3000", "http://127.0.0.1:3000", "http://localhost:5173", "http://127.0.0.1:5173"];
 
-const corsOptions = {
-  origin: allowedOrigins,
+const explicitOrigins = [process.env.CLIENT_URL, process.env.DRIVER_URL, ...localOrigins].filter(Boolean) as string[];
+
+const corsOptions: cors.CorsOptions = {
+  origin: (origin, callback) => {
+    // Allow non-browser requests (mobile apps, Postman, curl, server-to-server)
+    if (!origin) return callback(null, true);
+
+    // Allow explicitly registered origins
+    if (explicitOrigins.includes(origin)) return callback(null, true);
+
+    // Dynamically allow all Vercel deployments (*.vercel.app) and localhost
+    try {
+      const parsedUrl = new URL(origin);
+      const isVercelDomain = parsedUrl.hostname.endsWith(".vercel.app");
+      const isLocalhost = parsedUrl.hostname === "localhost" || parsedUrl.hostname === "127.0.0.1";
+
+      if (isVercelDomain || isLocalhost) return callback(null, true);
+    } catch {
+      // Ignore invalid URL formatting
+    }
+
+    return callback(null, false);
+  },
   credentials: true,
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With", "Accept", "Origin"],
   optionsSuccessStatus: 200,
 };
+
 app.use(cors(corsOptions));
 app.use(cookieParser());
 

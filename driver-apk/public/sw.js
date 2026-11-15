@@ -1,4 +1,4 @@
-const CACHE_NAME = "cravon-driver-v1";
+const CACHE_NAME = "cravon-driver-v2";
 
 const PRECACHE_ASSETS = [
   "/",
@@ -42,9 +42,14 @@ self.addEventListener("fetch", (event) => {
   const { request } = event;
   const url = new URL(request.url);
 
-  // Bypass cache for all backend API and socket calls
+  // Completely ignore cross-origin requests 
+  // Let the browser handle them directly without SW interception
+  if (url.origin !== self.location.origin) {
+    return;
+  }
+
+  // Bypass cache for any local API routes or non-GET requests
   if (url.pathname.startsWith("/api") || request.method !== "GET") {
-    event.respondWith(fetch(request));
     return;
   }
 
